@@ -40,10 +40,10 @@ The algorithm is provided with both inputs ($x$) and the correct outputs/labels 
         $$Loss = \frac{1}{n}\sum_{i=1}^{n} (f(x_i) - y_i)^2$$
 
 2.  **Classification:** Predicts **discrete** labels or categories (e.g., predicting if an email is "Spam" or "Not Spam").
-    *   **Common Model:** Linear Separator ($f(x) = \text{sign}(w^Tx + b)$).
+    *   **Common Model:** Linear Separator $f(x) = \text{sgn}(w^T x + b)$.
     *   **Classification Loss Formula (Miss-classification Rate):**
         $Loss = \frac{1}{n} \sum_{i=1}^n 1(f(x_i) \neq y_i)$
-        *(Where the indicator function $$1(\cdot)$$ is 1 if the prediction is wrong and 0 if correct.)*
+        (Where the indicator function $$\mathbb{1}(\cdot)$$ is 1 if the prediction is wrong and 0 if correct.)
 
 #### **B. Unsupervised Learning (Unlabeled Data)**
 The algorithm is only given inputs ($x$) and must identify inherent patterns or groupings.
