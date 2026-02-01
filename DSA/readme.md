@@ -1,3 +1,6 @@
+## The Roadmap
+
+
 | Week | Topic | Focus Area | Status |
 | --- | --- | --- | --- |
 | **Week 1** | Python Basics | Lists, Dicts, List Comprehensions | 🟡 In Progress |
