@@ -35,6 +35,8 @@ Univariate calculus focuses on real-valued functions $f: \mathbb{R} \to \mathbb{
 The derivative $f'(a)$ represents the **slope of the tangent line** at point $a$. Near $a$, the function can be approximated as:
 $$f(x) \approx f(a) + f'(a)(x - a)$$.
 
+<img width="440" height="250" alt="image" src="https://github.com/user-attachments/assets/fe8a1b4c-c5fd-4a78-92e0-d782df0cb007" />
+
 > **Visual 1: The Tangent Approximation**
 > *Description:* A black curve represents a function $f(x) = x^2$. At the point $(1, 1)$, a red straight line touches the curve. This red line (the linear approximation $2x - 1$) stays very close to the curve near $x=1$ but diverges as $x$ moves further away.
 
