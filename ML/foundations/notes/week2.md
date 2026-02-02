@@ -18,7 +18,7 @@ Before diving into calculus, it is necessary to establish the language of sets a
 *   **$\iff$**: Equivalent to / If and only if.
 
 #### **Convergence and Limits**
-A sequence $x_i$ converges to a point $x^*$ if for every radius $\epsilon > 0$, there is an integer $N$ such that all subsequent elements in the sequence ($n \ge N$) stay within a **ball** $B(x^*, \epsilon)$.
+A sequence $x_i$ converges to a point x* if for every radius $\epsilon > 0$, there is an integer $N$ such that all subsequent elements in the sequence ($n \ge N$) stay within a **ball** $B(x^*, \epsilon)$.
 *   **Metric Space Distance (Euclidean):** $D(x, y) = \|x - y\| = \sqrt{\sum (x_i - y_i)^2}$.
 
 ---
@@ -27,8 +27,8 @@ A sequence $x_i$ converges to a point $x^*$ if for every radius $\epsilon > 0$, 
 Univariate calculus focuses on real-valued functions $f: \mathbb{R} \to \mathbb{R}$.
 
 #### **Continuity and Differentiability**
-*   **Continuity:** A function is continuous at $x^*$ if for any sequence $x_i$ converging to $x^*$, the values $f(x_i)$ converge to $f(x^*)$.
-*   **Differentiability:** A function is differentiable if the limit $\lim_{x \to x^*} \frac{f(x) - f(x^*)}{x - x^*}$ exists.
+*   **Continuity:** A function is continuous at x* if for any sequence $x_i$ converging to $x^* $, the values $f(x_i)$ converge to $f(x^*)$.
+*   **Differentiability:** A function is differentiable if the limit $lim_{x \to x^* } \frac{f(x) - f(x^*)}{x - x^ * }$ exists.
 *   **Key Relationship:** If a function is differentiable at a point, it is **guaranteed to be continuous** there; however, a continuous function (like $f(x) = |x|$) is not necessarily differentiable.
 
 #### **Linear Approximation (The Tangent Line)**
@@ -77,6 +77,9 @@ A point $v$ is a **critical point** if the gradient $\nabla f(v)$ is the zero ve
 | **Local Minimum** | The function value is lower than all nearby points. |
 | **Local Maximum** | The function value is higher than all nearby points. |
 | **Saddle Point** | A point that is a maximum along one direction but a minimum along another. |
+
+<img width="800" height="325" alt="image" src="https://github.com/user-attachments/assets/6a00ee2f-010e-42f2-8d97-6b702c16ec92" />
+
 
 > **Visual 2: Contour Plots and Gradients**
 > *Description:* A 2D plot shows concentric circles (contours of constant function values). A black arrow originating from a point on a circle points directly away from the center, crossing the circle at a 90-degree angle. This arrow represents the gradient, showing the direction of steepest ascent.
