@@ -3,7 +3,7 @@
 
 | Week | Topic | Focus Area | Status |
 | --- | --- | --- | --- |
-| **Week 1** | Python Basics | Lists, Dicts, List Comprehensions | 🟡 In Progress |
+| **Week 1** | Python Refreshers | Basics | 🟡 In Progress |
 | **Week 2** | Complexity & Sorting | Big O, Merge Sort, Binary Search | ⚪ Planned |
 | **Week 3** | Linear Data Structures | Stacks, Queues, Hash Tables | ⚪ Planned |
 | **Week 4** | Graph Algorithms I | BFS, DFS, Adjacency Lists | ⚪ Planned |
