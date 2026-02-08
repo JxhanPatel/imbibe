@@ -3,8 +3,8 @@
 
 | Week | Topic | Focus Area | Status |
 | --- | --- | --- | --- |
-| **Week 1** | Python Refreshers | Basics | 🟡 In Progress |
-| **Week 2** | Complexity & Sorting | Big O, Merge Sort, Binary Search | ⚪ Planned |
+| **Week 1** | Python Refreshers | Back to Basics | 🟢 Done |
+| **Week 2** | Complexity & Sorting | Big O, Merge Sort, Binary Search | 🟡 In Progress |
 | **Week 3** | Linear Data Structures | Stacks, Queues, Hash Tables | ⚪ Planned |
 | **Week 4** | Graph Algorithms I | BFS, DFS, Adjacency Lists | ⚪ Planned |
 | **Week 5** | Graph Algorithms II | Dijkstra’s, Bellman-Ford, MST | ⚪ Planned |
