@@ -163,8 +163,8 @@ Why does $O(\log n)$ outperform $O(n)$ so dramatically?
 
 | Problem        | Inefficient Approach   | Efficient Approach          | Impact                                |
 | -------------- | ---------------------- | --------------------------- | ------------------------------------- |
-| Birthday Guess | Linear search ($O(n)$) | Binary search ($O(\log n)$) | $\le 9$ guesses                       |
-| Aadhaar Search | Linear search ($O(n)$) | Binary search ($O(\log n)$) | $\sim 3200$ years → $\sim 50$ minutes |
+| Birthday Guess | Linear search (O(n)) | Binary search (O(log n)) | $\le 9$ guesses                       |
+| Aadhaar Search | Linear search (O(n)) | Binary search (O(log n)) | $\sim 3200$ years → $\sim 50$ minutes |
 
 > **Important**
 > Efficient algorithms often require the appropriate data structure (e.g., sorted data for binary search).
