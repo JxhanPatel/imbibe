@@ -218,6 +218,9 @@ Requires **sorted input**.
 
 Repeatedly halves the search interval.
 
+A Quick Tip:
+If you see a function that splits the input in half (two recursive calls) and then does a linear amount of work ($O(n)$) outside those calls, it’s almost always going to be $O(n \log n)$.
+
 ### Implementation
 
 ```python
