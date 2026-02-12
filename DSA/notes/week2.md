@@ -159,6 +159,7 @@ We analyze recursion using **recurrence relations**.
 ---
 
 ### Example: Towers of Hanoi
+<img width="641" height="156" alt="image" src="https://github.com/user-attachments/assets/b73cd8ce-36ad-459d-b326-6c50b80e02ca" />
 
 To move $n$ disks:
 
