@@ -442,7 +442,7 @@ $$
 | Term                      | Definition                                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------- |
 | **Asymptotic Complexity** | Growth rate as $n \to \infty$                                                               |
-| **Amortized Analysis**    | Average cost per operation over worst-case sequence (e.g., list append is amortized $O(1)$) |
+| **Amortized Analysis**    | Average cost per operation over worst-case sequence (e.g., list append is amortized $O(1)$ ) |
 | **Divide & Conquer**      | Split → Solve → Combine                                                                     |
 | **Stable Sort**           | Preserves order of equal elements                                                           |
 | **In-Place**              | Uses $O(1)$ auxiliary space                                                                 |
