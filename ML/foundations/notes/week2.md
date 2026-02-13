@@ -17,9 +17,24 @@ Before diving into calculus, it is necessary to establish the language of sets a
 *   **$\implies$**: Implies.
 *   **$\iff$**: Equivalent to / If and only if.
 
+### Intervals and Cartesian Products
+Sets of $d$-dimensional vectors are constructed using the Cartesian product of real sets:
+*   **$\mathbb{R}^d$**: The space of all column vectors with $d$ real components.
+*   **Closed Interval $[a, b]$**: $\{x \in \mathbb{R} : a \le x \le b\}$.
+*   **Open Interval $(a, b)$**: $\{x \in \mathbb{R} : a < x < b\}$.
+*   **Higher Dimensional Intervals**: $[a, b]^d = \{\mathbf{x} \in \mathbb{R}^d : x_i \in [a, b], \forall i \in \{1, ..., d\}\}$.
+
+> [!NOTE]
+> In ML, the input $\mathbf{x}$ is typically a tuple in $\mathbb{R}^d$, where each dimension represents a specific feature (e.g., area, number of rooms).
+
+
 #### **Convergence and Limits**
 A sequence $x_i$ converges to a point x* if for every radius $\epsilon > 0$, there is an integer $N$ such that all subsequent elements in the sequence ($n \ge N$) stay within a **ball** $B(x^*, \epsilon)$.
 *   **Metric Space Distance (Euclidean):** $D(x, y) = \|x - y\| = \sqrt{\sum (x_i - y_i)^2}$.
+*   
+#### Defining Local Regions (Balls)
+*   **Open Ball** $B(\mathbf{x}, \epsilon)$: The set $\{\mathbf{y} \in \mathbb{R}^d : D(\mathbf{x}, \mathbf{y}) < \epsilon\}$.
+*   **Closed Ball** $\bar{B}(\mathbf{x}, \epsilon)$: The set $\{\mathbf{y} \in \mathbb{R}^d : D(\mathbf{x}, \mathbf{y}) \le \epsilon\}$.
 
 ---
 
