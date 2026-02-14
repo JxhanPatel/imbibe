@@ -103,3 +103,79 @@ The visual proves that convergence is a "tail property." The initial values of t
 > [!NOTE]
 > **Intuition behind Oscillation**
 > In the oscillatory example above, the sequence jumps between $(0,1)$, $(-1,0)$, $(0,-1)$, and $(1,0)$. Because it never "settles" into a single $\epsilon$-ball, it is divergent even though it is bounded.
+
+
+
+### 1.4 Vector Spaces
+
+A **Vector Space** ($V$) is a mathematical structure consisting of a set of elements (vectors) that are closed under two main operations: vector addition and scalar multiplication.
+
+#### **Core Properties and Operations**
+* **Elements**: If $V$ is a vector space, then $u, v \in V$ are vectors.
+* **Scalars**: Typically, we use real numbers ($\alpha, \beta \in \mathbb{R}$) as scalars.
+* **Closure under Linear Combination**: For any vectors $u, v \in V$ and scalars $\alpha, \beta \in \mathbb{R}$, the linear combination must also be in the space:
+    $$\alpha u + \beta v \in V$$
+* **Zero Vector**: A vector space must contain a zero vector, denoted as $\theta \in V$.
+
+
+
+#### **Standard Example: $\mathbb{R}^d$**
+The set of $d$-dimensional real vectors ($\mathbb{R}^d$) is the most common example of a vector space used in this course. It is defined as the Cartesian product of $\mathbb{R}$ with itself $d$ times:
+$$\mathbb{R}^d = \mathbb{R} \times \mathbb{R} \times \dots \times \mathbb{R}$$
+
+#### **Inner Products and Norms**
+Vector spaces often include additional structures to measure size and direction:
+* **Dot Product (Inner Product)**: Defined for two vectors $x, y \in \mathbb{R}^d$ as:
+    $$x \cdot y = x^T y = \sum_{i=1}^{d} x_i y_i$$
+* **Norm (Length)**: The squared norm of a vector $x$ is the dot product of the vector with itself:
+    $$\|x\|^2 = x \cdot x = x^T x = \sum_{i=1}^{d} x_i^2$$
+* **Orthogonality**: Two vectors $x$ and $y$ are considered **perpendicular** or **orthogonal** if their dot product is zero:
+    $$x \cdot y = x^T y = 0$$
+
+
+
+
+
+### 1.5 Functions and Graphs
+
+A function is a mapping between two sets that assigns each element of the first set to exactly one element of the second set.
+
+#### **1. Definitions and Notation**
+* **Function Notation**: Represented as $f: A \rightarrow B$, where $A$ is the domain and $B$ is the co-domain.
+* **Domain ($A$)**: The set of all possible input values.
+* **Co-domain ($B$)**: The set representing the potential output values.
+* **Graph of a Function ($G_f$)**: The set of all pairs $(x, f(x))$ where $x$ is in the domain.
+    * Mathematically: $G_f = \{(x, f(x)) : x \in \mathbb{R}^d\} \subseteq \mathbb{R}^{d+1}$
+
+#### **2. Types of Functions by Dimension**
+* **1-Dimensional Function**: A function $f: \mathbb{R} \rightarrow \mathbb{R}$.
+    * *Example*: $f(x) = x^2$.
+    * The graph $G_f$ is a curve in a 2D plane ($\mathbb{R}^2$).
+  
+ <img width="847" height="469" alt="image" src="https://github.com/user-attachments/assets/2594eaac-7ab8-420c-a00b-d0fa0b1e1b77" />
+
+
+
+* **d-Dimensional Function**: A function $f: \mathbb{R}^d \rightarrow \mathbb{R}$.
+    * These functions map a $d$-dimensional vector input to a single real number output.
+    * For $d=2$, the graph exists in 3D space ($\mathbb{R}^3$).
+
+
+
+#### **3. Visualizing 2-Dimensional Functions ($f: \mathbb{R}^2 \rightarrow \mathbb{R}$)**
+Visualizing 3D surfaces on 2D screens can be difficult, so two primary methods are used:
+
+* **Contour Plots**:
+    * These represent a function by drawing lines (isohypses/contours) where the function value is constant: $f(x) = c$.
+    * *Example*: For $f(x_1, x_2) = x_1^2 + x_2^2$, the contours are concentric circles.
+ <img width="903" height="493" alt="image" src="https://github.com/user-attachments/assets/223c7f32-9746-4106-ad3b-f1f1f46d7af8" />
+
+
+
+* **Heat Maps**:
+    * A heat map uses a color gradient to represent the value of the function at every point.
+    * While a heat map technically contains "infinite" contours and more data, a contour map is often clearer for identifying the specific geometric shape of the function's levels.
+ 
+<img width="916" height="556" alt="image" src="https://github.com/user-attachments/assets/ee06fe3a-69e9-4343-9416-1fddc1d08ce3" />
+
+<img width="914" height="596" alt="image" src="https://github.com/user-attachments/assets/f7ee6323-aaf7-4bb7-9aa2-7256c57e05d2" />
