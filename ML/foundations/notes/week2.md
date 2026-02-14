@@ -179,3 +179,11 @@ Visualizing 3D surfaces on 2D screens can be difficult, so two primary methods a
 <img width="916" height="556" alt="image" src="https://github.com/user-attachments/assets/ee06fe3a-69e9-4343-9416-1fddc1d08ce3" />
 
 <img width="914" height="596" alt="image" src="https://github.com/user-attachments/assets/f7ee6323-aaf7-4bb7-9aa2-7256c57e05d2" />
+
+
+---
+# Univariate Calculus
+## 2. Continuity and Differentiability
+
+
+
