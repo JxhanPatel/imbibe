@@ -182,8 +182,80 @@ Visualizing 3D surfaces on 2D screens can be difficult, so two primary methods a
 
 
 ---
+
 # Univariate Calculus
 ## 2. Continuity and Differentiability
+
+### 2.1 Continuity of functions
+
+#### **Theory of Continuity**
+
+A function $f: \mathbb{R} \to \mathbb{R}$ is considered **continuous at a point** $x^*$ if the following three conditions are met:
+
+1.  The function $f(x^*)$ is defined at that point.
+2.  The limit of the function as $x$ approaches $x^*$ exists: $\lim_{x \to x^*} f(x) = L$.
+3.  The value of the limit is exactly equal to the function's value at that point: $\lim_{x \to x^*} f(x) = f(x^*)$.
+
+**Visual Interpretation:**
+Intuitively, a function is continuous if you can draw its graph without lifting your pen from the paper. If there is a "jump," a "hole," or a "vertical asymptote" at $x^*$, the function is discontinuous at that point.
+
+
+
+#### **Formal Definition (Limit-based)**
+
+A function $f$ is continuous at $x^*$ if for every sequence $x_n$ that converges to $x^*$, the sequence of function values $f(x_n)$ converges to $f(x^*)$. 
+
+$$\lim_{n \to \infty} x_n = x^* \implies \lim_{n \to \infty} f(x_n) = f(x^*)$$
+
+---
+
+#### **Examples of Continuity and Discontinuity**
+
+**1. Example of a Continuous Function:**
+* **Function:** $f(x) = x^2$
+* **Analysis at $x^* = 1$:**
+    * $f(1) = 1^2 = 1$ (Defined)
+    * As $x$ gets closer and closer to 1 (e.g., 0.9, 0.99, 1.01), $x^2$ gets closer and closer to 1.
+    * Since $\lim_{x \to 1} x^2 = 1 = f(1)$, the function is continuous at $x = 1$.
+
+
+
+**2. Example of Discontinuity (The "Jump"):**
+* **Function:** $f(x) = \text{sign}(x)$ where:
+    * $f(x) = 1$ if $x > 0$
+    * $f(x) = -1$ if $x < 0$
+    * $f(x) = 0$ if $x = 0$
+* **Analysis at $x^* = 0$:**
+    * If we approach 0 from the positive side ($x = 0.1, 0.01$), the limit is 1.
+    * If we approach 0 from the negative side ($x = -0.1, -0.01$), the limit is -1.
+    * Because the limit from the left does not equal the limit from the right, the limit does not exist at $x=0$.
+    * **Conclusion:** The function is discontinuous at $x = 0$.
+
+
+
+**3. Example of Discontinuity (The "Hole"):**
+* **Function:** $f(x) = \frac{x^2 - 1}{x - 1}$
+* **Analysis at $x^* = 1$:**
+    * At $x = 1$, the function is $\frac{0}{0}$, which is undefined.
+    * However, for $x \neq 1$, $f(x) = \frac{(x-1)(x+1)}{x-1} = x + 1$.
+    * $\lim_{x \to 1} f(x) = 2$, but since $f(1)$ is not defined, the function is discontinuous at $x = 1$.
+
+
+
+**4. Example of Discontinuity (The "Removable" vs "Essential"):**
+* If we redefine the "Hole" example as $f(x) = x + 1$ for $x \neq 1$ and $f(1) = 3$:
+    * The limit $\lim_{x \to 1} f(x) = 2$.
+    * The value $f(1) = 3$.
+    * Since $2 \neq 3$, the function is still discontinuous.
+
+---
+
+#### **Types of Discontinuity Summary**
+* **Point Discontinuity:** A single point is missing or displaced (a "hole").
+* **Jump Discontinuity:** The function "jumps" from one value to another at a specific point.
+* **Infinite Discontinuity:** The function goes to infinity (e.g., $1/x$ at $x=0$).
+
+
 
 
 
