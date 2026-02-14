@@ -248,14 +248,80 @@ $$\lim_{n \to \infty} x_n = x^★ \implies \lim_{n \to \infty} f(x_n) = f(x^★)
     * The value $f(1) = 3$.
     * Since $2 \neq 3$, the function is still discontinuous.
 
----
+
 
 #### **Types of Discontinuity Summary**
 * **Point Discontinuity:** A single point is missing or displaced (a "hole").
 * **Jump Discontinuity:** The function "jumps" from one value to another at a specific point.
 * **Infinite Discontinuity:** The function goes to infinity (e.g., $1/x$ at $x=0$).
 
+---
+
+### 2.2: Differentiability of Functions
 
 
+#### 1. Definition of Differentiability
+A function $f: \mathbb{R} \to \mathbb{R}$ is differentiable at a point $x^★$ in reals if the following limit exists:
+
+$$\lim_{x \to x^★} \frac{f(x) - f(x^★)}{x - x^★}$$
+
+When we say the limit exists, it means that it converges to something. If it does exist, that particular limit is called the **derivative of $f$ at $x^★$**, which is denoted by $f'(x^★)$.
+
+#### 2. Relationship with Continuity
+* If a function $f$ is not continuous at $x^★$, it is not differentiable at $x^★$.
+* However, the converse is not necessarily true: You can have a function which is **not differentiable but still continuous**.
+
+#### 3. Alternative Expression for the Derivative
+An alternative expression for the derivative, which is easier to interpret, is:
+
+$$f'(x^★) = \lim_{h \to 0} \frac{f(x^★ + h) - f(x^★)}{h}$$
+
+These two expressions are exactly the same.
+
+---
+
+#### 4. Geometric Interpretation (Slope)
+The slope of a function at a point is simply given by $f'(x^★)$. 
+
+
+
+<img width="640" height="361" alt="image" src="https://github.com/user-attachments/assets/2484ae02-f92e-4201-b6e3-545f5e8e1b2c" />
+<img width="558" height="363" alt="image" src="https://github.com/user-attachments/assets/8e01b0a8-ad0f-48ce-b646-9159ed935bd6" />
+
+> **Analysis Note:**
+> As $h$ is reduced (e.g., from 1 to $1/2$ to $1/4$), the blue line segment joining $(x^★, f(x^★))$ and $(x^★+h, f(x^★+h))$ becomes a closer approximation of the black curve. When $h$ is practically zero, the slope of the resulting red line—representing the ratio of the vertical length to the horizontal length—corresponds exactly to the derivative $f'(x^★)$.
+
+---
+
+#### 5. Examples of Differentiability and Non-Differentiability
+
+**Example 1: The Absolute Value Function**
+$f(x) = |x|$ from $\mathbb{R}$ to $\mathbb{R}$. To show this is not differentiable at $x^★ = 0$, consider two sequences:
+
+1.  **Sequence 1:** $x_i = \{1, 1/2, 1/4, \dots\}$ which converges to $0$.
+    * $\frac{f(x_i) - f(0)}{x_i - 0} = \frac{x_i}{x_i} = 1$. This sequence converges to $1$.
+2.  **Sequence 2:** $x_i = \{-1, -1/2, -1/4, \dots\}$ which also converges to $0$.
+    * $\frac{f(x_i) - f(0)}{x_i - 0} = \frac{1 - 0}{-1} = -1$. This sequence converges to $-1$.
+
+Since two sequences converging to $x^★$ yield different values for the limit, the limit does not exist. Therefore, $f(x) = |x|$ is **not differentiable at $x^★ = 0$**.
+
+**Example 2: Piecewise Discontinuous Function**
+
+$$f(x) = \begin{cases} 4x + 2 & \text{if } x \ge 2 \\ 2x + 8 & \text{if } x < 2 \end{cases}$$
+
+* Approaching from the left: $\lim_{x \to 2^-} f(x) = 12$.
+* Approaching from the right: $\lim_{x \to 2^+} f(x) = 10$.
+
+Since the function is not continuous at $x^★ = 2$, it is **clearly not differentiable at $x^★ = 2$**.
+
+**Example 3: Piecewise Continuous but Non-Differentiable Function**
+
+$$f(x) = \begin{cases} 4x + 2 & \text{if } x \ge 2 \\ 2x + 6 & \text{if } x < 2 \end{cases}$$
+
+This function is continuous at $x^★ = 2$, but we check the limit:
+* From the positive side ($x \to 2^+$): $\frac{f(x) - f(2)}{x - 2} = 4$.
+* From the negative side ($x \to 2^-$): $\frac{f(x) - f(2)}{x - 2} = 2$.
+
+Because the limits from the two sequences are different ($4$ and $2$), the limit does not exist. Thus, the function is **not differentiable at $x^★ = 2$**.
 
 
