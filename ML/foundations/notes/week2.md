@@ -411,3 +411,140 @@ The univariate linear approximation serves as the foundation for multivariate ca
 For a 2D function $f(x_1, x_2)$, the approximation around $v = (v_1, v_2)$ is:
 $$f(y_1, y_2) \approx f(v_1, v_2) + \frac{\partial f}{\partial x_1}(v)(y_1 - v_1) + \frac{\partial f}{\partial x_2}(v)(y_2 - v_2)$$
 
+---
+
+
+
+## 2.4: Univariate Calculus: Applications and Advanced Rules
+
+Now we will take a look at some applications or advanced rules that we have. We will not go into greater detail but they will be still useful for understanding the basic terms that we have been discussing.
+
+### Why Linear Approximations?
+
+The first thing is why linear approximations? That is the first question that comes to mind. Linear approximations are fine, but what is so special about them? We have been approximating $f(x)$ by the linear approximation of $f$ around some point $x^{\star}$.
+
+$$f(x) \approx f(x^{\star}) + f'(x^{\star})(x - x^{\star})$$
+
+This is what you have been doing, but you could argue that there is nothing special about linear functions and you can go higher. In fact, you could do that, and that is the fundamental idea behind higher order approximations.
+
+#### Higher Order Approximations
+The linear approximation would simply say that $f(x)$ is approximately equal to $f(x^{\star}) + f'(x^{\star})(x - x^{\star})$. But you could go to higher order approximations and have a **quadratic approximation** instead, which would say:
+
+$$f(x) \approx f(x^{\star}) + f'(x^{\star})(x - x^{\star}) + \frac{1}{2} f''(x^{\star})(x - x^{\star})^2$$
+
+Both of these are valid around $x \approx x^{\star}$. The second expression is a better approximation than the first, but it comes at a cost: it is significantly more complex. It has a quadratic term here as opposed to just a linear term here.
+
+> The first expression ($f(x^{\star}) + f'(x^{\star})(x - x^{\star})$) is the linear approximation.
+
+> The second expression (including the $\frac{1}{2}f''(x^{\star})$ term) is the quadratic approximation.
+
+#### Special Case: Quadratic Functions
+For a special class of functions, quadratic function approximations are exactly equal to the function itself. The classic case for that is $f(x) = x^2$.
+
+**Example:**
+Let $f(x) = x^2$.
+* $f'(x) = 2x$
+* $f''(x) = 2$
+
+Pick any $x^{\star}$:
+$$x^2 \approx x^{\star 2} + 2x^{\star}(x - x^{\star}) + \frac{1}{2}(2)(x - x^{\star})^2$$
+Expanding this, you end up with the approximation being exactly equal to the function because the function itself is quadratic in nature.
+
+#### Example: $e^x$
+This is not true for all functions. For example, you could have $e^x$ instead. If you approximated $e^x$ around $x^{\star} = 0$:
+
+$$e^x \approx e^0 + e^0(x - 0) + \frac{1}{2}e^0(x - 0)^2$$
+$$e^x \approx 1 + x + \frac{x^2}{2}$$
+
+If you are all familiar with the **Taylor series**, this is exactly what it is. The linear approximation truncates it at the linear term; the quadratic approximation truncates the Taylor series at the quadratic term. You could in principle go up to cubic, quartic, quintic, and so on.
+
+> [!IMPORTANT]
+> In most machine learning applications, you will stop at the linear approximation. There are certain situations where you will go to the quadratic approximation, but in no practical scenario will you ever go beyond quadratic approximations.
+
+
+
+### Exercise: Compound Interest Logic
+Which is closest to $(1.1)^7$?
+The four options are: **1.7, 1.9, 2.1, 2.3**
+
+* **Linear Approximation:** $(1.1)^7$ is simply $1 + 7(0.1) = 1.7$. This makes the simple interest logic clear (every year money grows by 10%, so after 7 years you get 1.7).
+* **Quadratic Approximation:** For compound interest, simple interest is no longer a good approximation.
+  * $f(x) = (1 + x)^7 \implies f(0) = 1$
+  * $f'(x) = 7(1 + x)^6 \implies f'(0) = 7$
+  * $f''(x) = 42(1 + x)^5 \implies f''(0) = 42$
+
+$$f(0.1) \approx 1 + 7(0.1) + \frac{1}{2}(42)(0.1)^2$$
+$$f(0.1) \approx 1 + 0.7 + 21(0.01) = 1.91$$
+
+The second order approximation gives you $1.91$, which is much closer to the truth than the simple first order approximation of $1.7$.
+
+---
+
+### Product Rule via Linear Approximations
+Let $f(x) = g(x)h(x)$. We are working with one-dimensional functions $f: \mathbb{R} \to \mathbb{R}$.
+To find $f'(x)$, let's pick $x^{\star} = 0$:
+
+Linear approximation of components:
+* $g(x) \approx g(0) + x \cdot g'(0)$
+* $h(x) \approx h(0) + x \cdot h'(0)$
+
+$$f(x) \approx [g(0) + x \cdot g'(0)][h(0) + x \cdot h'(0)]$$
+$$f(x) \approx g(0)h(0) + x[g'(0)h(0) + h'(0)g(0)] + x^2[g'(0)h'(0)]$$
+
+Ignoring the quadratic term for a linear approximation:
+$L_x(f) = g(0)h(0) + x[g'(0)h(0) + h'(0)g(0)]$
+
+By matching terms with $f(0) + x \cdot f'(0)$:
+$$f'(0) = g'(0)h(0) + h'(0)g(0)$$
+This is the **product rule** derived from first principles based on linear approximations.
+
+---
+
+### Chain Rule via Linear Approximations
+Let $f(x) = g(h(x))$. We want $f'(0)$.
+1. First, approximate $h$ around 0: $h(x) \approx h(0) + h'(0)x$
+2. Then, approximate $g$ around $h(0)$:
+$$g(h(x)) \approx g(h(0) + h'(0)x)$$
+$$g(h(x)) \approx g(h(0)) + g'(h(0))[h(0) + h'(0)x - h(0)]$$
+$$f(x) \approx g(h(0)) + g'(h(0))h'(0)x$$
+
+Matching terms with $f(0) + f'(0)x$:
+$$f'(0) = g'(h(0))h'(0)$$
+This recovers the **chain rule**.
+
+---
+
+### Advanced Examples
+
+**Example 1:** Linear approximation of $f(x) = \frac{e^{3x}}{\sqrt{1+x}}$ around $x = 0$.
+* $e^{3x} \approx 1 + 3x$
+* $(1 + x)^{-1/2} \approx 1 - \frac{x}{2}$
+* Product: $(1 + 3x)(1 - \frac{x}{2}) = 1 + 3x - \frac{x}{2} - \frac{3x^2}{2}$
+* Ignore $x^2$: $1 + \frac{5}{2}x$
+The derivative at $x=0$ is $5/2$.
+
+**Example 2 (Exercise):** Give linear approximation of $e^{\sqrt{1+x}}$ around $x = 1$.
+$$e^{\sqrt{1+x}} \approx e^{\sqrt{2}} + \frac{e^{\sqrt{2}}}{2\sqrt{2}}(x - 1)$$
+
+---
+
+### Maxima, Minima, and Saddle Points
+
+Linear approximations are the key tool that allow you to get around most of machine learning with its very complex functions.
+
+**Critical Points:**
+If $f'(x^{\star}) = 0$, then $L_{x^{\star}}f(x) = f(x^{\star})$.
+Even though the left hand side is supposed to be a function of $x$, it is a constant. Such points where $f'(x^{\star}) = 0$ are called **critical points**.
+
+In the neighborhood of $x^{\star}$, if the derivative is not 0 (e.g., $7 + 3x$), there is variation. If the derivative is 0, there is no variation in the linear approximation. This happens when $x^{\star}$ is a:
+1. **Maxima**
+2. **Minima**
+3. **Saddle Point**
+
+**Saddle Point:** A point that is essentially a maxima of one part and a minima of another part. The function reaches a slope of $f'(x) = 0$ and then increases (or decreases) again.
+
+<img width="1081" height="744" alt="image" src="https://github.com/user-attachments/assets/d4b975ca-27f3-4bba-abc3-b302c3650be1" />
+
+
+
+Machine learning at its core is an applied optimization problem. We are interested in finding the minima or maxima of functions, and so we are really interested in finding points where the gradient or the derivative is 0.
