@@ -689,7 +689,7 @@ The gradient is typically written as a column vector. It is a collection of part
 ---
 
 
-## Multivariate Calculus - Linear Approximation and Applications
+## 2.6 Multivariate Calculus - Linear Approximation and Applications
 
 ### 1. Introduction to Interpretations of the Gradient
 
