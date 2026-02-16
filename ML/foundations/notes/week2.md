@@ -415,7 +415,7 @@ $$f(y_1, y_2) \approx f(v_1, v_2) + \frac{\partial f}{\partial x_1}(v)(y_1 - v_1
 
 
 
-## 2.4: Univariate Calculus: Applications and Advanced Rules
+## 3. Univariate Calculus: Applications and Advanced Rules
 
 Now we will take a look at some applications or advanced rules that we have. We will not go into greater detail but they will be still useful for understanding the basic terms that we have been discussing.
 
@@ -554,7 +554,7 @@ Machine learning at its core is an applied optimization problem. We are interest
 ---
 
 
-## 2.5  Multivariate Calculus: Lines and Planes in Higher Dimensional Space
+## 5. Multivariate Calculus: Lines and Planes in Higher Dimensional Space
 
 ### 1. Introduction to Multivariate Calculus
 Hello everyone and welcome to another lecture of machine learning foundations. We will continue with our calculus recap. We have been seeing about univariate function univariate calculus which is about functions $f$ from $\mathbb{R}$ to $\mathbb{R}$ where the domain and codomain are both $\mathbb{R}$. 
@@ -689,7 +689,7 @@ The gradient is typically written as a column vector. It is a collection of part
 ---
 
 
-## 2.6 Multivariate Calculus - Linear Approximation and Applications
+## 6. Multivariate Calculus - Linear Approximation and Applications
 
 ### 1. Introduction to Interpretations of the Gradient
 
