@@ -325,3 +325,89 @@ This function is continuous at $x^★ = 2$, but we check the limit:
 Because the limits from the two sequences are different ($4$ and $2$), the limit does not exist. Thus, the function is **not differentiable at $x^★ = 2$**.
 
 
+
+---
+
+
+## 3.1: Derivative and Linear Approximation
+
+### 1. Definition and Formula
+For a univariate function $f: \mathbb{R} \rightarrow \mathbb{R}$, the linear approximation of the function $f$ around a point $x$ close to $x^\star$ is given by:
+
+$$f(x) \approx f(x^\star) + f'(x^\star)(x - x^\star)$$
+
+This expression is denoted as the linear approximation of $f$ around $x^\star$ evaluated at $x$, often written as:
+$$L_{x^\star}f(x)$$
+
+> [!IMPORTANT]
+> This is a valid approximation only when $x$ is close to $x^\star$.
+
+---
+
+### 2. Geometric Interpretation: Tangent Lines
+The linear approximation $L_{x^\star}f$ is geometrically represented as a **tangent line** to the graph of $f$ (denoted as $G_f$) at the point $(x^\star, f(x^\star))$.
+
+<img width="325" height="352" alt="image" src="https://github.com/user-attachments/assets/99b00aeb-10e5-4ea2-95b3-60ca03f8488e" />
+
+
+
+---
+
+### 3. Step-by-Step Examples
+
+#### **Example 1: Function $f(x) = x^2$ around $x^\star = 1$**
+1.  **Identify the function and point**: $f(x) = x^2$ and $x^\star = 1$.
+2.  **Compute the derivative**: $f'(x) = 2x$.
+3.  **Evaluate at the point**:
+    * $f(x^\star) = f(1) = 1^2 = 1$.
+    * $f'(x^\star) = f'(1) = 2(1) = 2$.
+4.  **Apply the formula**:
+    $$f(x) \approx 1 + 2(x - 1)$$
+    $$f(x) \approx 1 + 2x - 2$$
+    $$f(x) \approx 2x - 1 \quad (\text{around } x = 1)$$
+
+#### **Example 2: Trigonometric Function $\sin(x)$ around $x^\star = 0$**
+1.  **Function and point**: $f(x) = \sin(x)$ around $x^\star = 0$.
+2.  **Derivatives and evaluations**:
+    * $f'(x) = \cos(x)$.
+    * $f'(x^\star) = \cos(0) = 1$.
+    * $f(x^\star) = \sin(0) = 0$.
+3.  **Linear Approximation**:
+    $$f(x) \approx f(x^\star) + f'(x^\star)(x - x^\star)$$
+    $$f(x) \approx 0 + 1(x - 0)$$
+    $$f(x) \approx x$$
+
+#### **Example 3: Exponential Function $e^x$ around $x^\star = 0$**
+1.  **Function and point**: $f(x) = e^x$ around $x^\star = 0$.
+2.  **Linear Approximation**:
+    $$e^x \approx e^0 + (x - 0) \cdot 1$$
+    $$e^x \approx 1 + x \quad (\text{around } x = 0)$$
+
+#### **Example 4: Numerical Approximation of $e^{0.017}$**
+**Problem**: Compute the approximate value of $e^{0.017}$.
+1.  **Setup**: The closest known value is $e^0$, so set $f(x) = e^x$ and $a = 0$.
+2.  **Values**: $f(0) = 1$ and $f'(0) = 1$.
+3.  **Linear Model**: $L(x) = f(0) + f'(0)(x - 0) = 1 + x$.
+4.  **Calculation**:
+    $$L(0.017) = 1 + 0.017 = 1.017$$
+   
+*Note: The actual value of $e^{0.017}$ is approximately 1.017.*
+
+---
+
+### 4. Summary Table of Linear Approximations around $x^\star = 0$
+
+| Function $f(x)$ | Approximation $L_0 f(x)$ |
+| :--- | :--- |
+| $\sin(x)$ | $x$ |
+| $e^x$ | $1+x$ |
+| $\ln(1+x)$ | $x$ |
+
+---
+
+### 5. Transition to Multivariate Case
+The univariate linear approximation serves as the foundation for multivariate calculus. By viewing a multidimensional function as a collection of multiple one-dimensional functions (holding other variables constant), we can extend this concept to partial derivatives and gradients.
+
+For a 2D function $f(x_1, x_2)$, the approximation around $v = (v_1, v_2)$ is:
+$$f(y_1, y_2) \approx f(v_1, v_2) + \frac{\partial f}{\partial x_1}(v)(y_1 - v_1) + \frac{\partial f}{\partial x_2}(v)(y_2 - v_2)$$
+
