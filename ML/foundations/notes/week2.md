@@ -686,4 +686,188 @@ The gradient is typically written as a column vector. It is a collection of part
     * $\nabla f(v) = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}$
     Because the gradient is a constant, these kind of functions are called linear functions.
 
+---
+
+
+## Multivariate Calculus - Linear Approximation and Applications
+
+### 1. Introduction to Interpretations of the Gradient
+
+In the previous class, partial derivatives and gradients were introduced and defined.
+* **Computational Interpretation:** A gradient is a package containing all the components of the partial derivatives with respect to all variables, put together into one vector.
+* **Geometric and Intuitive Interpretations:** Today’s lecture focuses on interpretations that are more geometric and intuitive in nature, primarily the **linear approximation interpretation**.
+
+---
+
+### 2. Linear Approximation
+
+#### 2.1 One-Dimensional Case Recap
+For a function $f: \mathbb{R} \to \mathbb{R}$, we approximate the function around $x$ close to $x^\star$ as follows:
+
+$$f(x) \approx f(x^\star) + f'(x^\star)(x - x^\star)$$
+
+This term is denoted as the linear approximation of $f$ around $x^\star$ evaluated at $x$. It is a valid approximation when $x$ is close to $x^\star$.
+
+#### 2.2 Multi-Dimensional Case ($f: \mathbb{R}^d \to \mathbb{R}$)
+For a $d$-dimensional vector $v$ and a vector $x$ in its neighborhood (close to $v$), the linear approximation is:
+
+$$f(x) \approx f(v) + \nabla f(v)^\top (x - v)$$
+
+> [!NOTE]
+> **Comparison:** > - $f(v)$ corresponds to $f(x^\star)$.
+> - $\nabla f(v)^\top (x - v)$ corresponds to $f'(x^\star)(x - x^\star)$.
+
+##### Breaking Down into Components
+The gradient can be broken down into its components:
+
+$$f(x) \approx f(v) + \sum_{i=1}^{d} \frac{\partial f}{\partial x_i}\bigg|_v (x_i - v_i)$$
+
+This is denoted as $L_v(f)(x)$, the **linear approximation of $f$ around the point $v$ evaluated at $x$**. This approximation is valid when $x \approx v$.
+
+---
+
+### 3. Interpretation via Breakdown into 1D Functions
+
+To interpret this, consider a two-dimensional function $f: \mathbb{R}^2 \to \mathbb{R}$.
+
+1. **Varying the first argument (viewing the second as a constant):**
+   $$f(y_1, v_2) - f(v_1, v_2) \approx \frac{\partial f}{\partial x_1}\bigg|_v (y_1 - v_1)$$
+   This represents the change in the value of the function as we move along the first axis from $v_1$ to $y_1$ while $v_2$ remains the same.
+
+2. **Varying the second argument (viewing the first as a constant):**
+   $$f(v_1, y_2) - f(v_1, v_2) \approx \frac{\partial f}{\partial x_2}\bigg|_v (y_2 - v_2)$$
+   This represents the change as we move from $v_2$ to $y_2$ along the second axis.
+
+3. **Simultaneous Change:**
+   If both variables change simultaneously, the total change is the sum of these two changes:
+   $$f(y_1, y_2) - f(v_1, v_2) \approx \frac{\partial f}{\partial x_1}\bigg|_v (y_1 - v_1) + \frac{\partial f}{\partial x_2}\bigg|_v (y_2 - v_2)$$
+   
+Full expression:
+$$f(y) \approx f(v) + \nabla f(v)^\top (y - v)$$
+
+---
+
+### 4. Practical Example: Linear Approximation
+
+**Function:** $f(x_1, x_2) = x_1^2 + x_2^2$  
+**Point of Approximation ($v$):** $(6, 2)$
+
+**Step-by-step Calculation:**
+1. **Function value at $v$:** $f(6, 2) = 6^2 + 2^2 = 36 + 4 = 40$
+2. **Gradient function:** $\nabla f(x) = \begin{bmatrix} 2x_1 \\ 2x_2 \end{bmatrix}$
+3. **Gradient at $v$:** $\nabla f(6, 2) = \begin{bmatrix} 2(6) \\ 2(2) \end{bmatrix} = \begin{bmatrix} 12 \\ 4 \end{bmatrix}$
+4. **Linear Approximation formula:**
+   $$f(x) \approx 40 + \begin{bmatrix} 12 & 4 \end{bmatrix} \begin{bmatrix} x_1 - 6 \\ x_2 - 2 \end{bmatrix}$$
+   $$f(x) \approx 40 + 12(x_1 - 6) + 4(x_2 - 2)$$
+   $$f(x) \approx 40 + 12x_1 - 72 + 4x_2 - 8$$
+   $$f(x) \approx 12x_1 + 4x_2 - 40$$.
+
+
+
+<img width="1139" height="672" alt="image" src="https://github.com/user-attachments/assets/214f3bbd-49ec-4bf5-927b-42e5321ecfbe" />
+
+
+
+**Key Property:**
+At the point of approximation ($x = v$), the linear approximation is exactly equal to the function value: $f(v) = L_v(f)(v) = 40$. At any other point $x \neq v$, it is only an approximation, particularly valid in the neighborhood of $v$.
+
+---
+
+### 5. Tangent Plane Interpretation
+
+The graph of the linear approximation $L_v(f)$ is a **plane** because it is a linear function.
+The graph of a function $f: \mathbb{R}^d \to \mathbb{R}$ is a subset of $\mathbb{R}^{d+1}$.
+
+> [!IMPORTANT]
+> The graph of $L_v(f)$ is a plane that is **tangent** to the graph of $f$ at the point $(v, f(v))$.
+
+
+
+<img width="1117" height="657" alt="image" src="https://github.com/user-attachments/assets/3524439e-f81c-4fc4-88f3-cf8171aa0ad7" />
+
+
+
+---
+
+### 6. Contour Sets and Gradient Direction
+
+The gradient $\nabla f(v)$ has a specific geometric relationship with the contour sets (level sets) of the function.
+
+**Theorem:** The gradient $\nabla f(v)$ is perpendicular to the level set defined by:
+$$\{x \in \mathbb{R}^d \mid f(x) = f(v)\}$$
+
+**Example:** For $f(x) = x_1^2 + x_2^2$ at $v = (-6, 2)$, $\nabla f(v) = (-12, 4)$. This vector is perpendicular to the circle $x_1^2 + x_2^2 = 40$.
+
+#### Proof via Linear Approximation
+Consider the set of $x$ such that the linear approximation equals $f(v)$:
+$$\{x \in \mathbb{R}^d \mid L_v(f)(x) = f(v)\}$$
+$$f(v) + \nabla f(v)^\top (x - v) = f(v)$$
+$$\nabla f(v)^\top x - \nabla f(v)^\top v = 0$$
+$$\nabla f(v)^\top x = \nabla f(v)^\top v$$
+
+This is the equation of a plane $w^\top x = b$, where $w = \nabla f(v)$. In such a plane, the vector $w$ is perpendicular to the plane. Thus, $\nabla f(v)$ is perpendicular to this plane.
+
+---
+
+### 7. Directional Derivative
+
+The directional derivative of function $f$ at point $v$ along direction $u$ quantifies the rate of change of the function as you move from $v$ along $u$.
+
+**Definition:**
+$$D_u f(v) = \lim_{\alpha \to 0} \frac{f(v + \alpha u) - f(v)}{\alpha}$$
+
+Using linear approximation for $f(v + \alpha u)$ when $\alpha \to 0$:
+$$D_u f(v) = \lim_{\alpha \to 0} \frac{f(v) + \nabla f(v)^\top (\alpha u) - f(v)}{\alpha} = \nabla f(v)^\top u$$
+
+> [!TIP]
+> To compute the directional derivative along any direction $u$, simply take the dot product of the direction with the gradient.
+
+---
+
+### 8. Steepest Ascent and Cauchy-Schwarz Inequality
+
+To decide which direction to move to increase or decrease the function the most, we use the **Cauchy-Schwarz Inequality**.
+
+#### 8.1 Cauchy-Schwarz Inequality
+For two $d$-dimensional vectors $a$ and $b$:
+$$-\|a\|\|b\| \leq a^\top b \leq \|a\|\|b\|$$
+
+**Equality Conditions:**
+* $a^\top b = -\|a\|\|b\|$ happens when $a = \alpha b$ for a scalar $\alpha < 0$.
+* $a^\top b = \|a\|\|b\|$ happens when $a = \alpha b$ for a scalar $\alpha > 0$.
+
+#### 8.2 Direction of Steepest Ascent
+Goal: Find a unit vector $u$ ($\|u\| = 1$) that maximizes $D_u f(v) = \nabla f(v)^\top u$.
+
+By Cauchy-Schwarz, this is maximized when $u$ is a positive scalar multiple of $\nabla f(v)$.
+Since $\|u\| = 1$, the optimal direction is:
+$$u = \frac{\nabla f(v)}{\|\nabla f(v)\|}$$
+
+**Interpretation:** The gradient is the direction of **steepest ascent**.
+
+---
+
+### 9. Descent Directions
+
+A direction $u$ is a **descent direction** if the function decreases moving along it, meaning the directional derivative is negative:
+
+$$\nabla f(v)^\top u < 0$$
+
+---
+
+### 10. Advanced Approximations and Optimality
+
+#### 10.1 Quadratic Approximation (Higher Order)
+Analogous to the quadratic term in 1D, for $f: \mathbb{R}^d \to \mathbb{R}$:
+
+$$f(x) \approx f(v) + \nabla f(v)^\top (x - v) + \frac{1}{2} (x - v)^\top \nabla^2 f(v) (x - v)$$
+
+* **Hessian ($\nabla^2 f(v)$):** A $d \times d$ matrix of second-order partial derivatives.
+
+#### 10.2 Critical Points and Optimality
+* **Necessary Condition:** If $f(x)$ is minimized (or maximized) at point $v$, then $\nabla f(v) = \mathbf{0}$ (the zero vector).
+* **Critical Points:** The set of points $\{v \mid \nabla f(v) = \mathbf{0}\}$.
+
+> [!CAUTION]
+> $\nabla f(v) = \mathbf{0}$ does *not* guarantee a minimum or maximum; these points are simply candidates (critical points) that satisfy the **first-order necessary condition for optimality**.
 
