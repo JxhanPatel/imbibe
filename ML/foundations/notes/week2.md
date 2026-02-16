@@ -548,3 +548,142 @@ In the neighborhood of $x^{\star}$, if the derivative is not 0 (e.g., $7 + 3x$),
 
 
 Machine learning at its core is an applied optimization problem. We are interested in finding the minima or maxima of functions, and so we are really interested in finding points where the gradient or the derivative is 0.
+
+
+
+---
+
+
+## 2.5  Multivariate Calculus: Lines and Planes in Higher Dimensional Space
+
+### 1. Introduction to Multivariate Calculus
+Hello everyone and welcome to another lecture of machine learning foundations. We will continue with our calculus recap. We have been seeing about univariate function univariate calculus which is about functions $f$ from $\mathbb{R}$ to $\mathbb{R}$ where the domain and codomain are both $\mathbb{R}$. 
+
+We will generalize most of these to multivariate functions, which are functions from $\mathbb{R}^d$ to $\mathbb{R}$. The codomain is still $\mathbb{R}$; the function is still real-valued, just that the input domain is $d$-dimensional. This brings us lots of geometric ideas for explaining multivariate calculus ideas. Still, we'll be doing mostly differential calculus, and most of these you should have seen in your Mathematics for Data Science 2.
+
+Before we actually get into the calculus, we should first get the basic geometry of high dimensional space, and the basic sets for doing that are lines and planes.
+
+---
+
+### 2. Geometry of Lines
+What is a line? We will be working with $\mathbb{R}^d$ now. A line in $\mathbb{R}^d$ is, first of all, a subset of $\mathbb{R}^d$. 
+
+#### Definition 2a: Line Through a Point Along a Direction
+A line is parameterized by two vectors. A line through the point $u$ in $\mathbb{R}^d$ along the direction $v$ in $\mathbb{R}^d$ is simply given by the set of all $d$-dimensional vectors such that $x$ can be written as:
+$$x = u + \alpha v$$
+for $\alpha$ reals ($\alpha \in \mathbb{R}$).
+
+#### Definition 2b: Line Through Two Points
+A line through the points $u$ and $u'$ is simply given by the set of all $x \in \mathbb{R}^d$ such that:
+$$x = u + \alpha(u' - u) \text{ for } \alpha \in \mathbb{R}$$
+Which is also written as the set of all $x \in \mathbb{R}^d$ such that:
+$$x = (1 - \alpha)u + \alpha u' \text{ for } \alpha \in \mathbb{R}$$
+As you vary $\alpha$, you get different $(1 - \alpha)u + \alpha u'$ and the union of every such element forms the line.
+
+#### Equivalence of Definitions
+You can see from this expression that a line through $u$ and $u'$ is exactly the same as the line through $u$ along the direction $u' - u$. Similarly, the following three sets are really the same:
+* Line through $u$ and $u'$
+* Line through $u$ along $u' - u$
+* Line through $u'$ along $u - u'$
+
+All of these are the same subset of $\mathbb{R}^d$. This is a simple exercise to prove. You can just view $u' - u$ as a vector indicating direction; if you do that, it's exactly the same as the first definition.
+
+#### Example: Line in $\mathbb{R}^2$
+Consider a line through the point $(1, 1)$ along the direction $(1, 2)$. This would be the set of all $x \in \mathbb{R}^2$ such that:
+$$x = \begin{bmatrix} 1 \\ 1 \end{bmatrix} + \alpha \begin{bmatrix} 1 \\ 2 \end{bmatrix} \text{ where } \alpha \text{ varies over the real line.}$$
+
+<img width="423" height="400" alt="image" src="https://github.com/user-attachments/assets/21e10ca2-cbd3-4ca5-a84e-92f64706fac1" />
+
+
+It does really look like a line when plotted.
+
+---
+
+### 3. Hyperplanes
+The next basic set in $d$-dimensional space is a hyperplane or just a plane. A hyperplane is typically a $(d - 1)$-dimensional hyperplane. This is the default dimension.
+
+#### Definition
+A hyperplane normal to the vector $w$ in $\mathbb{R}^d$ with value $b$ in $\mathbb{R}$ is given by the set of all $x$ in $\mathbb{R}^d$ such that:
+$$w^T x = b$$
+which is the set of $x$ in $\mathbb{R}^d$ such that:
+$$\sum_{i=1}^{d} w_i x_i = b$$
+
+This is the standard definition of a plane, which is defined in terms of a vector normal to the plane and value $b$.
+
+#### Example: Hyperplane in $\mathbb{R}^3$
+Consider $d = 3$. A hyperplane that is normal to the vector $(1, 1, 1)$ with value $1$ is simply the set of all $x$ in $\mathbb{R}^3$ such that:
+$$x_1 + x_2 + x_3 = 1$$
+
+<img width="383" height="373" alt="image" src="https://github.com/user-attachments/assets/7205371d-ddba-441c-87c4-9e31ab4ce403" />
+
+
+If you can imagine a 3D corner of your room, a piece of paper floating there would look like this corresponding to the hyperplane.
+
+---
+
+### 4. Points, Vectors, and Tuples
+In this particular set, we will call it this hyperplane $t$. We can say a statement like this: The point $(0, 1, 0)$ lies on $t$ which is perpendicular or normal to the vector $(1, 1, 1)$.
+
+#### The Distinction
+* **Tuple:** Simply what you would store in a programming language (e.g., a three-dimensional vector).
+* **Point:** Corresponds to a location (e.g., "I am in Chennai").
+* **Vector:** Corresponds to a direction (e.g., "I am going towards Bangalore").
+
+You can imagine a line through Chennai along the direction given by Bangalore minus Chennai. Both are represented by a tuple in $\mathbb{R}^d$, but there is a difference between points and vectors.
+
+> [!IMPORTANT]
+> From context, it should be clear whether a tuple is used as a point or as a vector. 
+> * $(0, 1, 0)$ is used as a **point** because a vector cannot lie on a plane; only points can.
+> * $(1, 1, 1)$ is used as a **vector** because you cannot be perpendicular to a point; you can be perpendicular to a vector.
+
+Algebraically it should be very clear, but geometrically you must understand whether a particular tuple is used as a vector or as a point.
+
+---
+
+### 5. Partial Derivatives
+The basic tool that is the basic building block of multivariate calculus are partial derivatives.
+
+#### Concept
+The partial derivative of a function with respect to one of its arguments means you view the rest of the arguments as constants. If you fix the other variables, it becomes a one-dimensional function and then you can do the derivative.
+
+#### Notation
+I am going to use the sound "dough" ($\partial$) to denote this.
+
+#### Mathematical Definition (2D Case)
+For a function $f$ from $\mathbb{R}^2$ to $\mathbb{R}$, the partial derivative with respect to $x_1$ evaluated at a point $v$:
+$$\frac{\partial f}{\partial x_1}(v) = \lim_{\alpha \to 0} \frac{f(v_1 + \alpha, v_2) - f(v_1, v_2)}{\alpha}$$
+
+The second variable is kept constant at $v_2$. Similarly for the second variable:
+$$\frac{\partial f}{\partial x_2}(v) = \lim_{\alpha \to 0} \frac{f(v_1, v_2 + \alpha) - f(v_1, v_2)}{\alpha}$$
+
+#### General $d$-dimensional Definition
+For a general $d$-dimensional function, the $i$-th argument:
+$$\frac{\partial f}{\partial x_i}(v) = \lim_{\alpha \to 0} \frac{f(v + \alpha e_i) - f(v)}{\alpha}$$
+Where $e_i$ is the coordinate vector with the $i$-th coordinate being equal to $1$ and the rest being $0$.
+
+---
+
+### 6. Gradients
+If you have a function $f$ from $\mathbb{R}^d$ to $\mathbb{R}$, for any given point $v$ you have these things:
+$$\frac{\partial f}{\partial x_1}(v), \frac{\partial f}{\partial x_2}(v), \dots, \frac{\partial f}{\partial x_d}(v)$$
+
+#### Row Vector
+You can imagine putting all of these in a row vector and call it:
+$$\frac{\partial f}{\partial x} = \begin{bmatrix} \frac{\partial f}{\partial x_1} & \frac{\partial f}{\partial x_2} & \dots & \frac{\partial f}{\partial x_d} \end{bmatrix}$$
+
+#### Gradient Definition
+A gradient of $f$ at $v$ is simply the transpose:
+$$\nabla f(v) = \left( \frac{\partial f}{\partial x} \right)^T$$
+The gradient is typically written as a column vector. It is a collection of partial derivatives; a $d$-dimensional vector which collects partial derivatives.
+
+#### Examples
+1.  **Quadratic:** $f(x) = x_1^2 + x_2^2$
+    * $\frac{\partial f}{\partial x_1} = 2x_1$
+    * $\frac{\partial f}{\partial x_2} = 2x_2$
+    * $\nabla f(v) = \begin{bmatrix} 2v_1 \\ 2v_2 \end{bmatrix}$
+
+2.  **Linear:** $f(x) = x_1 + 2x_2 + 3x_3$
+    * $\nabla f(v) = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}$
+    Because the gradient is a constant, these kind of functions are called linear functions.
+
+
