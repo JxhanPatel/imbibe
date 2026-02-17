@@ -54,7 +54,6 @@ A relation is essentially a table. Below is an example of the `instructor` relat
 2. A **relation** $r$ is a subset of $D_1 \times D_2 \times \dots \times D_n$.
    * Thus, a relation is a set of $n$-tuples $(a_1, a_2, \dots, a_n)$ where each $a_i \in D_i$.
 
-c
 
 ### 3.1 Relations are Unordered
 * Order of tuples is irrelevant (tuples may be stored in an arbitrary order).
@@ -108,6 +107,9 @@ A **primary key** is a candidate key chosen by the database designer as the prin
 A relation $r_1$ may include among its attributes the primary key of another relation $r_2$. This attribute is called a **foreign key** from $r_1$, referencing $r_2$.
 * The relation $r_1$ is called the **referencing relation**.
 * The relation $r_2$ is called the **referenced relation**.
+
+<img width="1337" height="708" alt="image" src="https://github.com/user-attachments/assets/60bb90aa-320b-4bf4-b231-8028b929c988" />
+
 
  ---
 
