@@ -108,7 +108,7 @@ A relation $r_1$ may include among its attributes the primary key of another rel
 * The relation $r_1$ is called the **referencing relation**.
 * The relation $r_2$ is called the **referenced relation**.
 
-<img width="1337" height="708" alt="image" src="https://github.com/user-attachments/assets/60bb90aa-320b-4bf4-b231-8028b929c988" />
+<img width="933" height="509" alt="image" src="https://github.com/user-attachments/assets/071af0e1-e8fa-49e3-84d9-786dff3316d3" />
 
 
  ---
