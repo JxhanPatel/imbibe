@@ -451,3 +451,195 @@ $$\text{where } P;$$
 #### **4. Summary**
 *   **Introduced relational query language**.
 *   **Familiarized with data definition and basic query structure**.
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 2.4: Introduction to SQL/2
+
+---
+
+## 1. Additional Basic Operations
+
+The basic structure of the `select-from-where` query is extended with additional features to enable writing varied forms of queries and making query writing easier.
+
+### 1.1 Cartesian Product in the From Clause
+
+If multiple relations are specified in the `from` clause, a Cartesian product is formed.
+
+- **Definition:** A combination of all tuples from one relation with all tuples from another.
+- **Example:** If we have relations `instructor` and `teaches`, specifying both in the `from` clause with a wildcard `*` in the `select` clause creates a table containing all columns from both, with all possible record combinations.
+- **Column Qualification:** If a column name is identical between two relations (e.g., `ID`), it is qualified by the relation name: `instructor.ID` and `teaches.ID`.
+
+
+### 1.2 Joining Information
+
+The raw Cartesian product is often not useful because it creates many meaningless tuples (where IDs do not match).
+
+- **Condition:** To relate instructor names to course IDs, we match the `ID` from both tables.
+- **Query Example:**
+
+```sql
+select name, course_id
+from instructor, teaches
+where instructor.ID = teaches.ID;
+
+```
+
+<img width="646" height="479" alt="image" src="https://github.com/user-attachments/assets/c3016164-3379-4b67-803c-06315d63193c" />
+
+
+
+- **Refinement with Additional Selection:**
+Find the names of all instructors in the Art department who have taught some course and the course_id of the course they taught:
+
+```sql
+select name, course_id
+from instructor, teaches
+where instructor.ID = teaches.ID and instructor.dept_name = 'Art';
+
+```
+
+---
+
+## 2. The Rename Operation (as Clause)
+
+The `as` clause is used to give a different name to an attribute or a relation.
+
+- **Syntax:** `old-name as new-name`
+- **Usage:** It can be used in the `select` clause or the `from` clause.
+- **Note:** The `as` keyword is optional; `instructor T` is equivalent to `instructor as T`.
+
+### 2.1 Self-Join Example
+
+Renaming is essential for operations within a single table (self-comparison).
+
+- **Query:** Find the names of all instructors whose salary is greater than at least one instructor in the Computer Science department.
+
+```sql
+select distinct T.name
+from instructor as T, instructor as S
+where T.salary > S.salary and S.dept_name = 'Comp. Sci.';
+
+```
+
+
+---
+
+## 3. String Operations
+
+Strings are used for names, IDs, and descriptions. SQL allows for exact and partial matching.
+
+- **Operator:** `like`
+- **Pattern Matching Characters:**
+
+  1. **Percent (%):** Matches any substring (including null strings).
+  2. **Underscore (_):** Matches any single character.
+
+### 3.1 Examples
+
+- `'Intro%'` matches any string beginning with "Intro".
+- `'%Computer%'` matches any string containing "Computer" as a substring.
+- `'___'` matches any string of exactly three characters.
+- `'___%'` matches any string of at least three characters.
+
+> [!IMPORTANT]
+> Patterns are **case-sensitive** in SQL string matching, whereas general SQL keywords are not.
+>
+>
+
+---
+
+## 4. Ordering the Display of Tuples
+
+The `order by` clause sorts the result of a query.
+
+- **Default:** Ascending order (`asc`).
+- **Descending:** Use `desc`.
+- **Multi-Attribute Sorting:** Sorting can be performed on multiple attributes.
+
+```sql
+select distinct name
+from instructor
+order by name desc;
+
+```
+
+### 4.1 Limiting Results
+
+To select a specific number of rows from a large list (e.g., top 10):
+
+- **SQL Server / MS Access:** `select top 10 ...`
+- **MySQL:** `... limit 10`
+- **Oracle / SQL Standard:** `fetch first 10 rows only`
+
+---
+
+## 5. Where Clause Predicates
+
+### 5.1 Range Comparisons (between)
+
+Simplifies range checks:
+
+```sql
+select name
+from instructor
+where salary between 90000 and 100000;
+-- Equivalent to: salary >= 90000 and salary <= 100000
+
+```
+
+### 5.2 Set Membership (in)
+
+Simplifies multiple `OR` conditions:
+
+```sql
+select name
+from instructor
+where dept_name in ('Comp. Sci.', 'Biology');
+
+```
+
+### 5.3 Tuple Comparison
+
+Allows comparing pairs of attributes:
+
+```sql
+select name, course_id
+from instructor, teaches
+where (instructor.ID, dept_name) = (teaches.ID, 'Biology');
+
+```
+
+---
+
+## 6. Duplicates and Multisets
+
+While Relational Algebra is based on set theory (no duplicates), SQL follows **multiset** (bag) semantics.
+
+### 6.1 Multiset Operations
+
+- **Selection:** If a tuple $t_1$ has $c_1$ copies and satisfies condition $\theta$, then all $c_1$ copies are included in the result.
+- **Projection:** For each copy of tuple $t_1$ in relation $r_1$, there is a copy of the projection of $t_1$ in the result.
+- **Cartesian Product:** If $t_1$ appears $c_1$ times in $r_1$ and $t_2$ appears $c_2$ times in $r_2$, the tuple $(t_1, t_2)$ appears $c_1 \times c_2$ times in $r_1 \times r_2$.
+
+
+<img width="1303" height="226" alt="image" src="https://github.com/user-attachments/assets/f06fa1fe-f66d-4f20-b8c3-efae2788d09a" />
+
+
+---
+
+
+
+
