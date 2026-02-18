@@ -643,3 +643,165 @@ While Relational Algebra is based on set theory (no duplicates), SQL follows **m
 
 
 
+
+
+
+### 2.5: Introduction to SQL/3
+
+#### **Outline**
+*   **Set Operations: union, intersect, except**.
+*   **Null Values**.
+*   **Aggregate Functions: avg, min, max, sum, and count**.
+*   **Group By**.
+*   **Having**.
+
+---
+
+#### **1. Set Operations**
+
+The SQL operations **union**, **intersect**, and **except** operate on relations and correspond to the mathematical set operations $\cup, \cap,$ and $-$.
+
+**Examples based on the University Schema:**
+*   **Find courses that ran in Fall 2009 or in Spring 2010 (Union):**
+    ```sql
+    (select course_id from section where sem = 'Fall' and year = 2009)
+    union
+    (select course_id from section where sem = 'Spring' and year = 2010);
+    ```
+*   **Find courses that ran in Fall 2009 and in Spring 2010 (Intersect):**
+    ```sql
+    (select course_id from section where sem = 'Fall' and year = 2009)
+    intersect
+    (select course_id from section where sem = 'Spring' and year = 2010);
+    ```
+*   **Find courses that ran in Fall 2009 but not in Spring 2010 (Except):**
+    ```sql
+    (select course_id from section where sem = 'Fall' and year = 2009)
+    except
+    (select course_id from section where sem = 'Spring' and year = 2010);
+    ```
+
+**Duplicates in Set Operations:**
+*   Each of the above operations **automatically eliminates duplicates**.
+*   To retain all duplicates, use the corresponding multiset versions: **union all**, **intersect all**, and **except all**.
+
+**Multiset Operation Rules:**
+Suppose a tuple occurs $m$ times in $r$ and $n$ times in $s$, then it occurs:
+*   $m + n$ times in $r$ **union all** $s$.
+*   $\min(m, n)$ times in $r$ **intersect all** $s$.
+*   $\max(0, m - n)$ times in $r$ **except all** $s$.
+
+---
+
+#### **2. Null Values**
+
+*   It is possible for tuples to have a **null value**, denoted by `null`, for some of their attributes.
+*   `null` signifies an **unknown value** or that a **value does not exist**.
+*   The result of any **arithmetic expression involving null is null** (e.g., $5 + null$ returns `null`).
+
+**Testing for Nulls:**
+*   The predicate **is null** can be used to check for null values.
+    *   *Example:* `select name from instructor where salary is null;`
+*   The predicate **is not null** succeeds if the value is not null.
+*   It is **not possible** to test for null values with comparison operators such as $=, <, >$.
+
+**Three-Valued Logic:**
+Any comparison with `null` returns **unknown**. This creates three logical values: **true**, **false**, and **unknown**.
+
+| Operation | Logical Result |
+| :--- | :--- |
+| **OR** | `(unknown or true) = true`, `(unknown or false) = unknown`, `(unknown or unknown) = unknown` |
+| **AND** | `(true and unknown) = unknown`, `(false and unknown) = false`, `(unknown and unknown) = unknown` |
+| **NOT** | `(not unknown) = unknown` |
+
+*   **"P is unknown"** evaluates to true if predicate $P$ evaluates to unknown.
+*   The result of a **where clause predicate is treated as false** if it evaluates to unknown.
+
+---
+
+#### **3. Aggregate Functions**
+
+Aggregate functions take a collection (a set or multiset) of values as input and return a **single value**.
+
+**Standard Built-in Functions:**
+*   `avg`: average value.
+*   `min`: minimum value.
+*   `max`: maximum value.
+*   `sum`: sum of values.
+*   `count`: number of values.
+
+**Examples:**
+*   **Average salary in Computer Science:**
+    ```sql
+    select avg(salary)
+    from instructor
+    where dept_name = 'Comp. Sci';
+    ```
+*   **Total number of instructors teaching in Spring 2010:**
+    ```sql
+    select count(distinct ID)
+    from teaches
+    where semester = 'Spring' and year = 2010;
+    ```
+*   **Number of tuples in the course relation:**
+    ```sql
+    select count(*)
+    from courses;
+    ```
+
+---
+
+#### **4. Aggregation with Grouping and Having**
+
+**The Group By Clause:**
+The attribute or attributes given in the `group by` clause are used to **form groups**. Tuples with the same value on all attributes in the clause are placed in one group.
+
+*   *Example:* Find average salary of instructors in each department:
+    ```sql
+    select dept_name, avg(salary) as avg_salary
+    from instructor
+    group by dept_name;
+    ```
+
+> [!CAUTION]
+> **Rule:** Attributes in the `select` clause outside of aggregate functions **must appear in the group by list**.
+>
+> **Erroneous Query Example:**
+> ```sql
+> select dept_name, ID, avg(salary)
+> from instructor
+> group by dept_name;
+> ```
+> *Explanation:* Each instructor in a group can have a different ID; there is no unique way to choose which ID value to output.
+
+
+<img width="845" height="467" alt="image" src="https://github.com/user-attachments/assets/f6b6786e-9c31-4275-a3ee-7f7460b69ebd" />
+
+
+
+
+#### **5. The Having Clause**
+It is useful to state a condition that **applies to groups** rather than to tuples. SQL applies predicates in the `having` clause **after groups have been formed**.
+
+*   *Example:* Find average salary of instructors in departments where that average is > \$42,000:
+    ```sql
+    select dept_name, avg(salary) as avg_salary
+    from instructor
+    group by dept_name
+    having avg(salary) > 42000;
+    ```
+
+---
+
+#### **Summary**
+*   **Familiarized with set operations, null values and aggregation**.
+*   The meaning of a query containing aggregation is defined by the sequence: **from** $\rightarrow$ **where** $\rightarrow$ **group by** $\rightarrow$ **having**.
+
+
+
+
+---
+
+
+
+
