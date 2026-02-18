@@ -283,3 +283,171 @@ These take a relation and, based on one or more columns, perform an aggregation.
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+# 2.3: Introduction to SQL/1
+
+
+
+#### **Outline**
+*   **History of SQL**.
+*   **Data Definition Language (DDL)**.
+*   **Data Manipulation Language (DML): Query Structure**.
+
+---
+
+#### **1. History of SQL**
+
+*   **IBM developed Structured English Query Language (SEQUEL)** as part of the **System R project**.
+*   It was later renamed **Structured Query Language (SQL)**, though it is still commonly pronounced as "SEQUEL".
+*   SQL has established itself as the **standard relational database language**.
+
+**ANSI and ISO Standard SQL Timeline:**
+| Standard | Key Features Added |
+| :--- | :--- |
+| **SQL-86** | First formalized by ANSI. |
+| **SQL-89** | Added Integrity Constraints. |
+| **SQL-92** | Major revision (ISO/IEC 9075 standard); became the De-facto Industry Standard. |
+| **SQL:1999** | Added Regular Expression Matching, Recursive Queries, Triggers, Support for Procedural and Control Flow Statements, Non-scalar types (Arrays), and Some OO features (structured types), Embedding SQL in Java (SQL/OLB), and Embedding Java in SQL (SQL/JRT). |
+| **SQL:2003** | Added XML features (SQL/XML), Window Functions, Standardized Sequences, and Columns with Auto-generated Values (identity columns). |
+| **SQL:2006** | Added ways of importing and storing XML data in an SQL database, manipulating it within the database, and publishing both XML and conventional SQL-data in XML form. |
+| **SQL:2008** | Legalizes ORDER BY outside Cursor Definitions; added INSTEAD OF Triggers, TRUNCATE Statement, and FETCH Clause. |
+| **SQL:2011** | Added Temporal Data (PERIOD FOR); enhancements for Window Functions and FETCH Clause. |
+| **SQL:2016** | Added Row Pattern Matching, Polymorphic Table Functions, and JSON. |
+| **SQL:2019** | Added Multidimensional Arrays (MDarray type and operators). |
+
+**Compliance:**
+*   SQL is the **de facto industry standard** today for relational or structured data systems.
+*   Commercial and open systems may be fully or partially compliant to one or more standards from SQL-92 onward.
+*   Not all examples may work on every system; users should check their specific system's SQL documentation.
+
+**Derivatives:**
+*   **SPARQL** (pronounced "sparkle") is a recursive acronym for **SPARQL Protocol and RDF Query Language**.
+*   It is a semantic query language for databases, able to retrieve and manipulate data stored in **Resource Description Framework (RDF)** format.
+*   Standardized by the **W3C Consortium** as a key technology of the semantic web.
+
+---
+
+#### **2. Data Definition Language (DDL)**
+
+The SQL data-definition language (DDL) allows the specification of information about relations, including:
+*   The **Schema** for each relation.
+*   The **Domain** of values associated with each attribute.
+*   **Integrity Constraints**.
+*   The set of **Indices** to be maintained for each relation.
+*   **Security and Authorization** information for each relation.
+*   The **Physical Storage Structure** of each relation on disk.
+
+**Domain Types in SQL:**
+*   `char(n)`: Fixed length character string, with user-specified length $n$.
+*   `varchar(n)`: Variable length character strings, with user-specified maximum length $n$.
+*   `int`: Integer (a finite subset of the integers that is machine-dependent).
+*   `smallint`: Small integer (a machine-dependent subset of the integer domain type).
+*   `numeric(p, d)`: Fixed point number, with user-specified precision of $p$ digits, with $d$ digits to the right of the decimal point.
+*   `real`, `double precision`: Floating point and double-precision floating point numbers, with machine-dependent precision.
+*   `float(n)`: Floating point number, with user-specified precision of at least $n$ digits.
+
+<img width="1163" height="662" alt="image" src="https://github.com/user-attachments/assets/cd34fead-1550-4029-a866-439569038a95" />
+
+
+
+ 
+ ---
+
+**Create Table Construct:**
+An SQL relation is defined using the `create table` command:
+$$\text{create table } r (A_1 D_1, A_2 D_2, ..., A_n D_n, \text{(integrity-constraint}_1), ..., \text{(integrity-constraint}_k));$$
+*   $r$ is the name of the relation.
+*   Each $A_i$ is an attribute name in the schema of relation $r$.
+*   $D_i$ is the data type of values in the domain of attribute $A_i$.
+
+**Example:**
+```sql
+create table instructor (
+    ID char(5),
+    name varchar(20),
+    dept_name varchar(20),
+    salary numeric(8, 2));
+```
+
+**Integrity Constraints:**
+*   `not null`: Indicates that an attribute cannot take a null value.
+*   `primary key (A_1, ..., A_n)`: Specifies that the listed attributes form the primary key for the relation. The primary key attributes are required to be non-null and unique.
+*   `foreign key (A_m, ..., A_n) references r`: Specifies that the values of these attributes for any tuple in the relation must correspond to values of the primary key attributes of some tuple in relation $r$.
+
+**Example with Constraints:**
+```sql
+create table instructor (
+    ID char(5),
+    name varchar(20) not null,
+    dept_name varchar(20),
+    salary numeric(8, 2),
+    primary key (ID),
+    foreign key (dept_name) references department);
+```
+
+**Update and Schema Modification Commands:**
+*   **Insert (DML):** `insert into instructor values ('10211', 'Smith', 'Biology', 66000);`
+*   **Delete (DML):** `delete from student;` (Removes all tuples from the student relation).
+*   **Drop Table (DDL):** `drop table r;` (Deletes the table and its schema).
+*   **Alter (DDL):** `alter table r add A D;` (Adds attribute $A$ of type $D$ to relation $r$; existing tuples are assigned `null` for the new attribute).
+*   **Alter (DDL):** `alter table r drop A;` (Drops attribute $A$ from relation $r$).
+
+---
+
+#### **3. Data Manipulation Language (DML): Query Structure**
+
+**Basic Query Structure:**
+A typical SQL query has the form:
+$$\text{select } A_1, A_2, ..., A_n$$
+$$\text{from } r_1, r_2, ..., r_m$$
+$$\text{where } P;$$
+*   $A_i$ represents an attribute.
+*   $r_i$ represents a relation.
+*   $P$ is a predicate.
+*   The result of an SQL query is a relation.
+
+**The Select Clause:**
+*   Lists the attributes desired in the result of a query.
+*   Corresponds to the **projection** operation of the relational algebra.
+*   **Case Insensitivity:** SQL names are case insensitive (e.g., $Name \equiv NAME \equiv name$).
+*   **Duplicates:** SQL allows duplicates in relations and query results.
+    *   To force elimination of duplicates, use `distinct`.
+    *   The keyword `all` specifies that duplicates should **not** be removed (default).
+*   **Wildcard:** An asterisk (`*`) denotes "all attributes".
+*   **Literals:** An attribute can be a literal.
+    *   `select '437'` results in a table with one column and one row containing '437'.
+    *   `select '437' as FOO` renames the literal column.
+*   **Arithmetic Expressions:** Can contain $+$, $-$, $*$, and $/$ operating on constants or attributes.
+    *   Example: `select ID, name, salary/12 as monthly_salary from instructor;`
+
+**The Where Clause:**
+*   Specifies conditions that the result must satisfy.
+*   Corresponds to the **selection predicate** of the relational algebra.
+*   **Connectives:** Comparison results can be combined using logical connectives `and`, `or`, and `not`.
+*   Comparisons can be applied to results of arithmetic expressions.
+
+**The From Clause:**
+*   Lists the relations involved in the query.
+*   Corresponds to the **Cartesian product** operation of the relational algebra.
+*   It generates every possible pair of tuples from the listed relations.
+
+
+<img width="624" height="479" alt="image" src="https://github.com/user-attachments/assets/d60f4a66-b21e-4ea2-8de6-3937a4f63304" />
+
+
+
+
+---
+
+#### **4. Summary**
+*   **Introduced relational query language**.
+*   **Familiarized with data definition and basic query structure**.
