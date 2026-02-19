@@ -4,8 +4,8 @@
 | Week | Topic | Core Concept | Status |
 | --- | --- | --- | --- |
 | **Week 1** | Intro to DBMS | Data Models & 3-Tier Architecture | 🟢 Done |
-| **Week 2** | Relational Model & Basic SQL | Schema, Constraints & CRUD | 🟡 In Progress |
-| **Week 3** | Advanced SQL | Joins, Subqueries & Window Functions | ⚪ Planned |
+| **Week 2** | Relational Model & Basic SQL | Schema, Constraints & CRUD | 🟢 Done |
+| **Week 3** | Advanced SQL | Joins, Subqueries & Window Functions | 🟡 In Progress |
 | **Week 4** | Relational Languages & Design | Relational Algebra & ER Diagrams | ⚪ Planned |
 | **Week 5** | Normalization I | 1NF, 2NF, 3NF & Redundancy | ⚪ Planned |
 | **Week 6** | Normalization II | BCNF, 4NF & Multi-valued Deps | ⚪ Planned |
