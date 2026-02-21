@@ -179,3 +179,166 @@ A = \begin{bmatrix} 1 & 2 \\ 3 & 6 \end{bmatrix}
 
 ---
 
+
+# 3.2: Orthogonal Vectors and Subspaces 
+
+---
+
+### 1. Introduction to Orthogonality
+
+A basis is a set of independent vectors that span a space. Geometrically, it is a set of coordinate axes. A vector space is defined without those axes, but every time we actually compute, we are using them.
+
+The goal in this section is to move from a "random" basis to an **orthogonal basis**. The coordinate axes are perpendicular, which makes the mathematics much simpler.
+
+---
+
+### 2. Orthogonal Vectors
+
+#### 2.1 Definition: Perpendicular Vectors
+
+Two vectors are orthogonal (perpendicular) if their **inner product** is zero.
+
+For vectors $x$ and $y$ in $\mathbb{R}^n$:
+
+
+
+$$
+x^T y = x_1 y_1 + x_2 y_2 + \dots + x_n y_n = 0
+$$
+
+#### 2.2 The Pythagorean Theorem
+
+In a right-angled triangle, the square of the hypotenuse is the sum of the squares of the legs. In vector terms, if $x \perp y$, then:
+
+
+
+$$
+\|x + y\|^2 = \|x\|^2 + \|y\|^2
+$$
+
+**Derivation:**
+
+
+
+$$
+\|x + y\|^2 = (x + y)^T (x + y) = x^T x + x^T y + y^T x + y^T y
+$$
+
+
+If $x$ and $y$ are orthogonal, then $x^T y = 0$ and $y^T x = 0$, leaving:
+
+
+
+$$
+\|x + y\|^2 = \|x\|^2 + \|y\|^2
+$$
+
+---
+
+### 3. Orthogonal Subspaces
+
+#### 3.1 Definition: Orthogonal Subspaces
+
+Two subspaces $V$ and $W$ of a vector space are **orthogonal** if every vector $v$ in $V$ is perpendicular to every vector $w$ in $W$.
+
+
+$$
+v^T w = 0 \quad \text{for all } v \in V \text{ and all } w \in W
+$$
+
+<img width="250" height="173" alt="image" src="https://github.com/user-attachments/assets/1727d7d6-c96b-4de7-9aec-b6dbb99baec8" />
+
+
+
+#### 3.2 Important Distinction
+
+If two subspaces meet at any vector other than the zero vector, they **cannot** be orthogonal. The zero vector is the only vector in the intersection of orthogonal subspaces.
+
+---
+
+### 4. Fundamental Subspaces and Orthogonality
+
+The "Big Picture" of linear algebra relates the four fundamental subspaces through orthogonality.
+
+#### 4.1 The Fundamental Theorem of Orthogonality
+
+1. **Row Space and Nullspace:** The nullspace $N(A)$ and the row space $C(A^T)$ are orthogonal subspaces in $\mathbb{R}^n$.
+2. **Column Space and Left Nullspace:** The left nullspace $N(A^T)$ and the column space $C(A)$ are orthogonal subspaces in $\mathbb{R}^m$.
+
+#### 4.2 Why the Row Space is Orthogonal to the Nullspace
+
+The equation $Ax = 0$ means that the vector $x$ is perpendicular to every row of $A$.
+
+
+
+$$
+Ax = \begin{bmatrix} \text{row } 1 \\ \vdots \\ \text{row } m \end{bmatrix} \begin{bmatrix} x \end{bmatrix} = \begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}
+$$
+
+
+Since $x$ is perpendicular to each row, it is perpendicular to any linear combination of the rows (the row space).
+
+---
+
+### 5. Orthogonal Complements
+
+#### 5.1 Definition
+
+The **orthogonal complement** of a subspace $V$ contains *every* vector that is perpendicular to $V$. It is denoted as $V^\perp$ ("V-perp").
+
+#### 5.2 Dimensions and the Direct Sum
+
+If $V$ is a subspace of $\mathbb{R}^n$, then the dimensions of $V$ and its orthogonal complement $V^\perp$ must add up to $n$:
+
+
+
+$$
+\dim(V) + \dim(V^\perp) = n
+$$
+
+
+Every vector $x$ in $\mathbb{R}^n$ can be uniquely split into a piece $v$ in $V$ and a piece $w$ in $V^\perp$.
+
+
+
+$$
+x = v + w
+$$
+
+---
+
+### 6. Summary Table: The Four Subspaces
+
+| Subspace | Notation | Location | Dimension | Orthogonal Complement |
+| --- | --- | --- | --- | --- |
+| **Row Space** | C($A^T$) | $R^n$ | r | Nullspace N(A) |
+| **Nullspace** | N(A) | $R^n$ | n−r | Row Space C($A^T$) |
+| **Column Space** | C(A) | $R^m$ | r | Left Nullspace N($A^T$) |
+| **Left Nullspace** | N($A^T$) | $R^m$ | m−r | Column Space C(A) |
+
+### 7. Example: Finding Perpendicular Vectors
+
+**Problem:** Find all vectors perpendicular to $(1, 3, 1)$ and $(2, 7, 2)$.
+
+**Solution:**
+Create a matrix $A$ where these vectors are the rows:
+
+
+
+$$
+A = \begin{bmatrix} 1 & 3 & 1 \\\ 2 & 7 & 2 \end{bmatrix}
+$$
+
+
+Solving $Ax = 0$ finds the nullspace, which is the orthogonal complement to the row space.
+
+1. Elimination:
+
+$$
+R_2 - 2R_1 \to \begin{bmatrix} 1 & 3 & 1 \\\ 0 & 1 & 0 \end{bmatrix}
+$$
+
+3. Back-substitution: $x_2 = 0$ and $x_1 + x_3 = 0$.
+4. The nullspace is all multiples of $(-1, 0, 1)$.
+
+
