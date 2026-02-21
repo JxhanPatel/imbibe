@@ -513,3 +513,16 @@ $$
 $$
 e = b - p = \\begin{bmatrix} 1 \\\\ 3 \\\\ -2 \\\\ 5 \\end{bmatrix} - \\begin{bmatrix} 10/9 \\\\ -5/18 \\\\ 10/9 \\\\ 5/3 \\end{bmatrix} = \\frac{1}{18} \\begin{bmatrix} -2 \\\\ 59 \\\\ -56 \\\\ 60 \\end{bmatrix}
 $$
+
+
+
+## Practise Questions
+
+
+<img width="437" height="246" alt="image" src="https://github.com/user-attachments/assets/e81eb5b2-b43f-41c5-b8e6-2f8de49b4067" />
+<img width="473" height="194" alt="image" src="https://github.com/user-attachments/assets/0345a41f-1556-48b5-ad54-a8924d00c594" />
+<img width="446" height="252" alt="image" src="https://github.com/user-attachments/assets/918a21d3-d780-4f40-a889-c86bbca793a8" />
+<img width="574" height="365" alt="image" src="https://github.com/user-attachments/assets/aff72b8b-3ea7-46eb-82c7-42d775326979" />
+
+
+
