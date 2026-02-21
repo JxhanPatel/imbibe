@@ -341,4 +341,16 @@ $$
 3. Back-substitution: $x_2 = 0$ and $x_1 + x_3 = 0$.
 4. The nullspace is all multiples of $(-1, 0, 1)$.
 
+## Practise Questions
+
+<img width="508" height="298" alt="image" src="https://github.com/user-attachments/assets/dfb1455f-1112-48d7-a6ba-28f105c3b17c" />
+
+<img width="626" height="141" alt="image" src="https://github.com/user-attachments/assets/52a615c1-5ef5-4a6c-94a8-21e2d829bf9d" />
+
+<img width="383" height="262" alt="image" src="https://github.com/user-attachments/assets/69f9683c-699e-4618-ae5f-20fbb7e4caa4" />
+
+<img width="383" height="253" alt="image" src="https://github.com/user-attachments/assets/c47dce3a-9b4b-474f-b968-89eb2e20e421" />
+
+
+<img width="404" height="107" alt="image" src="https://github.com/user-attachments/assets/344e7f65-c13f-4254-bc19-09f26f515645" />
 
