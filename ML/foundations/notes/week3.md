@@ -566,3 +566,184 @@ $$
 
 
 
+
+---
+
+
+
+# 3.4: Least Squares and Projections onto a Subspace
+
+## 1. Motivation: Why Project?
+
+The concept of projections is strongly connected to least squares problems. The need for projection arises when we have a linear system of equations $Ax = b$ that is **inconsistent**.
+
+### Inconsistent Systems
+Suppose we are given data points $(x_1, b_1), \dots, (x_n, b_n)$.
+Example systems:
+1.  **Case 1:** 
+
+$$
+    \begin{matrix} 2x = b_1 \\\ 3x = b_2 \\\ 4x = b_3 \end{matrix}
+$$
+
+    This system is solvable only if $b$ is on the line through $a = (2, 3, 4)$.
+2.  **Case 2:**
+
+$$
+    \begin{matrix} x + 2y = 4 \\\ x + 3y = 5 \\\ 2x + 4y = 6 \end{matrix}
+$$
+
+These systems are "inconsistent," meaning there is no solution that satisfies the system of equations.
+
+### Matrix View
+A system $Ax = b$ is inconsistent if $b \notin C(A)$ (the vector $b$ is not in the column space of $A$). In such situations, it makes sense to project $b$ onto $C(A)$.
+
+> [!NOTE]
+> Instead of picking a subset of equations to solve exactly (which leads to large errors in some inputs and no error in others), a reasonable alternative is to minimize the **average error**.
+
+---
+
+## 2. Least Squares: The Scalar Case
+
+Consider the inconsistent system $2x = b_1, 3x = b_2, 4x = b_3$. To find the "best" solution, we minimize the sum of squares of the errors ($E^2$):
+
+$$E^2 = (2x - b_1)^2 + (3x - b_2)^2 + (4x - b_3)^2$$
+
+### Calculus Approach
+Taking the derivative with respect to $x$ and setting it to zero:
+$$\frac{dE^2}{dx} = 0 \iff 2[2(2x - b_1) + 3(3x - b_2) + 4(4x - b_3)] = 0$$
+Solving for $\hat{x}$:
+
+
+$$
+\hat{x} = \frac{2b_1 + 3b_2 + 4b_3}{2^2 + 3^2 + 4^2} = \frac{a^T b}{a^T a} \quad \text{with } a = \begin{bmatrix} 2 \\\ 3 \\\ 4 \end{bmatrix}
+$$
+
+### Geometric Approach (Projection onto a Line)
+Let $p$ be the projection of $b$ onto line $a$.
+$$p = \hat{x}a$$
+The error vector $e$ is $e = b - p = b - \hat{x}a$. Since $e$ must be perpendicular to $a$:
+$$e \perp a \implies a^T(b - \hat{x}a) = 0$$
+$$\hat{x} = \frac{a^T b}{a^T a} \implies p = \hat{x}a = \left( \frac{a^T b}{a^T a} \right) a$$
+
+> [!IMPORTANT]
+> **Bottomline:** Taking the derivative to find the minima turns out to be the same as performing a projection.
+
+---
+
+## 3. Projection onto a Subspace
+
+We generalize this to $Ax = b$ where $A$ is an $m \times n$ matrix with $m > n$ (more equations than unknowns). We want the projection of $b$ onto the column space $C(A)$.
+
+--- 📸 INSERT IMAGE: [Figure (1): Geometric representation of vector b, its projection p onto the subspace S (spanned by columns of A), and the orthogonal error vector e | 01:15 in YouTube video or Source 929] ---
+
+### Derivation of the Normal Equations
+1.  **Goal:** Find $p = A\hat{x}$, where $p$ is the point in the column space closest to $b$.
+2.  **Observation:** The error vector $e = b - p = b - A\hat{x}$ must be orthogonal to every vector in the column space of $A$ ($e \perp C(A)$).
+3.  **Fundamental Relation:** Recall that $N(A^T)$ is the **orthogonal complement** of $C(A)$. Therefore, if $e$ is orthogonal to $C(A)$, it must belong to the null space of $A^T$ ($e \in N(A^T)$).
+4.  **Algebraic Step:**
+    $$e \in N(A^T) \implies A^T e = 0$$
+    Substituting $e = b - A\hat{x}$:
+    $$A^T(b - A\hat{x}) = 0$$
+    $$A^T A \hat{x} = A^T b$$
+
+### The Normal Equations
+The equation to solve to obtain the projection of $b$ onto $C(A)$ is:
+$$A^T A \hat{x} = A^T b$$
+
+> [!NOTE]
+> Even if $Ax = b$ is not solvable (inconsistent), $A^T A \hat{x} = A^T b$ always has a solution.
+
+---
+
+## 4. The Least Squares Solution and Projection Matrix
+
+### Solving for $\hat{x}$
+If the columns of $A$ are **linearly independent**, then $A^T A$ is square, symmetric, and **invertible**.
+$$\hat{x} = (A^T A)^{-1} A^T b$$
+
+### The Projection ($p$)
+The projection of $b$ is calculated by multiplying $A$ by the result $\hat{x}$:
+$$p = A\hat{x} = A(A^T A)^{-1} A^T b$$
+
+### The Projection Matrix ($P$)
+The projection matrix $P$ is defined as:
+$$P = A(A^T A)^{-1} A^T$$
+
+### Properties of the Projection Matrix $P$
+1.  **Symmetry:** $P^T = P$.
+2.  **Idempotency:** $P^2 = P$. left multiplication by $P$ brings a vector onto the subspace; another round of projection doesn't change it ($P(Pb) = Pb$).
+
+> [!IMPORTANT]
+> **Converse Claim:** If $P^2 = P$ and $P$ is symmetric, then $P$ is a projection matrix onto its own column space.
+
+---
+
+## 5. Special Cases of Projections
+
+| Case | Condition | Result | Explanation |
+| :--- | :--- | :--- | :--- |
+| **$b \in C(A)$** | $b = Ax$ | $p = b$ | $b$ is already in the column space; projection doesn't change it. |
+| **$b \in N(A^T)$** | $A^T b = 0$ | $p = 0$ | $b$ is in the orthogonal complement; its projection onto $C(A)$ is zero. |
+| **Square/Invertible** | $C(A) = \mathbb{R}^n$ | $p = b$ | The column space is the whole space; every vector projects to itself. |
+| **Rank One** | $A = [a]$ | $\hat{x} = \frac{a^T b}{a^T a}$ | Coincides with projection onto a line. |
+
+---
+
+## 6. Example: Least Squares Curve Fitting (One Dimension)
+
+**Problem:** Find the "best line" ($y = \hat{\theta}'x + \hat{\theta}''$) through data points $(-1, 1), (1, 1), (2, 3)$.
+
+**Matrix Formulation:**
+
+
+$$
+A\theta = b \implies \begin{bmatrix} -1 & 1 \\\ 1 & 1 \\\ 2 & 1 \end{bmatrix} \begin{bmatrix} \theta' \\\ \theta'' \end{bmatrix} = \begin{bmatrix} 1 \\\ 1 \\\ 3 \end{bmatrix}
+$$
+
+
+
+Gaussian elimination shows this system is **inconsistent** ($b \notin C(A)$).
+
+**Solving Normal Equations ($A^T A \hat{\theta} = A^T b$):**
+1.  **Calculate $A^T A$:**
+
+
+
+$$
+\begin{bmatrix} -1 & 1 & 2 \\\ 1 & 1 & 1 \end{bmatrix} \begin{bmatrix} -1 & 1 \\\ 1 & 1 \\\ 2 & 1 \end{bmatrix} = \begin{bmatrix} 6 & 2 \\\ 2 & 3 \end{bmatrix}
+$$
+
+
+2.  **Calculate $A^T b$:**
+
+
+$$
+\begin{bmatrix} -1 & 1 & 2 \\\ 1 & 1 & 1 \end{bmatrix} \begin{bmatrix} 1 \\\ 1 \\\ 3 \end{bmatrix} = \begin{bmatrix} 6 \\\ 5 \end{bmatrix}
+$$
+
+
+3.  **Solve System:**
+
+
+
+
+$$
+\begin{bmatrix} 6 & 2 \\\ 2 & 3 \end{bmatrix} \begin{bmatrix} \hat{\theta}' \\\ \hat{\theta}'' \end{bmatrix} = \begin{bmatrix} 6 \\\ 5 \end{bmatrix} \implies \hat{\theta} = \begin{bmatrix} 4/7 \\\ 9/7 \end{bmatrix}
+$$
+
+
+
+**Best Fit Line:** $y = \frac{4}{7}x + \frac{9}{7}$.
+
+**Projections and Errors:**
+*   Projections ($p$): $p_1 = \frac{5}{7}, p_2 = \frac{13}{7}, p_3 = \frac{17}{7}$.
+*   Error vector ($e = b - p$): 
+
+
+$$
+e = \begin{bmatrix} 2/7 \\\ -6/7 \\\ 4/7 \end{bmatrix}
+$$
+
+
+*   Verification: $e \perp \text{column 1 } (-1, 1, 2)$ and $e \perp \text{column 2 } (1, 1, 1)$.
