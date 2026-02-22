@@ -468,7 +468,9 @@ $$
 $$
 a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
 $$
-    *   **Null Space $N(P)$:** The plane orthogonal to
+
+
+   *   **Null Space $N(P)$:** The plane orthogonal to
   
 
 $$
