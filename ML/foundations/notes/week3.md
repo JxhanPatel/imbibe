@@ -635,7 +635,10 @@ $$\hat{x} = \frac{a^T b}{a^T a} \implies p = \hat{x}a = \left( \frac{a^T b}{a^T 
 
 We generalize this to $Ax = b$ where $A$ is an $m \times n$ matrix with $m > n$ (more equations than unknowns). We want the projection of $b$ onto the column space $C(A)$.
 
---- 📸 INSERT IMAGE: [Figure (1): Geometric representation of vector b, its projection p onto the subspace S (spanned by columns of A), and the orthogonal error vector e | 01:15 in YouTube video or Source 929] ---
+
+<img width="629" height="170" alt="image" src="https://github.com/user-attachments/assets/07d7f609-0b86-44f6-ad32-54e622db03bf" />
+
+
 
 ### Derivation of the Normal Equations
 1.  **Goal:** Find $p = A\hat{x}$, where $p$ is the point in the column space closest to $b$.
@@ -747,3 +750,11 @@ $$
 
 
 *   Verification: $e \perp \text{column 1 } (-1, 1, 2)$ and $e \perp \text{column 2 } (1, 1, 1)$.
+
+
+
+
+## Practise Questions
+
+<img width="327" height="254" alt="image" src="https://github.com/user-attachments/assets/7a279f5d-dc7d-487f-ba4e-c454a145f923" /> <img width="556" height="369" alt="image" src="https://github.com/user-attachments/assets/69237c64-9e14-4f82-9b76-01a71b2d7407" />
+
