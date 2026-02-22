@@ -119,10 +119,9 @@ $$
 
 
 
-U =
-```math
-\\begin{bmatrix} 1 & 2 & 2 & 2 \\\\ 0 & 0 & 2 & 4 \\\\ 0 & 0 & 0 & 0 \\end{bmatrix}
-```
+$$
+U = \\begin{bmatrix} 1 & 2 & 2 & 2 \\\\ 0 & 0 & 2 & 4 \\\\ 0 & 0 & 0 & 0 \\end{bmatrix}
+$$
 
 
 2. **Identify Pivots:** Columns 1 and 3 are pivot columns.
@@ -167,9 +166,12 @@ $$
 ## 7. Comprehensive Example
 
 Matrix 
-```math
-A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix} 
-```
+
+$$
+A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix}
+$$
+
+
 ($m=2, n=2$)
 
 1. **Column Space:** $C_2 = 2 \\times C_1$. $C(A)$ is the line through $[1, 3]^T$. $\\text{Rank} (r) = 1$.
@@ -434,7 +436,7 @@ We define the **Projection Matrix** $P$ as:
 $$P = \\frac{a a^T}{a^T a}$$
 To project any vector $b$ onto the line through $a$, simply left-multiply $b$ by the projection matrix $P$: $p = Pb$.
 
-### Example: $a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$
+### Example: $$a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$$
 The projection matrix is:
 $$P = \\frac{a a^T}{a^T a} = \\frac{1}{3} \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} 1 & 1 & 1 \\end{bmatrix} = \\begin{bmatrix} 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\end{bmatrix}$$
 
@@ -453,9 +455,7 @@ $$P = \\frac{a a^T}{a^T a} = \\frac{1}{3} \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end
 Scaling the vector $a$ does not change the projection matrix. For example, if
 
 $$
-
 a = \\begin{bmatrix} 2 \\\\ 2 \\\\ 2 \\end{bmatrix}
-
 $$
 
 
