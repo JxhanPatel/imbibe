@@ -377,9 +377,14 @@ The concept of projections is very, very important because they have a strong co
 ### Motivation: Inconsistent Systems
 Suppose we are given data points $(x_1, b_1), \\dots, (x_n, b_n)$. 
 For example:
+
+
 $$
 \\begin{matrix} 2x = b_1 \\\\ 3x = b_2 \\\\ 4x = b_3 \\end{matrix} \\quad \\text{or} \\quad \\begin{matrix} x + 2y = 4 \\\\ x + 3y = 5 \\\\ 2x + 4y = 6 \\end{matrix}
 $$
+
+
+
 These systems are "inconsistent," meaning there is no solution that satisfies the system of equations.
 
 **Matrix View:**
@@ -442,9 +447,15 @@ a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
 $$
 
 The projection matrix is:
+
+
+
 $$
 P = \\frac{a a^T}{a^T a} = \\frac{1}{3} \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} 1 & 1 & 1 \\end{bmatrix} = \\begin{bmatrix} 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\end{bmatrix}
 $$
+
+
+
 
 ### Properties of the Projection Matrix $P$
 1.  **Symmetry:** $P$ is symmetric ($P^T = P$).
@@ -452,13 +463,19 @@ $$
     *   *Idea:* Left multiplication by $P$ brings a vector onto the line through $a$. Once a vector $Pb$ is already on that line, another round of projection doesn't change it ($P(Pb) = Pb$).
 3.  **Subspaces:**
     *   **Column Space $C(P)$:** The line through
+  
+
 $$
 a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
 $$
     *   **Null Space $N(P)$:** The plane orthogonal to
+  
+
 $$
 a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
 $$
+
+
 5.  **Rank:** $r(P) = 1$.
 
 > [!NOTE]
@@ -466,12 +483,16 @@ $$
 
 Scaling the vector $a$ does not change the projection matrix. For example, if
 
+
 $$
 a = \\begin{bmatrix} 2 \\\\ 2 \\\\ 2 \\end{bmatrix}
 $$
 
 
 , the resulting $P$ is identical to the one derived from
+
+
+
 $$
 a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
 $$
