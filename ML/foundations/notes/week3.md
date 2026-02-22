@@ -436,18 +436,30 @@ We define the **Projection Matrix** $P$ as:
 $$P = \\frac{a a^T}{a^T a}$$
 To project any vector $b$ onto the line through $a$, simply left-multiply $b$ by the projection matrix $P$: $p = Pb$.
 
-### Example: $$a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$$
+### Example:
+$$
+a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
+$$
+
 The projection matrix is:
-$$P = \\frac{a a^T}{a^T a} = \\frac{1}{3} \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} 1 & 1 & 1 \\end{bmatrix} = \\begin{bmatrix} 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\end{bmatrix}$$
+$$
+P = \\frac{a a^T}{a^T a} = \\frac{1}{3} \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} 1 & 1 & 1 \\end{bmatrix} = \\begin{bmatrix} 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\\\ 1/3 & 1/3 & 1/3 \\end{bmatrix}
+$$
 
 ### Properties of the Projection Matrix $P$
 1.  **Symmetry:** $P$ is symmetric ($P^T = P$).
 2.  **Idempotency:** $P^2 = P$.
     *   *Idea:* Left multiplication by $P$ brings a vector onto the line through $a$. Once a vector $Pb$ is already on that line, another round of projection doesn't change it ($P(Pb) = Pb$).
 3.  **Subspaces:**
-    *   **Column Space $C(P)$:** The line through $a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$.
-    *   **Null Space $N(P)$:** The plane orthogonal to $a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$.
-4.  **Rank:** $r(P) = 1$.
+    *   **Column Space $C(P)$:** The line through
+$$
+a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
+$$
+    *   **Null Space $N(P)$:** The plane orthogonal to
+$$
+a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
+$$
+5.  **Rank:** $r(P) = 1$.
 
 > [!NOTE]
 
@@ -459,7 +471,10 @@ a = \\begin{bmatrix} 2 \\\\ 2 \\\\ 2 \\end{bmatrix}
 $$
 
 
-, the resulting $P$ is identical to the one derived from $a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$.
+, the resulting $P$ is identical to the one derived from
+$$
+a = \\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}
+$$
 
 ---
 
@@ -477,13 +492,14 @@ Let $u = (1, 2, 4, 0)^T, v = (-2, 3, -1, 0)^T, w = (0, 2, 6, -1)^T$.
 
 ### Example 2: Projection Matrix and Error Calculation
 **Problem:** i. Find the projection matrix for
-$$
 
+$$
 a = \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\\\ 3 \\end{bmatrix}
-
 $$
 
-ii. Obtain the projection of $$
+ii. Obtain the projection of
+
+$$
 b = \\begin{bmatrix} 1 \\\\ 3 \\\\ -2 \\\\ 5 \\end{bmatrix}
 $$
 
@@ -491,8 +507,9 @@ onto $a$ and compute the error.
 
 **Solution:**
 i. **Projection Matrix ($P$):**
+
 $$
-a a^T = \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\\\ 3 \\end{bmatrix} \\begin{bmatrix} 2 & -1 & 2 & 3 \\end{bmatrix} = \\begin{bmatrix} 4 & -2 & 4 & 6 \\\\ -2 & 1 & -2 & -3 \\\\ 4 & -2 & 4 & 6 \\\\ 6 & -3 & 6 & 9 \\end{bmatrix}
+a^T = \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\\\ 3 \\end{bmatrix} \\begin{bmatrix} 2 & -1 & 2 & 3 \\end{bmatrix} = \\begin{bmatrix} 4 & -2 & 4 & 6 \\\\ -2 & 1 & -2 & -3 \\\\ 4 & -2 & 4 & 6 \\\\ 6 & -3 & 6 & 9 \\end{bmatrix}
 $$
 
 $$
