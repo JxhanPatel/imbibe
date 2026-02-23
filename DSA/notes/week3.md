@@ -396,4 +396,159 @@ When inserting a value $v$ into a sorted sequence of length $n$:
 > - **Arrays** support random access (constant time) but expansion and contraction take linear time.
 > - Algorithm analysis depends heavily on the underlying representation. Swapping $A[i]$ and $A[j]$ is a "basic operation" only if the sequence is an array.
 > - When choosing a representation, consider if the sequence is **dynamic** (frequently growing/shrinking) or **fixed**.
->
+
+
+
+
+
+---
+
+
+# 3.6: Designing a Flexible List and Operations on the Same
+
+## 1. Introduction to Flexible Lists
+
+A flexible list (or linked list) is a sequence of **nodes** strung together like a train.
+
+- **Structure:** Each node consists of a **value** and a pointer/link to the **next node**.
+- **Navigation:** To reach any specific point, you must start from the **head** each time and walk down the list.
+- **Operations:** Insertion and deletion are easy to perform locally using "plumbing" operations.
+
+---
+
+## 2. Defining the Node Class
+
+In Python, we use a class to represent a single node.
+
+### 2.1 The Basic Node Class
+
+```python
+class Node:
+    def __init__(self, v=None):
+        self.value = v
+        self.next = None
+
+```
+
+- **self.value:** Stores the data.
+- **self.next:** Stores the reference to the next node in the list. It defaults to `None`.
+- **Initialization:** If no value is passed, it creates an "empty" node.
+
+### 2.2 Representing an Empty List
+
+- **The Problem:** In Python, variables must be initialized to a data type to allow operations (like `append`).
+- **The Convention:** A node where `self.value` is `None` is considered an **empty list**.
+- **Function isempty:**
+
+```python
+def isempty(self):
+    if self.value == None:
+        return True
+    else:
+        return False
+
+```
+- **Usage Examples:**
+
+  - `l1 = Node()` creates an empty list (`l1.isempty()` is `True`).
+  - `l2 = Node(5)` creates a list with value 5 (`l2.isempty()` is `False`).
+
+
+
+## 3. The append Operation
+
+Adding a value to the **end** of the list.
+
+### 3.1 Recursive Implementation
+
+There are three cases:
+
+1. **Empty List:** Change the value from `None` to `v`.
+2. **Last Node:** (Where `self.next` is `None`) Create a new node with value `v` and point `self.next` to it.
+3. **Middle Node:** Recursively call `append` on `self.next`.
+
+```python
+def append(self, v):
+    if self.isempty():
+        self.value = v
+    elif self.next == None:
+        self.next = Node(v)
+    else:
+        self.next.append(v)
+
+```
+
+### 3.2 Iterative Implementation
+
+Instead of recursion, use a loop with a temporary pointer (`temp`) to find the last node.
+
+- Start `temp` at the head.
+- While `temp.next` is not `None`, move `temp` to `temp.next`.
+- Once the loop ends, `temp` points to the last node. Attach the new node there.
+
+---
+
+## 4. The insert Operation
+
+Inserting a value at the **beginning** of the list.
+
+### 4.1 The Challenge
+
+We cannot simply reassign the "head" pointer inside a function because reassigning the local name does not change the reference outside the function.
+
+### 4.2 The Solution: Value Swapping
+
+To make value `v` logically come before the old first value $v_0$:
+
+1. Create a new node.
+2. **Exchange values:** Move $v_0$ to the new node and put $v$ into the head node.
+3. **Plumbing:** Point the head node's `next` to the new node, and point the new node's `next` to what used to be the head's `next`.
+
+<img width="600" height="245" alt="image" src="https://github.com/user-attachments/assets/78db2c39-3d96-45f6-9d66-0dca4e3c33ec" />
+
+<img width="1227" height="564" alt="image" src="https://github.com/user-attachments/assets/1757803e-9298-4d14-8d98-87453ad6a9c4" />
+
+
+---
+
+## 5. The delete Operation
+
+Removing the **first occurrence** of a value `v`. If `v` is not present, do nothing.
+
+### 5.1 The Bypass Logic
+
+To delete a node, you logically "bypass" it. If node A points to node B (which contains `v`) and node B points to node C, you make node A point directly to node C.
+
+### 5.2 Recursive Implementation
+
+- **Case 1 (Empty):** Nothing to delete.
+- **Case 2 (Value Found at Current Node):** * If it is a singleton, set value to `None`.
+
+  - If there is a next node, copy the next node's value to the current node and bypass the next node (`self.next = self.next.next`).
+- **Case 3 (Value Not Found):** Recursively call `delete` on `self.next`.
+
+```python
+def delete(self, v):
+    if self.isempty():
+        return
+    if self.value == v:
+        if self.next == None:
+            self.value = None
+        else:
+            self.value = self.next.value
+            self.next = self.next.next
+    else:
+        if self.next != None:
+            self.next.delete(v)
+
+```
+
+
+
+## 6. Summary of Key Concepts
+
+- **Dynamic Structure:** Flexible lists can easily expand and contract.
+- **Tricky Head Operations:** Operations at the head (insert/delete first node) require value swapping or bypassing because you cannot change the initial reference that identifies the list.
+- **Efficiency:** `append` is straightforward; `insert` requires care; `delete` involves searching and bypassing.
+- **Note on Python:** Standard Python lists are **not** implemented as these types of flexible linked lists; their internal behavior is different.
+
