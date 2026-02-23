@@ -133,3 +133,102 @@ def quicksort(L, l, r): # Sort L[l:r]
 
 > [!IMPORTANT]
 > The partitioning algorithm is where implementation mistakes usually occur. The recursive calls are straightforward, but the logic to correctly rearrange elements around the pivot must be handled with care 
+
+
+
+
+
+
+
+
+---
+
+# 3.2: Analysis of Quicksort
+
+### Overview of Quicksort Mechanism
+
+Quicksort operates through the following steps:
+
+1. **Choose a pivot**: Select an element from the list.
+2. **Partition**: Divide the array into two segments a lower and a right segment based on the pivot.
+3. **Recursive Sort**: Recursively sort the two partitions.
+
+The efficiency of the algorithm depends on how well the partitioning divides the array into two smaller parts.
+
+
+### Best-Case Analysis (The Median Pivot)
+
+If the chosen pivot is the median, the two halves are roughly equal in size (each containing approximately half the elements).
+
+- **Partitioning Cost**: $O(n)$ (takes linear time in one scan).
+- **Recurrence Relation**:
+
+
+
+$$
+T(n) = 2 \cdot T\left(\frac{n}{2}\right) + n
+$$
+- **Result**: $O(n \log n)$.
+
+In this scenario, Quicksort behaves like Merge Sort but functions as an in-place algorithm without the extra space overhead of recursion or additional arrays.
+
+### Worst-Case Analysis
+
+In the worst case, there is no control over the pivot (e.g., picking the first element without analyzing values). The pivot may be the smallest or largest value in the list.
+
+- **Partition Behavior**: One partition will have $0$ elements, while the other will have $n-1$ elements.
+- **Recurrence Relation**:
+
+
+
+$$
+T(n) = T(n-1) + n
+$$
+- **Result**: $O(n^2)$.
+
+**Example of the Worst Case**: Paradoxically, an already sorted array is a worst-case input if the first element is always chosen as the pivot.
+
+- If sorting in ascending order and the first element is picked, it is the smallest.
+- This produces an upper partition of $n-1$ sorted elements.
+- The next step picks the next smallest element, producing $n-2$ sorted elements, and so on.
+
+
+
+### Average-Case Analysis
+
+The average-case complexity for Quicksort is $O(n \log n)$.
+
+- **Relative Order**: Since sorting depends on "compare and swap," the actual values do not matter as much as their relative order. An input of size $n$ can be viewed as one of the $n!$ (n factorial) permutations of elements.
+- **Assumption**: In a general sorting scenario, every permutation is assumed to be equally likely.
+- **Expected Running Time**: Averaged over all $n!$ permutations, the time is $O(n \log n)$, making $O(n^2)$ a rare case.
+
+### Randomized Quicksort
+
+To prevent an adversary from providing a worst-case input, a fixed strategy for choosing a pivot (like always picking the first, last, or middle element) should be avoided.
+
+- **Randomized Strategy**: Pick a random value between $0$ and $n-1$ uniformly (with probability $1/n$).
+- **Benefit**: By picking the pivot at random in each iteration, it is impossible for an input to consistently trigger the worst-case behavior.
+- **Result**: This achieves an expected running time of $O(n \log n)$.
+
+### Implementation Characteristics
+
+- **Iterative Quicksort**: Quicksort can be implemented iteratively. Because calls happen on disjoint parts of the array (bounded intervals from left to right), working on one segment does not influence others.
+- **In-place**: Unlike Merge Sort, Quicksort works in place and does not require the construction of new arrays.
+- **Efficiency**: Quicksort is very fast in practice and is often the algorithm used for built-in sorting functions in programming languages (e.g., Python's `sort` or `sorted`).
+
+### Summary Table: Quicksort Complexity
+
+| Case | Complexity | Condition |
+| --- | --- | --- |
+| **Best Case** | O(nlogn) | Pivot is always the median. |
+| **Worst Case** | O($n^2$) | Pivot is always the smallest or largest element. |
+| **Average Case** | O(nlogn) | Based on the distribution of all permutations. |
+| **Expected Case** | O(nlogn) | Using a randomized pivot selection strategy. |
+
+ [!IMPORTANT]
+> Quicksort illustrates that using an upper bound ($O(n^2)$) as a prediction for overall behavior is often very pessimistic, as its practical performance is highly efficient.
+
+
+
+
+
