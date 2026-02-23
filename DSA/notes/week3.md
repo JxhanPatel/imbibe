@@ -552,3 +552,82 @@ def delete(self, v):
 - **Efficiency:** `append` is straightforward; `insert` requires care; `delete` involves searching and bypassing.
 - **Note on Python:** Standard Python lists are **not** implemented as these types of flexible linked lists; their internal behavior is different.
 
+
+
+
+
+---
+
+
+
+# 3.7 Implementation of Lists in Python Lecture Notes**
+
+---
+
+## **1. Lists and Arrays in Python: Overview**
+While sequences can be stored as either lists or arrays, algorithm analysis must take the underlying implementation into account.
+*   **Classical Lists:** Flexible length, easy to modify structure, but values are scattered in memory, making access $O(n)$.
+*   **Classical Arrays:** Fixed size, contiguous memory block, supporting "random access" (constant time access $O(1)$), but difficult to expand or contract.
+
+**Key Question:** Is the built-in list type in Python really a "linked" list?
+
+---
+
+## **2. Underlying Implementation of Python Lists**
+Despite the name, Python lists are **not** implemented as flexible linked lists.
+*   **Array Mapping:** The underlying interpretation maps the list to an **array**.
+*   **Memory Allocation:** Python assigns a fixed contiguous block of memory when a list is created. This block is typically much larger than the current list to accommodate growth.
+*   **Overflow Handling:** If the list grows beyond the size of the currently allocated array, Python allocates a new array, typically **doubling the size** (e.g., from $n$ to $2n$), and copies all elements to the new location.
+
+
+---
+
+## **3. Performance and Complexity of List Operations**
+Because Python lists behave more like arrays than linked lists, their operation costs differ from classical linked structures.
+
+### **3.1 Constant Time Operations ($O(1)$ Amortized)**
+Python keeps track of the last position of the list within the allocated array.
+*   **`l.append()`:** Adding an element to the right is easy because it just moves the pointer to the next free slot in the pre-allocated block.
+*   **`l.pop()`:** Removing the last element is also cheap; it removes the element and moves the pointer back.
+*   **Amortized Analysis:** While doubling the array size takes $O(n)$ time, this cost is distributed over the $n$ preceding appends. Effectively, each append takes approximately two steps on average, making the cost **$O(1)$ amortized**.
+
+
+### **3.2 Linear Time Operations ($O(n)$)**
+*   **Insertion/Deletion:** Inserting or deleting in the middle or at the beginning of a list requires shifting all subsequent elements to the right or left to maintain a contiguous block. This requires time proportional to the number of elements moved, hence **$O(n)$**.
+*   **Experiment Observation:** Inserting at the beginning (`l.insert(0, i)`) $10^5$ times takes roughly the same time as $10^7$ appends, demonstrating that `insert` is significantly more expensive.
+
+---
+
+## **4. Multi-dimensional Lists: Mutability and Aliasing**
+Arrays (matrices) are often represented as nested lists (e.g., `[]`).
+
+### **4.1 The Aliasing Problem**
+Initialization requires caution due to list mutability.
+*   **Incorrect Initialization:**
+    ```python
+    zerolist = 
+    zeromatrix = [zerolist, zerolist, zerolist]
+    ```
+    In this case, `zeromatrix` contains three pointers all pointing to the **same object** in memory.
+*   **Consequence:** Modifying one entry (e.g., `zeromatrix = 1`) changes every row because they are all aliases of `zerolist`.
+
+<img width="1245" height="510" alt="image" src="https://github.com/user-attachments/assets/1e904fb4-0c7e-419c-a19f-0a0bd19872e4" />
+
+
+### **4.2 Correct Initialization**
+To ensure each row is a distinct element in memory, use **list comprehension**:
+```python
+zeromatrix = [[0 for i in range(3)] for j in range(3)]
+```
+
+---
+
+## **5. Numpy Arrays**
+The `numpy` library provides actual array types that are more efficient for data science and matrix operations.
+*   **Initialization:** `np.zeros(shape=(3,3))` creates an array of zeros without aliasing issues.
+*   **Conversion:** `np.array([])` converts standard Python sequences to numpy arrays.
+*   **Range:** `np.arange(5)` is the array equivalent of `range(5)`.
+*   **Block Operations:** Numpy allows operating on a matrix as a whole (e.g., `C = 3*A + B` or `np.matmul(A, B)`) without writing explicit nested loops.
+
+> [!NOTE]
+> **Performance Tip:** While numpy is powerful for matrix math, simple indexing and searching operations can sometimes be slower than native Python lists due to the additional overhead of the library layer.
