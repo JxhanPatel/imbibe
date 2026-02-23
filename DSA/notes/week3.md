@@ -703,3 +703,50 @@ In Python, dictionary keys **must be immutable**.
 
 > [!NOTE]
 > **Summary:** A dictionary is implemented as a **hash table** (array + hash function). A successful implementation requires a robust hash function to minimize collisions and a strategy (Open Addressing or Open Hashing) to resolve the collisions that remain.
+
+
+
+
+
+
+---
+
+
+
+# 3.9 Stack and Queue
+
+
+
+### Stack
+
+- **Definition**: A non-primitive linear data structure and an ordered list where adding and deleting items happens only at one end, called the **top**.
+- **LIFO**: It follows the **Last In First Out** principle, meaning the last element added is the first one to be removed.
+- **Basic Operations**:
+
+<img width="748" height="494" alt="image" src="https://github.com/user-attachments/assets/514a7cae-ee8c-46dc-b466-abd1f0a5f5e5" />
+
+
+
+  - **Push**: The process of adding a new element to the top.
+  - **Pop**: The process of deleting an element from the top; this operation returns the deleted value.
+  - **Traverse/Display**: Accessing or reading each element from top to bottom.
+- **Applications**: Used for reversing strings, evaluating expressions, undo/redo operations, backtracking, and Depth First Search (DFS) in graphs.
+- **Python Implementation**: Can be implemented using a list or a linked list.
+
+
+
+### Queue
+
+- **Definition**: A non-primitive linear data structure where new elements are added at the **Back end** and existing elements are deleted from the **Front end**.
+- **FIFO**: It follows the **First In First Out** principle.
+- **Basic Operations**:
+
+<img width="788" height="528" alt="image" src="https://github.com/user-attachments/assets/8b5d615f-f93d-41c7-8abd-9206f3dbb1bc" />
+
+
+
+  - **Enqueue**: The process of adding a new element at the Back end.
+  - **Dequeue**: The process of deleting an element from the Front; this operation returns the deleted value.
+  - **Traverse/Display**: Accessing or reading each element from Front to Back.
+- **Applications**: Used for printer spooling, job scheduling in operating systems, waiting list applications, and Breadth First Search (BFS) in graphs.
+- **Python Implementation**: Can be implemented using a list or a linked list.
