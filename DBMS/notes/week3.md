@@ -174,3 +174,12 @@ having avg(capacity) > 25;
 
 
 **Summary:** These foundational SQL features form the basis for data manipulation. Practice is highly encouraged to gain confidence before moving toward advanced features like nested subqueries, joins, and triggers.
+
+
+# Practise Questions
+
+<img width="1020" height="328" alt="image" src="https://github.com/user-attachments/assets/3283324b-02bc-405d-8076-4a4b444d7983" />
+<img width="310" height="250" alt="image" src="https://github.com/user-attachments/assets/1a0b7e93-c274-4639-ab6c-1d6854ad8254" />
+<img width="532" height="269" alt="image" src="https://github.com/user-attachments/assets/9e468d52-e7e6-400a-b683-f1d0c34214b8" />
+<img width="1372" height="398" alt="image" src="https://github.com/user-attachments/assets/caa561d4-b45e-4ff1-9cb6-e120f03fb747" />
+<img width="491" height="288" alt="image" src="https://github.com/user-attachments/assets/17005790-5d49-40d5-8b44-83b9fabc11f7" />
