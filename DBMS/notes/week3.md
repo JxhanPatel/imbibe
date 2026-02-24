@@ -614,3 +614,180 @@ set salary = case
 *   **Learnt SQL expressions for Join and Views**.
 *   Join is powerful for linking information but can be computationally expensive due to Cartesian product blow-up.
 *   Views provide restricted, virtual access to data.
+
+
+
+
+
+---
+
+
+
+
+
+
+### **3.4: Intermediate SQL/3**
+
+---
+
+#### **1. Recap**
+*   **SQL expressions for Join and Views**.
+
+---
+
+#### **2. Objectives**
+*   **To understand Transactions**.
+*   **To learn SQL expressions for Integrity Constraints**.
+*   **To understand more Data Types in SQL**.
+*   **To understand Authorization in SQL**.
+
+---
+
+#### **3. Outline**
+*   **Transactions**.
+*   **Integrity Constraints**.
+*   **SQL Data Types and Schemas**.
+*   **Authorization**.
+
+---
+
+#### **4. Transactions**
+
+**Definition:**
+*   A **Unit of work**.
+*   **Atomic transaction**: either fully executed or rolled back as if it never occurred.
+*   **Isolation** from concurrent transactions.
+
+
+---
+
+#### **5. Integrity Constraints**
+
+**Purpose:**
+*   Integrity constraints guard against **accidental damage** to the database, by ensuring that authorized changes to the database do not result in a **loss of data consistency**.
+
+**Basic Constraints:**
+*   `not null`: Declare attributes (e.g., name and budget) to be not null.
+    *   *Example:* `name varchar(20) not null`.
+*   `unique`: Ensures that no two tuples have the same value for a specified set of attributes.
+
+**Referential Integrity:**
+*   Ensures that a value that appears in one relation for a given set of attributes also appears for a certain set of attributes in another relation.
+*   **Formal Definition:** Let $A$ be a set of attributes. Let $R$ and $S$ be two relations that contain attributes $A$ and where $A$ is the primary key of $S$. $A$ is said to be a **foreign key** of $R$ if for any values of $A$ appearing in $R$ these values also appear in $S$.
+
+**Cascading Actions in Referential Integrity:**
+*   With cascading, you can define the actions that the Database Engine takes when a user tries to delete or update a key to which existing foreign keys point.
+*   *Example:*
+    ```sql
+    create table course (
+        course_id char(5) primary key,
+        title varchar(20),
+        dept_name varchar(20),
+        foreign key (dept_name) references department
+            on delete cascade
+            on update cascade
+    );
+    ```
+*   **Alternative actions to cascade**: `no action`, `set null`, `set default`.
+
+**Integrity Constraint Violation During Transactions:**
+*   *Scenario:* Consider a table `person(ID, name, mother, father)` where `father` and `mother` are foreign keys referencing `person`.
+*   *Problem:* How to insert a tuple without causing constraint violation if the parents are not yet in the table?.
+*   *Solutions:*
+    1.  Insert father and mother of a person before inserting the person.
+    2.  Set father and mother to **null initially**, update after inserting all persons (not possible if attributes are declared `not null`).
+    3.  **Defer constraint checking** (to be discussed later).
+
+---
+
+#### **6. SQL Data Types and Schemas**
+
+**Built-in Data Types in SQL:**
+*   `date`: Dates, containing a (4 digit) year, month and date. *Example:* `date '2005-7-27'`.
+*   `time`: Time of day, in hours, minutes and seconds. *Example:* `time '09:00:30'` or `time '09:00:30.75'`.
+*   `timestamp`: date plus time of day. *Example:* `timestamp '2005-7-27 09:00:30.75'`.
+*   `interval`: period of time. *Example:* `interval '1' day`.
+    *   Subtracting a date/time/timestamp value from another gives an `interval` value.
+    *   `interval` values can be added to date/time/timestamp values.
+
+**Index Creation:**
+*   Indices are data structures used to **speed up access** to records with specified values for index attributes.
+*   *Syntax:* `create index <index-name> on <relation-name>(<attribute-list>)`.
+*   *Example:* `create index studentID_index on student(ID);`.
+*   *Query Execution:* A query `where ID = '12345'` can be executed using the index to find the required record without looking at all records.
+
+
+**User-Defined Types (UDT):**
+*   `create type` construct creates a user-defined type (an alias, similar to `typedef` in C).
+*   *Example:*
+    ```sql
+    create type Dollars as numeric (12,2) final;
+    create table department (
+        dept_name varchar (20),
+        building varchar (15),
+        budget Dollars
+    );
+    ```
+
+**Domains:**
+*   `create domain` construct creates user-defined domain types.
+*   *Example:* `create domain person_name char(20) not null;`.
+*   Types and domains are similar.
+<img width="1164" height="394" alt="image" src="https://github.com/user-attachments/assets/8f198f95-f4d0-4f90-ab90-ab6603c74534" />
+
+
+
+**Large-Object Types:**
+*   Large objects (photos, videos, CAD files, etc.) are stored as:
+    *   `blob`: **binary large object** – object is a large collection of uninterpreted binary data (interpretation is left to an application outside the DBMS).
+    *   `clob`: **character large object** – object is a large collection of character data.
+*   When a query returns a large object, a **pointer is returned** rather than the large object itself.
+
+---
+
+#### **7. Authorization**
+
+**Authorization Specification in SQL:**
+*   The **grant statement** is used to confer authorization.
+*   *Syntax:* `grant <privilege list> on <relation name or view name> to <user list>;`.
+*   `<user list>` can be:
+    *   A **user-id**.
+    *   `public` (allows all valid users the privilege).
+    *   A **role**.
+
+**Privileges in SQL:**
+*   `select`: Allows read access to relation, or the ability to query using the view.
+*   `insert`: Allows the ability to insert tuples.
+*   `update`: Allows the ability to update using the SQL update statement.
+*   `delete`: Allows the ability to delete tuples.
+<img width="950" height="269" alt="image" src="https://github.com/user-attachments/assets/01bbdbd2-2d3e-4376-80c0-4c7e7abd427e" />
+
+<img width="739" height="157" alt="image" src="https://github.com/user-attachments/assets/787e6f6a-2fc9-408a-b054-6adba42b3211" />
+
+**Authorization on Views:**
+*   *Example:*
+    ```sql
+    create view geo_instructor as
+    (select * from instructor where dept_name = 'Geology');
+    grant select on geo_instructor to geo_staff;
+    ```
+*   *Scenario:* If a `geo_staff` member issues `select * from geo_instructor;`, the system must check if the staff has permission on the view and if the view creator had permission on the underlying `instructor` relation.
+
+**Other Authorization Features:**
+*   `references` privilege: Required to create a foreign key. *Example:* `grant reference (dept_name) on department to Mariano;`.
+*   **Transfer of privileges**:
+    *   `grant ... with grant option`: Allows the recipient to pass the privilege to others.
+*   **Revocation**:
+    *   `revoke <privilege list> on <relation> from <user list> <cascade/restrict>;`.
+
+### Roles
+<img width="629" height="404" alt="image" src="https://github.com/user-attachments/assets/b1a42ffc-f087-4826-bc58-98fea778ee56" />
+
+
+---
+
+#### **8. Summary**
+*   **Introduced transactions**.
+*   **Learnt SQL expressions for integrity constraints**.
+*   **Familiarized with more data types in SQL**.
+*   **Discussed authorization in SQL**.
