@@ -460,3 +460,157 @@ set salary = case
 - **Nested subqueries** provide a powerful way to structure complex queries.
 - **Set membership (in)**, **set comparison (some, all)**, and **cardinality (exists, unique)** are core components of intermediate SQL.
 - **Data modification** is handled via `insert`, `delete`, and `update` commands, which can also incorporate subqueries.
+
+
+
+
+
+---
+
+
+
+
+### **3.3: Intermediate SQL/2**
+
+---
+
+#### **1. Recap**
+*   **Nested subquery in SQL**: Understanding how a subquery output can be used in the `from` clause, `where` clause predicates, or the `select` clause.
+*   **Processes for data modification**: Basic features for `delete`, `insert`, and `update`.
+
+---
+
+#### **2. Objectives**
+*   **To learn SQL expressions for Join**.
+*   **To learn SQL expressions for Views**.
+
+---
+
+#### **3. Outline**
+*   **Join Expressions**.
+*   **Views**.
+
+---
+
+#### **4. Join Expressions**
+
+**Joined Relations:**
+*   Join operations take two relations and return as a result another relation.
+*   A join operation is a Cartesian product which requires that tuples in the two relations match (under some condition).
+*   It also specifies the attributes that are present in the result of the join.
+*   The join operations are typically used as subquery expressions in the `from` clause.
+
+**Types of Join between Relations:**
+*   **Cross join**.
+*   **Inner join**:
+    *   Equi-join.
+    *   Natural join.
+*   **Outer join**:
+    *   Left outer join.
+    *   Right outer join.
+    *   Full outer join.
+*   **Self-join**.
+
+**Cross Join:**
+*   `CROSS JOIN` returns the Cartesian product of rows from tables in the join.
+*   **Explicit Syntax**: `select * from employee cross join department;`.
+*   **Implicit Syntax**: `select * from employee, department;`.
+
+**Inner Join:**
+*   An inner join is the intersection part of two relations—something that exists clearly in both.
+*   Example: `course inner join prereq`.
+*   If specified as **natural**, the second `course_id` field (the join attribute) is skipped.
+
+<img width="789" height="418" alt="image" src="https://github.com/user-attachments/assets/6fe126b1-04b2-40b2-a9c9-d7ece232584c" />
+
+
+**Outer Join:**
+*   An extension of the join operation that avoids loss of information.
+*   Computes the join and then adds tuples from one relation that do not match tuples in the other relation to the result of the join.
+*   Uses **null values** to pad missing information.
+
+1.  **Left Outer Join**:
+    *   Preserves all tuples in the relation named before (to the left of) the operation.
+    *   Example: `course natural left outer join prereq`.
+    *   Attributes derived from the right-hand side for non-matching tuples are filled with null values.
+    *   <img width="796" height="408" alt="image" src="https://github.com/user-attachments/assets/2bcfe85e-f182-4bb5-a522-7aab730b9937" />
+
+2.  **Right Outer Join**:
+    *   Preserves all tuples in the relation named after (to the right of) the operation.
+    *   Example: `course natural right outer join prereq`.
+    *   <img width="763" height="400" alt="image" src="https://github.com/user-attachments/assets/f1e43e41-6922-441d-9dc5-35114dfd8fb3" />
+
+3.  **Full Outer Join**:
+    *   A combination of the left and right outer-join types.
+    *   Preserves tuples in both relations, padding with nulls where matches are absent.
+    *   Example: `course natural full outer join prereq`.
+    *   <img width="762" height="414" alt="image" src="https://github.com/user-attachments/assets/515f66da-0059-433a-88bf-5b958a98be93" />
+
+
+**Join Conditions and Types Summary:**
+| Join Types | Join Conditions |
+| :--- | :--- |
+| `inner join` | `natural` |
+| `left outer join` | `on <predicate>` |
+| `right outer join` | `using (A1, A2, ...)` |
+| `full outer join` | |
+
+> [!NOTE]
+> **Difference between `on` and `natural` join**: A `natural join` will not have the second join attribute column in the output, whereas a join with an `on` condition will include both.
+
+---
+
+#### **5. Views**
+
+**Definition and Purpose:**
+*   In some cases, it is not desirable for all users to see the entire logical model (all actual relations stored in the database).
+*   A view provides a mechanism to hide certain data from the view of certain users.
+*   Any relation that is not of the conceptual model but is made visible to a user as a **"virtual relation"** is called a view.
+*   A view is defined using the `create view` statement:
+    $$\text{create view } v \text{ as } <\text{query expression}>;$$
+    where $v$ is the view name.
+
+**Mechanism:**
+*   View definition is **not** the same as creating a new relation by evaluating the query expression.
+*   Instead, the database system saves the expression; the expression is substituted into queries using the view.
+*   A view is dynamic; it is recomputed whenever it is used.
+
+**Example Views:**
+*   **Faculty view (hiding salary)**:
+    ```sql
+    create view faculty as
+    select ID, name, dept_name
+    from instructor;
+    ```
+*   **Department total salary view**:
+    ```sql
+    create view departments_total_salary(dept_name, total_salary) as
+    select dept_name, sum(salary)
+    from instructor
+    group by dept_name;
+    ```
+
+**View Expansion:**
+*   One view may be used in the expression defining another view.
+*   A view $v_1$ is said to depend directly on view $v_2$ if $v_2$ is used in the expression defining $v_1$.
+*   **Expansion Process**: The system repeats a replacement step, finding any view relation in an expression and replacing it with the expression defining that view, until no more view relations are present.
+
+**Update of a View:**
+*   Modifying a view (insert, update, delete) must be translated into an update of the original physical relation.
+*   **Problem**: Some updates cannot be translated uniquely. For example, inserting into a join view might not clearly indicate which underlying tuple to modify if information (like a join attribute) is missing.
+*   **Updatable View Constraints**: Most SQL implementations allow updates only on simple views satisfying:
+    1.  The `from` clause has only one database relation.
+    2.  The `select` clause contains only attribute names, no expressions, aggregates, or `distinct`.
+    3.  Any attribute not listed in the `select` can be set to null.
+    4.  The query does not have a `group by` or `having` clause.
+
+**Materialized Views:**
+*   Materializing a view involves creating a **physical table** containing all the tuples in the result of the query defining the view.
+*   If the underlying relations are updated, the materialized view result becomes out of date and must be maintained.
+
+---
+
+#### **6. Summary**
+*   **Learnt SQL expressions for Join and Views**.
+*   Join is powerful for linking information but can be computationally expensive due to Cartesian product blow-up.
+*   Views provide restricted, virtual access to data.
