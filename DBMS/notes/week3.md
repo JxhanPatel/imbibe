@@ -791,3 +791,15 @@ set salary = case
 *   **Learnt SQL expressions for integrity constraints**.
 *   **Familiarized with more data types in SQL**.
 *   **Discussed authorization in SQL**.
+
+
+
+
+
+# Practise Questions
+
+<img width="582" height="263" alt="image" src="https://github.com/user-attachments/assets/db9f5458-c6fb-433e-861e-87aabdf2f96c" />
+<img width="753" height="267" alt="image" src="https://github.com/user-attachments/assets/9aaddc7d-633e-4b3f-a1b2-173cda426cec" />
+
+<img width="1263" height="290" alt="image" src="https://github.com/user-attachments/assets/2b275907-4110-4002-b60a-c4fe2e65159e" />
+
