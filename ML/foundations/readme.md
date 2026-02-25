@@ -5,8 +5,8 @@
 | --- | --- | --- | --- |
 | **Week 1** | Intro to ML | Overview & types of learning | 🟢 Done |
 | **Week 2** | Calculus | Derivatives & Gradients | 🟢 Done |
-| **Week 3** | Linear Algebra I | Least Squares Regression | 🟡 In Progress |
-| **Week 4** | Linear Algebra II | Eigenvalues & Eigenvectors | ⚪ Planned |
+| **Week 3** | Linear Algebra I | Least Squares Regression | 🟢 Done |
+| **Week 4** | Linear Algebra II | Eigenvalues & Eigenvectors | 🟡 In Progress |
 | **Week 5** | Linear Algebra III | Symmetric Matrices | ⚪ Planned |
 | **Week 6** | Linear Algebra IV | SVD & PCA (Image Processing) | ⚪ Planned |
 | **Week 7** | Optimization I | Unconstrained Optimization | ⚪ Planned |
