@@ -803,3 +803,184 @@ set salary = case
 
 <img width="1263" height="290" alt="image" src="https://github.com/user-attachments/assets/2b275907-4110-4002-b60a-c4fe2e65159e" />
 
+---
+
+
+
+### **3.5: Advanced SQL**
+
+---
+
+#### **1. Recap**
+*   **Transactions**.
+*   **Integrity Constraints**.
+*   **More Data Types in SQL**.
+*   **Authorization in SQL**.
+
+---
+
+#### **2. Objectives**
+*   **To familiarize with functions and procedures in SQL**.
+*   **To understand the triggers and their performance issues**.
+
+---
+
+#### **3. Outline**
+*   **Functions and Procedural Constructs**.
+*   **Triggers**.
+    *   **Functionality vs Performance**.
+
+---
+
+#### **4. Functions and Procedural Constructs**
+
+**Native Language vs. Query Language Paradigms:**
+*   **Query Language (SQL):** A declarative language where the user describes the desired information without giving a specific sequence of steps.
+*   **Native Language (C, Java, Python):** Procedural programming that requires the programmer to tell the computer *how* to get the output, requiring knowledge of an appropriate algorithm.
+
+<img width="797" height="501" alt="image" src="https://github.com/user-attachments/assets/7b01d513-6953-48f4-968e-fa57d60c7c84" />
+
+**Overview of Functions and Procedures:**
+*   **SQL:1999** added Functions, Procedures, and Control Flow Statements.
+*   These can be written in **SQL itself** or in an **external programming language** (e.g., C, Java, Python).
+*   **External language routines** are particularly useful with specialized data types like images (comparing similarity) and geometric objects (checking if polygons overlap).
+*   Some systems support **table-valued functions**, which return a relation as a result.
+*   Functions are essentially **parameterized views** that generalize the regular notion of views by allowing parameters.
+
+**SQL Functions:**
+*   Defined using the `create function` command.
+*   **Structure:**
+    ```sql
+    create function dept_count (dept_name varchar(20))
+    returns integer
+    begin
+        declare d_count integer; -- Local variable
+        select count (*) into d_count
+        from instructor
+        where instructor.dept_name = dept_name;
+        return d_count;
+    end
+    ```
+    <img width="797" height="143" alt="image" src="https://github.com/user-attachments/assets/dc9edf2c-5afe-47b5-a083-90a6ab094f14" />
+
+*   **Keywords:**
+    *   `returns`: Indicates the variable-type that is returned.
+    *   `return`: Specifies the values to be returned.
+    *   `begin ... end`: Compound statement body.
+
+**Table Functions:**
+*   Added in **SQL:2003**.
+*   Example returning all instructors in a given department:
+    ```sql
+    create function instructor_of (dept_name char(20))
+    returns table (
+        ID varchar(5),
+        name varchar(20),
+        dept_name varchar(20),
+        salary numeric(8, 2))
+    return table
+        (select ID, name, dept_name, salary
+         from instructor
+         where instructor.dept_name = instructor_of.dept_name);
+    ```
+*   **Usage:** `select * from table (instructor_of ('Music'));`
+
+**SQL Procedures:**
+*   Similar to functions but do not have a return value; they use `in` and `out` parameters.
+*   **Structure:**
+    ```sql
+    create procedure dept_count_proc (in dept_name varchar (20), out d_count integer)
+    begin
+        select count(*) into d_count
+        from instructor
+        where instructor.dept_name = dept_count_proc.dept_name;
+    end
+    ```
+*   **Invocation:** Procedures are invoked using the `call` statement.
+    *   Example: `call dept_count_proc('Physics', d_count);`
+*   **Overloading:** SQL:1999 allows more than one function/procedure of the same name if the number or types of arguments differ.
+
+**Language Constructs:**
+*   **Compound statement:** `begin ... end`.
+*   **Assignment:** Performed using the `set` statement.
+*   **Loops:**
+    *   `while`: `while boolean expression do sequence of statements; end while;`
+    *   `repeat`: `repeat sequence of statements; until boolean expression end repeat;`
+    *   <img width="674" height="377" alt="image" src="https://github.com/user-attachments/assets/480a647b-db3c-4815-a204-048766dcccc1" />
+
+    *   `for`: Permits iteration over query results.
+    *   <img width="492" height="279" alt="image" src="https://github.com/user-attachments/assets/8270480d-4d0f-4f91-8db4-7720597cf2ea" />
+
+*   **Conditional Statements:**
+    *   `if-then-else`: Supports `elseif` and `else`.
+    *   <img width="464" height="238" alt="image" src="https://github.com/user-attachments/assets/f81c94df-389e-4d98-8c8c-52a49cf7786d" />
+
+    *   **Simple Case:** `case variable when value1 then ... else ... end case;`
+    *   <img width="733" height="344" alt="image" src="https://github.com/user-attachments/assets/ae513c52-1c95-4c0a-aac7-c4928659c623" />
+
+    *   **Searched Case:** `case when sql-expression = value1 then ... else ... end case;`
+    *   <img width="752" height="333" alt="image" src="https://github.com/user-attachments/assets/5e8edcf5-bed3-4ea4-83b0-49025ad56c6b" />
+
+*   **Exceptions:** Signaling conditions and declaring handlers (e.g., `declare exit handler for ...`).
+*   <img width="813" height="298" alt="image" src="https://github.com/user-attachments/assets/cd95de15-9a2b-4099-a36c-28d526b1fd98" />
+
+
+**External Language Routines:**
+*   Written in imperative languages like **Java, C#, C, or C++**.
+*   **Benefits:** More efficient for many operations and higher expressive power.
+*   **Drawbacks/Security:** Code might corrupt database structures or allow unauthorized access.
+*   **Security Solutions:**
+    *   **Sandbox techniques:** Use "safe" languages like Java that cannot damage other memory parts.
+    *   **Separate processes:** Run functions in a separate address space, communicating via inter-process communication (high overhead).
+
+---
+
+#### **5. Triggers**
+
+**Definition and Use:**
+*   A statement executed automatically as a side effect of a modification (insert, update, or delete).
+*   Used to enforce data integrity, maintain audit trails, issue alerts, or cause automatic updates in other tables.
+*   To design a trigger, one must specify: **Events** (update/insert/delete), **Timing** (BEFORE/AFTER), and **Actions**.
+
+**Types of Triggers:**
+*   **BEFORE Triggers:** Run before the event. Values can be modified or checked before the database is physically changed. Useful for data transformation (e.g., converting blank grades to null).
+*   **AFTER Triggers:** Run after the event. Typically used for audit trails, issuing alerts, or updating other tables for referential integrity.
+
+**Levels of Triggers:**
+*   **Row Level:** Executed once for every row affected by the event.
+*   **Statement Level:** Performed once for the entire SQL statement. Uses **transition tables** (`referencing old table` / `new table`) to refer to temporary tables of all affected rows.
+
+**SQL Syntax Features:**
+*   **Transition Variables:** `referencing old row as` (for deletes/updates) and `referencing new row as` (for inserts/updates).
+*   **Atomic execution:** Trigger bodies often enclosed in `begin atomic ... end`.
+
+<img width="827" height="514" alt="image" src="https://github.com/user-attachments/assets/31d89b8b-927c-4bae-9467-ad8ea339c33d" />
+
+---
+
+#### **6. Triggers: Functionality vs. Performance**
+
+**When to Use Triggers:**
+*   Optimal for **short, simple, and easy-to-maintain** write operations independent of business logic.
+*   Recommended for: Logging history, auditing users, adding system values (user name, time), and simple validation.
+
+**When NOT to Use Triggers:**
+*   **"Triggers are like Lays: Once you pop, you can't stop."**
+*   They should not become a "one-size-fits-all" solution.
+*   **Dangers include:**
+    *   Having too many triggers.
+    *   Complex trigger code.
+    *   Cross-server/cross-network triggers.
+    *   **Trigger chains:** Triggers calling other triggers (can lead to infinite loops).
+    *   Enabling recursive triggers.
+    *   Including expensive operations like iteration or calling functions/views inside triggers.
+
+> [!CAUTION]
+> A trigger error detected at runtime causes the failure of the entire action statement that set off the trigger.
+
+---
+
+#### **7. Summary**
+*   **Familiarized with functions and procedures in SQL**.
+*   **Understood trigger mechanisms**.
+*   **Familiarized with performance and security issues** regarding procedural code and triggers.
