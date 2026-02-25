@@ -5,8 +5,8 @@
 | --- | --- | --- | --- |
 | **Week 1** | Python Refreshers | Back to Basics | 🟢 Done |
 | **Week 2** | Complexity & Sorting | Big O, Merge Sort, Binary Search | 🟢 Done |
-| **Week 3** | Linear Data Structures | Stacks, Queues, Hash Tables | 🟡 In Progress |
-| **Week 4** | Graph Algorithms I | BFS, DFS, Adjacency Lists | ⚪ Planned |
+| **Week 3** | Linear Data Structures | Stacks, Queues, Hash Tables | 🟢 Done |
+| **Week 4** | Graph Algorithms I | BFS, DFS, Adjacency Lists | 🟡 In Progress |
 | **Week 5** | Graph Algorithms II | Dijkstra’s, Bellman-Ford, MST | ⚪ Planned |
 | **Week 6** | Trees & Heaps | BST, Min/Max Heaps, Union-Find | ⚪ Planned |
 | **Week 7** | Balanced Trees & Greedy | AVL/Red-Black Trees, Huffman Coding | ⚪ Planned |
