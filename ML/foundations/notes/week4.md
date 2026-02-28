@@ -1085,7 +1085,81 @@ $$
 ---
 
 
-## 13. Diagonalization
+
+### Gram–Schmidt Process
+
+
+If eigenvectors are orthogonal but not orthonormal, or if you have a basis that needs to be orthogonalized, use the **Gram–Schmidt Process** 
+
+
+### Formula for v2  ​
+
+
+
+$$
+v_2 = x_2 - \text{proj}_{v_1}(x_2) =
+x_2 - \frac{x_2 \cdot v_1}{\|v_1\|^2}v_1
+$$
+
+
+ 
+
+---
+
+
+### Final Normalization
+
+
+To ensure the matrix $P$ is orthogonal, divide each column by its norm:
+
+
+
+$$
+\text{New Column} =
+\frac{\text{Column}}{\|\text{Column}\|}
+$$
+
+
+
+
+
+---
+
+
+## Conclusion
+
+
+Diagonalization simplifies complex calculations, such as computing high powers of matrices (e.g., $A^{200}$), by allowing us to work with diagonal forms
+
+
+
+# Practise Questions:
+
+<img width="692" height="229" alt="image" src="https://github.com/user-attachments/assets/b6ffe9bb-24bd-49c2-86cb-2884599505b5" />
+<img width="343" height="170" alt="image" src="https://github.com/user-attachments/assets/4d691fd6-3053-43b6-a66f-1fbd12e5629a" />
+<img width="540" height="210" alt="image" src="https://github.com/user-attachments/assets/7d599a6b-ae8f-4a0d-9b9e-981b1a465cf0" />
+<img width="878" height="170" alt="image" src="https://github.com/user-attachments/assets/49142138-8e90-40dc-8cf1-5285f88a6231" />
+<img width="346" height="205" alt="image" src="https://github.com/user-attachments/assets/0efe164c-1867-4807-88a1-e18b6d9283e5" />
+<img width="1147" height="114" alt="image" src="https://github.com/user-attachments/assets/5eb90f45-0d6c-4b8f-ba25-2d76f9f47af1" />
+<img width="295" height="200" alt="image" src="https://github.com/user-attachments/assets/5ba5a66f-0d81-4753-b64d-8e0d0f431231" />
+
+
+
+
+---
+
+
+# 4.3: Diagonalization of a Matrix
+
+## 1. Introduction to Similarity and Diagonalization
+
+A matrix $A$ being diagonalizable is strongly related to "having enough independent eigenvectors". 
+
+### Definitions
+> [!IMPORTANT]
+> **Definition:** A matrix $A$ is **diagonalizable** if there exists an invertible matrix $S$ such that $S^{-1}AS = \Lambda$, where $\Lambda$ is a diagonal matrix.
+
+## 2. Diagonalization
 
 
 A matrix $A$ is **diagonalizable** if there exists an invertible matrix $S$ such that:
@@ -1151,7 +1225,7 @@ Example:
 ---
 
 
-## 14. Orthogonal Diagonalization
+## 3. Orthogonal Diagonalization
 
 
 A matrix $A$ is **orthogonally diagonalizable** if there exists an orthogonal matrix $P$ such that:
@@ -1177,62 +1251,21 @@ where $P^T = P^{-1}$
 - **Orthonormality:** Each column of the matrix $P$ must be **orthonormal** (orthogonal to each other and having a length/norm of 1)  
 
 
----
-
-
-### Gram–Schmidt Process
-
-
-If eigenvectors are orthogonal but not orthonormal, or if you have a basis that needs to be orthogonalized, use the **Gram–Schmidt Process** 
-
-
-### Formula for v2  ​
+### Summary Remarks
+1.  **Uniqueness:** $S$ is **not unique**. Eigenvectors can be scaled by any non-zero constant, producing a new $S$.
+2.  **Diagonal Matrix:** If $A$ is diagonalizable, the diagonal matrix $\Lambda$ is unique (except for the order of eigenvalues), but $S$ is not.
+3.  **Invertibility vs. Diagonalizability:** 
+    *   **Diagonalizability** depends on enough independent eigenvectors.
+    *   **Invertibility** depends on non-zero eigenvalues.
+4.  **Commuting Matrices (5F):** Diagonalizable matrices share the same eigenvector matrix $S$ if and only if $AB = BA$.
 
 
 
-$$
-v_2 = x_2 - \text{proj}_{v_1}(x_2) =
-x_2 - \frac{x_2 \cdot v_1}{\|v_1\|^2}v_1
-$$
+# Practise Questions
+<img width="252" height="124" alt="image" src="https://github.com/user-attachments/assets/8421015e-30bd-434e-913f-9196fb5ce9bf" />
+<img width="612" height="118" alt="image" src="https://github.com/user-attachments/assets/925f8d9b-0dca-4d5a-8d1d-36a1a6ba13f0" />
+<img width="404" height="112" alt="image" src="https://github.com/user-attachments/assets/47e99ec5-1a76-436b-87ed-91d07681617e" />
+<img width="282" height="132" alt="image" src="https://github.com/user-attachments/assets/53752b57-aa69-49a8-b29f-95cbca7e66fc" />
+<img width="385" height="212" alt="image" src="https://github.com/user-attachments/assets/741c3d83-932c-40b6-afa4-46334044c231" />
 
 
- 
-
----
-
-
-### Final Normalization
-
-
-To ensure the matrix $P$ is orthogonal, divide each column by its norm:
-
-
-
-$$
-\text{New Column} =
-\frac{\text{Column}}{\|\text{Column}\|}
-$$
-
-
-
-
-
----
-
-
-## Conclusion
-
-
-Diagonalization simplifies complex calculations, such as computing high powers of matrices (e.g., $A^{200}$), by allowing us to work with diagonal forms
-
-
-
-# Practise Questions:
-
-<img width="692" height="229" alt="image" src="https://github.com/user-attachments/assets/b6ffe9bb-24bd-49c2-86cb-2884599505b5" />
-<img width="343" height="170" alt="image" src="https://github.com/user-attachments/assets/4d691fd6-3053-43b6-a66f-1fbd12e5629a" />
-<img width="540" height="210" alt="image" src="https://github.com/user-attachments/assets/7d599a6b-ae8f-4a0d-9b9e-981b1a465cf0" />
-<img width="878" height="170" alt="image" src="https://github.com/user-attachments/assets/49142138-8e90-40dc-8cf1-5285f88a6231" />
-<img width="346" height="205" alt="image" src="https://github.com/user-attachments/assets/0efe164c-1867-4807-88a1-e18b6d9283e5" />
-<img width="1147" height="114" alt="image" src="https://github.com/user-attachments/assets/5eb90f45-0d6c-4b8f-ba25-2d76f9f47af1" />
-<img width="295" height="200" alt="image" src="https://github.com/user-attachments/assets/5ba5a66f-0d81-4753-b64d-8e0d0f431231" />
