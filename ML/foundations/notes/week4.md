@@ -476,6 +476,7 @@ Where:
 
 
 The scalar λ is the eigenvalue corresponding to the eigenvector $v$. It represents the factor by which the vector is scaled or expanded during the transformation  
+<img width="1143" height="509" alt="image" src="https://github.com/user-attachments/assets/7241c774-c1b3-4cf4-90e1-a527fd348d3f" />
 
 
 ---
@@ -684,7 +685,7 @@ $$
 ---
 
 
-## 6. Example 2: Calculation for a 2×22  Matrix
+## 6. Example 2: Calculation for a 2×2  Matrix
 
 
 Let:
@@ -828,7 +829,7 @@ Px = 0
 $$
 
 
-Thus, **λ=0\lambda = 0λ=0** is an eigenvalue, and every vector orthogonal to the plane is an eigenvector.
+Thus, **λ=0** is an eigenvalue, and every vector orthogonal to the plane is an eigenvector.
 
 
 *The eigenvalues of a projection matrix are always 1 or 0.*
@@ -1053,6 +1054,8 @@ $$
 A^2x = A(Ax) = A(\lambda x) = \lambda(Ax) = \lambda(\lambda x) = \lambda^2 x
 $$
 
+Example:
+<img width="1310" height="795" alt="image" src="https://github.com/user-attachments/assets/e1423bce-db7d-4dda-ad7f-cae1fd1e16f9" />
 
  
 
@@ -1090,7 +1093,7 @@ A matrix $A$ is **diagonalizable** if there exists an invertible matrix $S$ such
 
 
 $$
-S^{-1}AS = D
+S^{-1}AS = λ (or D) 
 $$
 
 
@@ -1125,6 +1128,14 @@ $$
 
 **Note:** The order of eigenvectors in $X$ must strictly match the order of eigenvalues in $D$  
 
+<img width="1411" height="769" alt="image" src="https://github.com/user-attachments/assets/6416c345-09b4-476a-8ce0-bb8346a758fc" />
+
+
+Example:
+<img width="990" height="538" alt="image" src="https://github.com/user-attachments/assets/d2d38726-f551-40c1-bb48-d07b480a9f15" />
+<img width="777" height="500" alt="image" src="https://github.com/user-attachments/assets/8860ae37-65fd-4621-804e-74ce7f9c1f25" />
+<img width="944" height="299" alt="image" src="https://github.com/user-attachments/assets/b5fed3d0-1d72-4824-a558-1425a01427f6" />
+<img width="872" height="474" alt="image" src="https://github.com/user-attachments/assets/6cde9a40-e3f9-4b47-a79a-65bfa9ef064b" />
 
 ---
 
@@ -1135,6 +1146,7 @@ $$
 - An $n \times n$ matrix is diagonalizable if it has $n$ **linearly independent eigenvectors** 
 - If a matrix has $n$ **distinct eigenvalues**, it is guaranteed to be diagonalizable 
 
+<img width="1164" height="516" alt="image" src="https://github.com/user-attachments/assets/2ed72821-6b45-404c-95e7-3fb37cc2d183" />
 
 ---
 
@@ -1148,6 +1160,10 @@ A matrix $A$ is **orthogonally diagonalizable** if there exists an orthogonal ma
 
 $$
 P^T AP = D
+$$
+or 
+$$
+A = PDP^{-1}
 $$
 
 
