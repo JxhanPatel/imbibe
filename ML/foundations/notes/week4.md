@@ -331,6 +331,7 @@ Everything reduces to solving structured linear systems efficiently.
 
 #  4.2: Eigenvalues and Eigenvectors
 
+<img width="1289" height="722" alt="image" src="https://github.com/user-attachments/assets/ab13b9fb-ece9-477b-b27b-efc1837aba8a" />
 
 
 ---
