@@ -1224,3 +1224,15 @@ $$
 
 
 Diagonalization simplifies complex calculations, such as computing high powers of matrices (e.g., $A^{200}$), by allowing us to work with diagonal forms
+
+
+
+# Practise Questions:
+
+<img width="692" height="229" alt="image" src="https://github.com/user-attachments/assets/b6ffe9bb-24bd-49c2-86cb-2884599505b5" />
+<img width="343" height="170" alt="image" src="https://github.com/user-attachments/assets/4d691fd6-3053-43b6-a66f-1fbd12e5629a" />
+<img width="540" height="210" alt="image" src="https://github.com/user-attachments/assets/7d599a6b-ae8f-4a0d-9b9e-981b1a465cf0" />
+<img width="878" height="170" alt="image" src="https://github.com/user-attachments/assets/49142138-8e90-40dc-8cf1-5285f88a6231" />
+<img width="346" height="205" alt="image" src="https://github.com/user-attachments/assets/0efe164c-1867-4807-88a1-e18b6d9283e5" />
+<img width="1147" height="114" alt="image" src="https://github.com/user-attachments/assets/5eb90f45-0d6c-4b8f-ba25-2d76f9f47af1" />
+<img width="295" height="200" alt="image" src="https://github.com/user-attachments/assets/5ba5a66f-0d81-4753-b64d-8e0d0f431231" />
