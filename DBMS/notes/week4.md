@@ -674,3 +674,17 @@ Entity sets and relationship sets can be expressed uniformly as **relation schem
 #### **12. Summary**
 *   **Illustrated ER Diagram notation** for entities, relationships, cardinalities, and complex attributes.
 *   **Discussed translation of ER Models to Relational Schemas**, including rules for handling composite/multivalued attributes and schema optimization.
+
+
+
+----
+
+
+
+# Practise Question
+<img width="581" height="459" alt="image" src="https://github.com/user-attachments/assets/7c47da68-f4d8-4d88-aca8-a3fe9e91eef3" />
+<img width="583" height="454" alt="image" src="https://github.com/user-attachments/assets/c7c1b9ea-1268-47a4-bd91-25807067d11c" />
+<img width="613" height="391" alt="image" src="https://github.com/user-attachments/assets/e2e90079-60af-43a7-83ef-007683f17c43" />
+
+
+---
