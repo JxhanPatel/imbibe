@@ -341,3 +341,173 @@ The three models are equivalent in power. For every relational algebra operator,
 #### **9. Summary**
 *   **Introduced tuple relational and domain relational calculus**.
 *   **Illustrated equivalence of algebra and calculus**.
+
+
+
+
+
+
+---
+
+
+
+
+# **4.3: Entity-Relationship Model/1**
+
+---
+
+#### **1. Recap**
+*   **Predicate Calculus**.
+*   **Tuple Relational and Domain Relational Calculus**.
+*   **Equivalence of Relational Algebra and Relational Calculus**.
+
+---
+
+#### **2. Objectives**
+*   To understand the **Design Process for Database Systems**.
+*   To study the **E-R Model for real world representation**.
+
+---
+
+#### **3. Outline**
+*   **Design Process**.
+*   **E-R Model**:
+    *   **Entity and Entity Set**.
+    *   **Relationship** (including **Cardinality**).
+    *   **Attributes**.
+    *   **Weak Entity Sets**.
+
+---
+
+#### **4. Design Process**
+
+**What is Design?**
+A Design:
+*   Satisfies a given (perhaps informal) **functional specification**.
+*   Conforms to **limitations of the target medium**.
+*   Meets implicit or explicit requirements on **performance and resource usage**.
+*   Satisfies implicit or explicit design criteria on the form of the artifact.
+*   Satisfies restrictions on the design process itself, such as its length or cost, or the tools available for doing the design.
+
+**Role of Abstraction**
+*   **Disorganized Complexity** results from Storage (STM) limitations of the human brain; an individual can simultaneously comprehend of the order of **seven, plus or minus two chunks of information**.
+*   **Abstraction** allows a person to use a complex device or system without having to know the details of how that device or system is constructed.
+*   **Example of Abstraction Levels**:
+    *   $1100011010111001_2$ (Raw Data).
+    *   $6251_8$ (Octal Abstraction).
+    *   $CA9_{16}$ (Hexadecimal Abstraction).
+
+**Model Building**
+*   Models are common in all engineering disciplines.
+*   Model building follows principles of **decomposition, abstraction, and hierarchy**.
+*   Each model describes a specific aspect of the system.
+*   New models are built upon old proven models.
+*   **Examples in other fields**:
+    *   **Physics**: Time-Distance Equation, Quantum Mechanics.
+    *   **Geography**: Maps, Projections.
+    *   **Building & Bridges**: Drawings - Plan, Elevation, Side view.
+
+**Design Approach**
+1.  **Requirement Analysis**: Analyze the data needs of the prospective database users.
+    *   Planning.
+    *   System Definition.
+2.  **Database Designing**: Use a modeling framework to create abstraction of the real world.
+    *   **Logical Model**: Deciding on a good database schema.
+        *   *Business Decision*: What attributes should we record in the database?.
+        *   *Computer Science Decision*: What relation schema should we have and how should the attributes be distributed among the various relation schema?.
+    *   **Physical Model**: Deciding on the physical layout of the database.
+3.  **Implementation**:
+    *   Data Conversion and Loading.
+    *   Testing.
+
+
+
+
+<img width="1424" height="636" alt="image" src="https://github.com/user-attachments/assets/8c9fc408-ce7c-4eb9-ad5c-193e54b733fe" />
+
+---
+
+#### **5. Entity Relationship (ER) Model**
+
+**Database Modeling Concepts**
+*   The ER data model was developed to facilitate database design by allowing specification of an **enterprise schema** that represents the overall logical structure of a database.
+*   It is useful in mapping the meanings and interactions of real-world enterprises onto a conceptual schema.
+*   **Three Basic Concepts**: Attributes, Entity sets, and Relationship sets.
+*   **ER Diagram**: A diagrammatic representation that can express the overall logical structure of a database graphically.
+
+**Attributes**
+*   An **Attribute** is a property associated with an entity / entity set.
+*   Based on values of certain attributes, an entity can be identified uniquely.
+*   **Attribute Types**:
+    *   **Simple and Composite**: Simple attributes are not divided into subparts. Composite attributes can be divided into subparts (e.g., `name` divided into `first_name`, `middle_initial`, `last_name`).
+    *   **Single-valued and Multivalued**: Single-valued attributes have one value for a particular entity. Multivalued attributes may have a set of values for a specific entity (e.g., `phone_numbers`, `dependent_name`).
+    *   **Derived**: The value can be computed from other attributes (e.g., `age` derived from `date_of_birth` and current date).
+*   **Domain**: The set of permitted values for each attribute.
+
+<img width="654" height="237" alt="image" src="https://github.com/user-attachments/assets/d7bccfe2-6063-489c-aa12-89f72e2fda6d" />
+
+**Entity Sets**
+*   An **Entity** is an object that exists and is distinguishable from other objects (e.g., a specific person, company, event).
+*   An **Entity Set** is a set of entities of the same type that share the same properties (e.g., the set of all persons, companies).
+*   An entity is represented by a set of attributes.
+    *   *Example*: $instructor = (ID, name, street, city, salary)$.
+*   A subset of attributes forms a **primary key** of the entity set to uniquely identify each member. Primary keys are represented by **underlining** them.
+
+**Relationship Sets**
+*   A **Relationship** is an association among several entities.
+*   A **Relationship Set** is a mathematical relation among $n \ge 2$ entities, each taken from entity sets.
+    *   $\{(e_1, e_2, ..., e_n) \mid e_1 \in E_1, e_2 \in E_2, ..., e_n \in E_n\}$.
+ <img width="531" height="258" alt="image" src="https://github.com/user-attachments/assets/8e83213c-44c8-438a-97f4-d017d0915d1d" />
+
+*   **Degree of Relationship Set**: The number of entity sets that participate in a relationship set.
+    *   **Binary Relationship**: Involves two entity sets (degree two); most common in database systems.
+    *   **Ternary Relationship**: Involves three entity sets (e.g., `proj_guide` between `instructor`, `student`, and `project`).
+*   Attributes can be associated with a relationship set (e.g., `date` attribute for the `advisor` relationship tracking when the association started).
+
+**Redundant Attributes**
+*   Attributes may be redundant if the information they replicate is present in a relationship.
+*   *Example*: If `instructor` has `dept_name` and there is an `inst_dept` relationship with the `department` entity set, the `dept_name` attribute is redundant in the `instructor` entity set and needs to be removed.
+
+---
+
+#### **6. Mapping Cardinality Constraints**
+
+*   Express the number of entities to which another entity can be associated via a relationship set.
+*   **Types for Binary Relationship Sets**:
+    1.  **One to one**: An entity in A is associated with at most one entity in B, and an entity in B is associated with at most one entity in A.
+    2.  **One to many**: An entity in A is associated with any number (zero or more) of entities in B. An entity in B can be associated with at most one entity in A.
+    3.  **Many to one**: An entity in A is associated with at most one entity in B. An entity in B can be associated with any number (zero or more) of entities in A.
+    4.  **Many to many**: An entity in A is associated with any number of entities in B, and an entity in B is associated with any number of entities in A.
+
+<img width="535" height="327" alt="image" src="https://github.com/user-attachments/assets/b1ea943c-6408-4f84-90ff-124a4190580c" />
+<img width="540" height="319" alt="image" src="https://github.com/user-attachments/assets/4bddc6e7-d934-4bea-acfc-b8186a8f5c25" />
+
+---
+
+#### **7. Weak Entity Sets**
+
+**Definition**
+*   **Strong Entity Set**: An entity set that contains sufficient attributes to uniquely identify all its entities; a primary key exists.
+*   **Weak Entity Set**: An entity set that does not contain sufficient attributes to uniquely identify its entities.
+*   **Discriminator**: A partial key in a weak entity set that can identify a group of entities within that set. It is represented by underlining with a **dashed line**.
+
+**Existence Dependency**
+*   A weak entity set is **existence dependent** on another entity set, called its **identifying entity set** (or owner).
+*   **Identifying Relationship**: The relationship associating the weak entity set with the identifying entity set. It is depicted by a **double diamond**.
+*   The weak entity set must have **total participation** in the identifying relationship.
+
+**Primary Key of Weak Entity Set**
+*   Formed by the combination of the **discriminator** of the weak entity set and the **primary key of the identifying strong entity set**.
+*   **Formula**: $\text{Primary Key of Weak Entity Set} = \text{Discriminator} + \text{Primary Key of Strong Entity Set}$.
+
+**Example**
+*   **Strong Entity Set**: `Building(building_no, building_name, address)`.
+*   **Weak Entity Set**: `Apartment(door_no, floor)`. `door_no` is the discriminator.
+*   **Relationship**: `BA` between `Building` and `Apartment`.
+*   **Primary Key of Apartment**: `building_no` + `door_no`.
+
+---
+
+#### **8. Summary**
+*   Introduced the **Design Process for Database Systems**.
+*   Elucidated the **E-R Model** for real-world representation with entities, entity sets, attributes, and relationships.
