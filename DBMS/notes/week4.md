@@ -688,3 +688,172 @@ Entity sets and relationship sets can be expressed uniformly as **relation schem
 
 
 ---
+
+
+
+
+
+
+
+# **4.5: Entity-Relationship Model/3**
+
+---
+
+#### **1. Recap**
+*   **ER Diagram for ER Models**.
+*   **Translation of ER Models to Relational Schema**.
+
+---
+
+#### **2. Objectives**
+*   **To understand extended features of ER Model**.
+*   **To discuss various design issues**.
+
+---
+
+#### **3. Outline**
+*   **Extended ER Features**.
+*   **Design Issues**.
+
+---
+
+#### **4. Non-binary Relationship Sets**
+
+*   **Most relationship sets are binary**.
+*   **There are occasions when it is more convenient to represent relationships as non-binary**.
+*   **Formally, a relationship set is a mathematical relation on $n \ge 2$ (possibly nondistinct) entity sets**.
+*   **Degree of Relationship Set**: The number of entity sets that participate in a relationship set.
+    *   A binary relationship set is of degree 2; a ternary relationship set is of degree 3.
+
+<img width="533" height="223" alt="image" src="https://github.com/user-attachments/assets/cc7008cd-158e-4aaa-8edf-d58146620ffd" />
+
+**Cardinality Constraints on Non-binary Relationships:**
+*   **We allow at most one arrow out of a ternary (or greater degree) relationship** to indicate a cardinality constraint.
+*   For example, an arrow from `proj_guide` to `instructor` indicates **each student has at most one guide for a project**.
+*   **Two arrows out of a non-binary relationship set can be interpreted in two ways**:
+    1.  A particular combination of entities from $E_1, E_2$ can be associated with at most one combination of entities from $E_3, E_4$.
+    2.  A particular combination of entities from $E_1, E_2, E_3$ can be associated with at most one combination of entities from $E_4$, and a particular combination from $E_1, E_2, E_4$ can be associated with at most one from $E_3$.
+*   **To avoid confusion, only one arrow is permitted**, in which case the two interpretations are equivalent.
+
+---
+
+#### **5. Extended ER Features: Specialization and Generalization**
+
+**Specialization:**
+*   **Top-down design process**: Designating subgroupings within an entity set that are distinctive from other entities in the set.
+*   These subgroupings become **lower-level entity sets** that have attributes or participate in relationships that do not apply to the higher-level entity set.
+*   **ISA Relationship**: Depicted by a triangle component (or hollow arrow-head) labeled **ISA**, which stands for **"is a"** (e.g., instructor "is a" employee).
+*   **Superclass-Subclass Relationship**: Higher-level entity sets may be called superclasses and lower-level sets called subclasses.
+
+<img width="311" height="316" alt="image" src="https://github.com/user-attachments/assets/3e411435-d527-42f3-9e27-cfeebbd5c5fb" />
+
+**Generalization:**
+*   **Bottom-up design process**: Multiple entity sets are synthesized into a higher-level entity set on the basis of common features.
+*   Attributes that are conceptually the same across lower-level sets are given a common name and represented with the higher-level entity.
+*   **Specialization and generalization are simple inversions of each other** and are represented in an ER diagram in the same way.
+
+**Attribute Inheritance:**
+*   **A crucial property is attribute inheritance**.
+*   A lower-level entity set inherits **all the attributes and relationship participation** of the higher-level entity set to which it is linked.
+*   **Single Inheritance**: In a hierarchy, an entity set is involved as a lower-level set in only one ISA relationship.
+*   **Multiple Inheritance**: If an entity set is a lower-level set in more than one ISA relationship, the structure is called a **lattice**.
+
+---
+
+#### **6. Constraints on Specialization/Generalization**
+
+**Completeness Constraints:**
+*   **Total specialization/generalization**: Each higher-level entity must belong to at least one lower-level entity set.
+*   **Partial specialization/generalization**: Some higher-level entities may not belong to any lower-level entity set (this is the default).
+*   **Total is specified in an ER diagram by adding the keyword "total"** and drawing a dashed line to the hollow arrow-head.
+
+**Disjointness Constraints:**
+*   **Disjoint specialization**: An entity must belong to at most one specialized entity set.
+    *   *Example:* instructor and secretary.
+*   **Overlapping specialization**: An entity may belong to multiple specialized entity sets.
+    *   *Example:* student and employee (a person could be both).
+
+---
+
+#### **7. Aggregation**
+
+*   **One limitation of the E-R model is that it cannot express relationships among relationships**.
+*   **Aggregation is an abstraction through which relationships are treated as higher-level entities**.
+*   It allows us to regard a relationship set (and its associated entities) as an entity set that can then participate in other relationships.
+
+<img width="392" height="298" alt="image" src="https://github.com/user-attachments/assets/f4e9edac-7ced-4eed-81f5-c63dfdd365e5" />
+
+*   **Example**: To record evaluations for a (student, project, instructor) combination, we treat the `proj_guide` relationship as an entity set and create a binary relationship `eval_for` between `proj_guide` and `evaluation`.
+
+---
+
+#### **8. Reduction to Relational Schema**
+
+**Representing Specialization/Generalization:**
+*   **Method 1**: Create a schema for the higher-level entity set and a schema for each lower-level entity set that includes the primary key of the higher-level set and local attributes.
+    *   *Example*: `person (ID, name, street, city)`, `student (ID, tot_cred)`, `employee (ID, salary)`.
+    *   **Drawback**: Getting info about an employee requires accessing two relations and performing a join.
+*   **Method 2**: If generalization is disjoint and complete, create a schema for each lower-level entity set with all local and inherited attributes.
+    *   *Example*: `student (ID, name, street, city, tot_cred)`, `employee (ID, name, street, city, salary)`.
+    *   **Drawback**: Name and address may be stored redundantly for people who are both students and employees.
+
+**Representing Aggregation:**
+*   **To represent aggregation, create a schema containing**:
+    1.  The primary key of the aggregated relationship.
+    2.  The primary key of the associated entity set.
+    3.  Any descriptive attributes of the relationship.
+*   *Example*: `eval_for (s_ID, project_id, i_ID, evaluation_id)`.
+*   **The schema for the aggregated relationship (e.g., `proj_guide`) is used; no separate relation is required**.
+
+---
+
+#### **9. ER Design Issues**
+
+**Entities vs. Attributes:**
+*   **Distinctions depend on the structure of the enterprise and semantics**.
+*   **Treating an object as an entity is better when extra information needs to be kept** about it, or when it may have multiple values (multivalued).
+    *   *Example*: `phone_number` as an attribute vs. a `phone` entity set with `location` and `type`.
+<img width="584" height="143" alt="image" src="https://github.com/user-attachments/assets/7f9e36ac-70d0-4c29-aca9-4ac3bf54247c" />
+
+**Entity Sets vs. Relationship Sets:**
+*   It is not always clear whether an object is best expressed as an entity or relationship.
+*   **Guideline**: Designate a relationship set to describe an **action** that occurs between entities.
+*   *Example*: The `takes` relationship vs. a `registration` entity set.
+<img width="589" height="206" alt="image" src="https://github.com/user-attachments/assets/73311e67-2670-49d2-9e1e-70f23d672ce0" />
+
+**Binary vs. Non-Binary Relationship Sets:**
+*   **It is always possible to replace a nonbinary relationship set by a number of distinct binary relationship sets**.
+*   **Conversion Process**:
+    1.  Replace ternary relationship $R$ between sets $A, B, C$ with an artificial entity set $E$.
+    2.  Create three binary many-to-one relationship sets $R_A, R_B, R_C$ from $E$ to $A, B, C$.
+    3.  Create an identifying attribute for $E$.
+    4.  $E$ is required to have total participation in $R_A, R_B, R_C$.
+
+<img width="560" height="182" alt="image" src="https://github.com/user-attachments/assets/44f228ff-2178-4a01-94b2-2e0239cb2eef" />
+
+*   **Drawbacks of conversion**:
+    *   An n-ary set shows participation more clearly.
+    *   **Translating all constraints may not be possible** (e.g., a many-to-one constraint from $A, B$ to $C$).
+
+---
+
+#### **10. Symbols Used in ER Notation**
+
+| Symbol | Representation |
+| :--- | :--- |
+| **Rectangle** | Entity set |
+| **Diamond** | Relationship set |
+| **Double Rectangle** | Weak entity set |
+| **Double Diamond** | Identifying relationship set for weak entity set |
+| **Underlined Attribute** | Primary key |
+| **Dashed Underline** | Discriminator / partial key of weak entity set |
+| **Double Line** | Total participation of entity set in relationship |
+| **Arrow ($\rightarrow$)** | "One" side of relationship / Cardinality constraint |
+| **ISA Triangle** | Specialization or Generalization |
+| **Box Enclosing Relationship**| Aggregation |
+
+---
+
+#### **11. Summary**
+*   **Discussed the extended features of ER Model** (Non-binary relationships, Specialization, Generalization, Aggregation).
+*   **Deliberated on various design issues** (Entities vs. Attributes, Entities vs. Relationships, Binary vs. n-ary conversion).
