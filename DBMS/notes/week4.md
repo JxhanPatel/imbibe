@@ -511,3 +511,166 @@ A Design:
 #### **8. Summary**
 *   Introduced the **Design Process for Database Systems**.
 *   Elucidated the **E-R Model** for real-world representation with entities, entity sets, attributes, and relationships.
+
+
+
+
+
+---
+
+
+
+
+# **4.4: Entity-Relationship Model/2**
+
+---
+
+#### **1. Recap**
+*   **Design Process for Database Systems**.
+*   **ER Model for real-world representation** with entities, entity sets, attributes, and relationships.
+
+---
+
+#### **2. Objectives**
+*   **To illustrate ER Diagram notation** for ER Models.
+*   **To explore translation of ER Models to Relational Schemas**.
+
+---
+
+#### **3. ER Diagram: Graphical Representations**
+
+**Entity Sets:**
+*   **Rectangles** represent entity sets.
+*   **Attributes** are listed inside the entity rectangle.
+*   **Underline** indicates primary key attributes.
+
+<img width="378" height="163" alt="image" src="https://github.com/user-attachments/assets/831b23d7-5eb4-49ea-b000-c617699f0a94" />
+
+**Relationship Sets:**
+*   **Diamonds** represent relationship sets.
+*   The diamond is linked via lines to a number of different entity sets (rectangles).
+*   Unless otherwise specified, a relationship represents an association between the keys of the connected entity sets.
+
+**Relationship Sets with Attributes:**
+*   An attribute of a relationship set is represented by an **undivided rectangle**.
+*   It is linked with a **dashed line** to the diamond representing that relationship set.
+*   *Example:* The `advisor` relationship may have an attribute `date` tracking when the association started.
+
+<img width="606" height="208" alt="image" src="https://github.com/user-attachments/assets/9bfbaff5-1806-4e33-a335-9a2c1c20e96d" />
+
+**Roles:**
+*   Entity sets of a relationship need not be distinct; each occurrence of an entity set plays a **"role"** in the relationship.
+*   In a **recursive relationship set**, explicit role names are necessary to specify how an entity participates.
+*   *Example:* In the `prereq` relationship between `course` and `course`, labels `course_id` and `prereq_id` are role indicators.
+
+<img width="517" height="169" alt="image" src="https://github.com/user-attachments/assets/697441fe-1c2c-4176-a360-58e414a18cb3" />
+
+---
+
+#### **4. Cardinality Constraints**
+
+Cardinality is expressed by drawing either a **directed line** ($\rightarrow$) signifying "one," or an **undirected line** (—) signifying "many," between the relationship set and the entity set.
+<img width="500" height="157" alt="image" src="https://github.com/user-attachments/assets/c86e5233-42bd-4706-8d79-32bca0cfa1a4" />
+<img width="568" height="163" alt="image" src="https://github.com/user-attachments/assets/acb5179b-b0b8-4ce5-9cb8-fd8364fbedf5" />
+
+**Binary Relationship Types:**
+1.  **One-to-one:** A directed line points from the relationship set to both entity sets. An entity in A is associated with at most one entity in B, and vice-versa.
+2.  **One-to-many:** A directed line points to the "one" side. An instructor is associated with several students, but a student is associated with at most one instructor.
+3.  **Many-to-one:** A directed line points from the relationship set to the "one" side (e.g., student to instructor). An instructor is associated with at most one student, while a student can have many instructors.
+4.  **Many-to-many:** Undirected lines point to both entity sets. An instructor is associated with several students, and a student is associated with several instructors.
+
+---
+
+#### **5. Participation Constraints**
+
+*   **Total Participation:** Indicated by a **double line**. Every entity in the entity set must participate in at least one relationship in the relationship set.
+*   **Partial Participation:** Some entities may not participate in any relationship in the set.
+*   *Example:* Participation of `student` in `advisor` is total (every student must have an instructor), but participation of `instructor` in `advisor` is partial.
+
+<img width="494" height="126" alt="image" src="https://github.com/user-attachments/assets/bc9b66c5-06eb-4b82-a815-4ecdcdfcfd29" />
+
+---
+
+#### **6. Complex Constraints: Cardinality Limits**
+
+*   A line may have an associated **minimum and maximum cardinality** shown as $l..h$.
+*   **Minimum value ($l$):** A value of 1 indicates total participation.
+*   **Maximum value ($h$):** A value of 1 indicates the entity participates in at most one relationship; a value of $*$ indicates no limit.
+*   *Example:* `1..1` on the `student` side of `advisor` means each student must have exactly one advisor; `0..*` on the `instructor` side means an instructor can have zero or more students.
+
+<img width="549" height="128" alt="image" src="https://github.com/user-attachments/assets/0d86dc27-0a77-4849-a8b7-11c7ff9be49c" />
+
+---
+
+#### **7. Notation for Complex Attributes**
+
+*   **Composite Attributes:** Represented by the main attribute name with component attributes listed below it (often indented or branching).
+*   **Multivalued Attributes:** Indicated by **curly braces** around the attribute name, e.g., `{phone_number}`.
+*   **Derived Attributes:** Indicated by a **pair of parenthesis** following the attribute name, e.g., `age()`.
+
+<img width="216" height="417" alt="image" src="https://github.com/user-attachments/assets/75d83825-b514-4cb0-9462-340cd302d85a" />
+
+---
+
+#### **8. Weak Entity Sets**
+
+*   **Representation:** Depicted via a **double rectangle**.
+*   **Discriminator:** The partial key is underlined with a **dashed line**.
+*   **Identifying Relationship:** The link to the strong entity set is depicted by a **double diamond**.
+*   **Primary Key:** Formed by the discriminator of the weak entity set plus the primary key of the identifying strong entity set.
+*   *Example:* `section` is a weak entity set dependent on `course`. Its primary key is `(course_id, sec_id, semester, year)`.
+
+<img width="502" height="118" alt="image" src="https://github.com/user-attachments/assets/4509969d-7b2d-46df-953e-3547caed2403" />
+
+---
+
+#### **9. Full University Enterprise ER Diagram**
+
+The complete ER diagram includes entity sets like `classroom`, `department`, `course`, `instructor`, `section`, `student`, and `time_slot`, along with their complex relationship interconnections.
+
+<img width="956" height="874" alt="image" src="https://github.com/user-attachments/assets/4db18f2b-5457-4ebe-ac74-4194a4a7aceb" />
+
+---
+
+#### **10. Reduction to Relational Schema**
+
+Entity sets and relationship sets can be expressed uniformly as **relation schemas**.
+
+**Representing Entity Sets:**
+*   **Strong Entity Set:** Reduces to a schema with the same attributes.
+    *   *Example:* `student (ID, name, tot_cred)`.
+*   **Weak Entity Set:** Becomes a table that includes a column for the primary key of the identifying strong entity set.
+    *   *Example:* `section (course_id, sec_id, semester, year)`.
+
+**Representing Relationship Sets:**
+*   A relationship set $R$ is represented by a schema with attributes formed by the union of the **primary keys** of each participating entity set, plus any **descriptive attributes** of $R$.
+*   **Many-to-Many:** The primary key for the schema consists of the union of the primary keys of the participating entity sets.
+    *   *Example:* `advisor (s_ID, i_ID)`.
+
+**Handling Complex Attributes:**
+*   **Composite Attributes:** Flattened out by creating a separate attribute for each component attribute.
+    *   *Example:* `name` becomes `name_first_name` and `name_last_name`. Prefixes are omitted if there is no ambiguity.
+*   **Multivalued Attributes:** A multivalued attribute $M$ of entity $E$ is represented by a **separate schema** $EM$.
+    *   Schema $EM$ contains attributes for the primary key of $E$ and an attribute for $M$.
+    *   *Example:* `{phone_number}` of `instructor` becomes `inst_phone (ID, phone_number)`.
+*   **Derived Attributes:** Not explicitly represented in the relational model; they may be represented as stored procedures or functions.
+
+---
+
+#### **11. Schema Redundancy and Optimization**
+
+**Combining Schemas:**
+*   **Many-to-One/One-to-Many:** If participation is **total** on the "many" side, the relationship schema can be combined with the "many" side entity schema by adding the primary key of the "one" side as an extra attribute.
+    *   *Example:* Instead of a separate `inst_dept` table, add `dept_name` to the `instructor` table.
+*   **One-to-One:** The relationship schema can be merged into either of the two entity tables.
+*   **Partial Participation Warning:** If participation is partial on the "many" side, merging could result in null values.
+
+**Redundancy of Weak Entity Relationships:**
+*   The schema for a relationship set linking a weak entity set to its strong identifying entity set is **redundant**.
+*   The attributes of the relationship are already present in the schema generated for the weak entity set.
+
+---
+
+#### **12. Summary**
+*   **Illustrated ER Diagram notation** for entities, relationships, cardinalities, and complex attributes.
+*   **Discussed translation of ER Models to Relational Schemas**, including rules for handling composite/multivalued attributes and schema optimization.
