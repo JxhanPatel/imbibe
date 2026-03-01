@@ -857,3 +857,14 @@ Entity sets and relationship sets can be expressed uniformly as **relation schem
 #### **11. Summary**
 *   **Discussed the extended features of ER Model** (Non-binary relationships, Specialization, Generalization, Aggregation).
 *   **Deliberated on various design issues** (Entities vs. Attributes, Entities vs. Relationships, Binary vs. n-ary conversion).
+
+
+
+---
+
+# Practise Question
+<img width="546" height="330" alt="image" src="https://github.com/user-attachments/assets/12e8b504-a3b3-4164-bb6e-10277521ba78" />
+<img width="513" height="439" alt="image" src="https://github.com/user-attachments/assets/31567eec-7e30-4c52-86d5-d82e68b79287" />
+<img width="565" height="554" alt="image" src="https://github.com/user-attachments/assets/dad53064-7fdd-4cef-8927-f3d8c87a0d7d" />
+<img width="748" height="132" alt="image" src="https://github.com/user-attachments/assets/f0be76d6-aa75-4735-9a13-ce431913f0fc" />
+<img width="685" height="123" alt="image" src="https://github.com/user-attachments/assets/1a167942-0656-4d42-b402-6445e87a5404" />
