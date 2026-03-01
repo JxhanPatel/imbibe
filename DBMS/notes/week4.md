@@ -207,7 +207,7 @@ $A$ is customer name; $B$ is branch name. If $S$ contains branches $\{1, 2\}$, t
 
 
 
-### **4.2: Formal Relational Query Languages/2**
+# **4.2: Formal Relational Query Languages/2**
 
 ---
 
