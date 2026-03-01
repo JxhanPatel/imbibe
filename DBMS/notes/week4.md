@@ -200,3 +200,144 @@ $A$ is customer name; $B$ is branch name. If $S$ contains branches $\{1, 2\}$, t
 *   **Relational Algebra** discussed with examples.
 *   Six basic operators: **select, project, union, set difference, Cartesian product, and rename**.
 *   Relational Algebra is **not Turing complete**.
+
+
+
+---
+
+
+
+### **4.2: Formal Relational Query Languages/2**
+
+---
+
+#### **1. Recap**
+*   **Relational Algebras and its Operations**.
+
+---
+
+#### **2. Objectives**
+*   To understand **formal calculus-based query language through relational algebra**.
+
+---
+
+#### **3. Outline**
+*   **Tuple Relational Calculus (Overview only)**.
+*   **Domain Relational Calculus (Overview only)**.
+*   **Equivalence of Algebra and Calculus**.
+
+---
+
+#### **4. Formal Relational Query Language**
+
+*   **Relational Algebra**: Procedural and Algebra based.
+*   **Tuple Relational Calculus**: Non-Procedural and Predicate Calculus based.
+*   **Domain Relational Calculus**: Non-Procedural and Predicate Calculus based.
+
+---
+
+#### **5. Predicate Logic**
+
+*   **Predicate Logic or Predicate Calculus** is an extension of Propositional Logic or Boolean Algebra.
+*   It adds the concept of **predicates and quantifiers** to better capture the meaning of statements that cannot be adequately expressed by propositional logic.
+*   Tuple Relational Calculus and Domain Relational Calculus are based on **Predicate Calculus**.
+
+**Predicate:**
+*   Consider the statement, "x is greater than 3". It has two parts. The first part, the **variable x**, is the subject of the statement. The second part, **"is greater than 3"**, is the predicate. It refers to a property that the subject of the statement can have.
+*   The statement "x is greater than 3" can be denoted by $P(x)$ where $P$ is the predicate "is greater than 3" and $x$ is the variable.
+
+**Quantifiers:**
+In predicate logic, predicates are used alongside quantifiers to express the extent to which a predicate is true over a range of elements. Using quantifiers to create such propositions is called **quantification**.
+
+*   **Universal Quantifier ($\forall$):** Mathematical statements sometimes assert that a property is true for all the values of a variable in a particular domain, called the **domain of discourse**.
+    *   The notation $\forall x P(x)$ denotes the universal quantification of $P(x)$.
+    *   It is read as **"for all x P(x)"**.
+    *   *Example:* Let $P(x)$ be the statement "$x + 2 > x$". The truth value of $\forall x P(x)$ is **True (T)** as it is true for any real number.
+*   **Existential Quantifier ($\exists$):** Some mathematical statements assert that there is an element with a certain property.
+    *   The notation $\exists x P(x)$ denotes the existential quantification of $P(x)$.
+    *   It is read as **"there exists an x such that P(x)"**.
+    *   *Example:* Let $P(x)$ be the statement "$x > 5$". $\exists x P(x) = T$ because it is true for all real numbers greater than 5.
+
+---
+
+#### **6. Tuple Relational Calculus (TRC)**
+
+**Definition:**
+*   TRC is a **non-procedural query language**, where each query is of the form:
+    $$\{t | P(t)\}$$
+    *   $t =$ resulting tuples.
+    *   $P(t) =$ known as **predicate**; these are the conditions that are used to fetch $t$.
+*   $P(t)$ may have various conditions logically combined with **OR ($\vee$)**, **AND ($\wedge$)**, **NOT ($\neg$)**.
+*   It uses quantifiers:
+    *   $\exists t \in r (Q(t))$: "there exists" a tuple $t$ in relation $r$ such that predicate $Q(t)$ is true.
+    *   $\forall t \in r (Q(t))$: $Q(t)$ is true "for all" tuples in relation $r$.
+
+**Predicate Calculus Formula Components:**
+1.  **Set of attributes and constants**.
+2.  **Set of comparison operators**: $<, \le, =, \ne, >, \ge)$.
+3.  **Set of connectives**: and $(\wedge)$, or $(\vee)$, not $(\neg)$.
+4.  **Implication ($\Rightarrow$)**: $x \Rightarrow y$; if $x$ is true, then $y$ is true ($x \Rightarrow y \equiv \neg x \vee y$).
+5.  **Set of quantifiers**: $\exists, \forall$.
+
+**TRC Examples:**
+
+<img width="327" height="173" alt="image" src="https://github.com/user-attachments/assets/20fdd4cd-b9b0-4e9a-a4ba-1a3e3810eddf" />
+
+
+*   **Example 1: Obtain the first name of students whose age is greater than 21.**
+    *   $\{t.Fname | Student(t) \wedge t.age > 21\}$
+    *   $\{t.Fname | t \in Student \wedge t.age > 21\}$
+    *   $\{t | \exists s \in Student(s.age > 21 \wedge t.Fname = s.Fname)\}$
+*   **Example 2: Find the names of all students who have taken the course name 'DBMS'.**
+    *   Schema: `student(rollNo, name, year, courseId)`, `course(courseId, cname, teacher)`
+    *   $\{s.name | s \in student \wedge \exists c \in course(s.courseId = c.courseId \wedge c.cname = 'DBMS')\}$
+ 
+<img width="661" height="308" alt="image" src="https://github.com/user-attachments/assets/b69ac70d-0d0e-418b-b24a-92d52b5a1e07" />
+
+*   **Example 3: Find the eids of pilots certified for Boeing aircraft.**
+    *   Relations: `Aircraft(aid, aname, cruisingrange)`, `Certified(eid, aid)`
+    *   $\{C.eid | C \in Certified \wedge \exists A \in Aircraft(A.aid = C.aid \wedge A.aname = 'Boeing')\}$
+*   **Example 4: Identify the flights that can be piloted by every pilot whose salary is more than \$100,000.**
+    *   $\{F.flno | F \in Flights \wedge \forall C \in Certified \exists E \in Employees(A.cruisingrange > F.distance \wedge A.aid = C.aid \wedge E.salary > 100,000 \wedge E.eid = C.eid)\}$
+
+**Safety of Expressions:**
+*   It is possible to write tuple calculus expressions that generate **infinite relations**.
+*   *Example:* $\{t | \neg t \in r\}$ results in an infinite relation if the domain of any attribute is infinite.
+*   To guard against this, we restrict to **safe expressions**.
+*   **Definition:** An expression $\{t | P(t)\}$ in the TRC is **safe** if every component of $t$ appears in one of the relations, tuples, or constants that appear in $P$.
+
+---
+
+#### **7. Domain Relational Calculus (DRC)**
+
+*   A **non-procedural query language** equivalent in power to the tuple relational calculus.
+*   In TRC, you have a variable for the entire tuple; in DRC, every attribute is a different variable.
+*   Each query is an expression of the form:
+    $$\{<x_1, x_2, ..., x_n> | P(x_1, x_2, ..., x_n)\}$$
+    *   $x_1, x_2, ..., x_n$ represent **domain variables**.
+    *   $P$ represents a formula similar to that of the predicate calculus.
+
+---
+
+#### **8. Equivalence of RA, TRC, and DRC**
+
+The three models are equivalent in power. For every relational algebra operator, there is an equivalent calculus expression, and vice versa.
+
+| Operation | Relational Algebra | Tuple Relational Calculus | Domain Relational Calculus |
+| :--- | :--- | :--- | :--- |
+| **Select** | $\sigma_{B=17}(r)$ | ${t∣t∈R∧B=17}$ | ${⟨a,b⟩∣⟨a,b⟩∈r∧b=17}$ | $\{<a,b> | <a,b> \in r \wedge b=17\}$ |
+| **Project** | $\Pi_{A}(r)$ | $\{t \| \exists p \in r(t[A]=p[A])\}$ | $\{<a> \| \exists b(<a,b> \in r)\}$ |
+| **Union** | $r \cup s$ | $\{t \| t \in r \vee t \in s\}$ | $\{<a,b,c> \| <a,b,c> \in r \vee <a,b,c> \in s\}$ |
+| **Set Difference** | $r - s$ | $\{t \| t \in r \wedge t \notin s\}$ | $\{<a,b,c> \| <a,b,c> \in r \wedge <a,b,c> \notin s\}$ |
+| **Intersection** | $r \cap s$ | $\{t \| t \in r \wedge t \in s\}$ | $\{<a,b,c> \| <a,b,c> \in r \wedge <a,b,c> \in s\}$ |
+| **Cartesian Product** | $r \times s$ | $\{t \| \exists p \in r \exists q \in s (t[A]=p[A] \wedge t[B]=p[B] \wedge t[C]=q[C] \wedge t[D]=q[D])\}$ | $\{<a,b,c,d> \| <a,b> \in r \wedge <c,d> \in s\}$ |
+| **Natural Join** | $r \bowtie s$ | $\{t \| \exists p \in r \exists q \in s (... \text{matching conditions} ...)\}$ | $\{<a,b,c,d,e> \| <a,b,c,d> \in r \wedge <b,d,e> \in s\}$ |
+| **Division** | $r \div s$ | $\{t \| \exists p \in r \forall q \in s (p[B]=q[B] \Rightarrow t[A]=p[A])\}$ | $\{<a> \ \forall <b> (<b> \in s \Rightarrow <a>, <b> \in r)\}$ |
+
+(Note: Schemas for equivalence examples: $R=(A,B)$ for Select/Project/Cartesian; $R,S=(A,B,C)$ for set operations; $R=(A,B,C,D)$ and $S=(B,D,E)$ for Natural Join; $R=(A,B)$ and $S=(B)$ for Division.)
+
+---
+
+#### **9. Summary**
+*   **Introduced tuple relational and domain relational calculus**.
+*   **Illustrated equivalence of algebra and calculus**.
