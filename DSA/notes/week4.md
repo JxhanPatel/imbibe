@@ -661,3 +661,168 @@ def DFSListGlobal(AList, v):
 >
 
 
+
+
+
+---
+
+
+
+
+
+
+# 4.5: Applications of BFS and DFS
+
+## 1. Beyond Reachability
+
+Graph exploration using BFS and DFS primarily focuses on:
+
+- **Reachability:** Determining if a path exists between vertices.
+- **Path Recovery:** Finding the actual path between vertices.
+- **Distance (BFS only):** Recovering the distance in terms of the number of edges, as BFS works level by level to discover shortest paths.
+
+Beyond these, BFS and DFS are used to discover structural properties of graphs, such as connected components and cycles.
+
+---
+
+## 2. Connected Components (Undirected Graphs)
+
+A graph may consist of multiple parts that are not connected to each other.
+
+- **Connected Graph:** You can get from every vertex to every other vertex.
+- **Disconnected Graph:** There are parts which cannot be reached from other parts.
+- **Connected Component:** A maximal set of vertices that are connected. "Maximal" means everything in the set is connected, and no more vertices can be added to the set while keeping it connected.
+
+### Example: Finding Components
+
+In a disconnected graph, we identify components through reachability:
+
+1. Assign each vertex a **component number**.
+2. Start with vertex 0 (or the smallest unvisited node).
+3. Run BFS or DFS to explore everything reachable from that vertex.
+4. Assign all reached vertices the current `comp_id` (e.g., 0).
+5. Find the smallest unvisited node, increment the `comp_id` (e.g., 1), and repeat the process.
+6. Continue until all vertices have been visited.
+
+<img width="284" height="421" alt="image" src="https://github.com/user-attachments/assets/5bcf86db-33a6-459b-99af-469b7d4263e7" />
+
+
+### BFS Implementation for Connected Components
+
+The following Python-style logic uses an adjacency list to find component IDs:
+
+```python
+def find_components(AList):
+    component = {}
+    for i in AList.keys():
+        component[i] = -1 # Initialize all to -1 (unvisited)
+    
+    comp_id = 0
+    seen = 0
+    n = len(AList.keys())
+    
+    while seen < n:
+        # Find the smallest vertex not yet visited
+        start_v = min([i for i in AList.keys() if component[i] == -1])
+        
+        # Run BFS from start_v
+        visited = BFS(AList, start_v) 
+        
+        # Mark all vertices reachable in this round
+        for node in visited.keys():
+            if visited[node]:
+                seen += 1
+                component[node] = comp_id
+        
+        comp_id += 1 # Increment for the next component
+        
+    return component
+
+```
+
+---
+
+## 3. Detecting Cycles
+
+A **cycle** is a walk that starts and ends at the same vertex.
+
+- **Simple Cycle:** A cycle that does not repeat intermediate vertices or edges.
+- **Acyclic Graph:** A graph with no cycles.
+
+<img width="832" height="413" alt="image" src="https://github.com/user-attachments/assets/6882edeb-4472-44b7-ae1b-d5198a3b10b9" />
+
+
+### Cycle Detection using BFS
+
+When BFS explores a graph, the edges used to reach unvisited neighbors form a **BFS Tree** (or a **Forest** if the graph is disconnected).
+
+- **Tree Edges:** Edges used by BFS to visit new nodes.
+- **Non-tree Edges:** Edges in the graph that were discarded because the target vertex was already visited.
+- **Property:** In an undirected graph, **any non-tree edge corresponds to a cycle**.
+
+<img width="919" height="488" alt="image" src="https://github.com/user-attachments/assets/4f2d5e92-abe5-40cd-806a-e8f5f341e10e" />
+
+---
+
+## 4. DFS Numbering: Pre and Post Numbers
+
+DFS can record the progress of exploration using a counter to assign two numbers to each vertex:
+
+1. **Pre-number:** The counter value when exploration of the vertex *starts*.
+2. **Post-number:** The counter value when exploration of the vertex *finishes*.
+
+### DFS with Pre/Post Implementation
+
+```python
+def DFS(AList, v, count, visited, pre, post):
+    visited[v] = True
+    pre[v] = count
+    count += 1
+    
+    for k in AList[v]:
+        if not visited[k]:
+            count = DFS(AList, k, count, visited, pre, post)
+            
+    post[v] = count
+    count += 1
+    return count
+
+```
+
+
+<img width="897" height="440" alt="image" src="https://github.com/user-attachments/assets/30d3da41-137d-47ed-a2e2-4dd269fa8af4" />
+
+
+---
+
+## 5. Classification of Edges (Directed Graphs)
+
+In directed graphs, cycles are more complex because they must follow the direction of the arrows. Non-tree edges in a **DFS Tree** are classified into three flavors based on their pre and post intervals:
+
+| Edge Type | Description | Interval Property (u→v) |
+| --- | --- | --- |
+| **Tree/Forward Edge** | From ancestor to descendant. | v's interval is subsumed by u's (\[pre_v​,post_v​\]⊂\[pre_u​,post_u​\]). |
+| **Back Edge** | From descendant to ancestor. | u's interval is sitting inside v's (\[pre_u​,post_u​\]⊂\[pre_v​,post_v​\]). |
+| **Cross Edge** | Between disjoint branches. | Intervals of u and v are disjoint. |
+
+> [!IMPORTANT]
+> In a directed graph, **only back edges generate cycles**. Forward and cross edges do not complete a cycle following the arrows.
+>
+>
+
+<img width="892" height="423" alt="image" src="https://github.com/user-attachments/assets/5033bab1-f57c-42b1-8660-c67648d7ef9b" />
+<img width="914" height="393" alt="image" src="https://github.com/user-attachments/assets/c823ec07-4b01-47b3-8ec6-ef650b8d1461" />
+
+---
+
+## 6. Summary of Applications
+
+- **BFS/DFS:** Reachability, finding parents/paths.
+- **BFS:** Shortest path distance (unweighted).
+- **Connected Components:** Identifying isolated subgraphs.
+- **Cycles:** Found by identifying non-tree edges (specifically back edges in directed graphs).
+- **Strongly Connected Components (SCC):** Subsets where every vertex is reachable from every other vertex (requires bidirectional connectivity).
+- **Structural Features:** Identifying **articulation points** (cut vertices) and **bridges** (cut edges) using DFS numbering.
+
+**Conclusion:** While BFS is simpler for distances, **DFS is the preferred tool** for uncovering the deep structure of a graph because its numbering scheme provides significantly more information.
+
