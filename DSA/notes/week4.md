@@ -271,3 +271,224 @@ If edges are $(0,1)$ and $(0,4)$, then `adj_list[0] = [1, 4]`. It is often conve
 **Summary:** Adjacency lists are generally better for the types of problems we explore because they require less space and allow faster neighbor discovery in sparse graphs.
 
 
+
+
+
+---
+
+
+
+
+
+# 4.3: Breadth First Search (BFS)
+
+
+## 1. Introduction to Systematic Exploration
+
+Breadth First Search (BFS) is our first strategy to systematically explore a graph. The core objective is **reachability**:
+
+- Start from a vertex and mark it as reachable.
+- Systematically mark all the neighbors of already known reachable markings.
+- Look at the neighbors of those neighbors and mark them as reachable.
+- Stop when the target is marked.
+- **Avoid Redundancy:** To prevent going around and redoing work, we must keep track of which vertices are already marked.
+
+<img width="402" height="432" alt="image" src="https://github.com/user-attachments/assets/a9487420-a6c9-45b4-ad06-4aa02522e38c" />
+<img width="327" height="359" alt="image" src="https://github.com/user-attachments/assets/2402d3f2-0720-44ac-9f01-3c5015ec8f9b" />
+
+
+### Comparison: BFS vs. DFS
+
+- **Breadth First Search (BFS):** Propagates one level at a time.
+
+  - Start with a vertex reachable in 0 steps.
+  - Find all vertices reachable in 1 step.
+  - From 1-step vertices, find all reachable in 2 steps, and so on.
+  - The set of nodes grows broader and broader.
+- **Depth First Search (DFS):** Picks one neighbor and explores as far as possible.
+
+  - If a neighbor is reached, move to its neighbor immediately.
+  - Keep exploring until stuck, then backtrack to find unexplored neighbors.
+
+---
+
+## 2. BFS Mechanism and Data Structures
+
+In BFS, we explore the graph level by level (1 step away, then 2 steps away, etc.). Whenever we reach a vertex for the first time, it must be **explored** (looking at its neighbors). We must ensure we do not visit a vertex twice to avoid infinite loops.
+
+### Tracking Information
+
+We maintain two states for vertices:
+
+1. **Visited:** The vertex has been seen for the first time.
+2. **Explored:** The neighbors of the visited vertex have been processed.
+
+We use a **dictionary or function** to mark each vertex (0 to $n-1$) as `True` or `False` for its visited status. Initially, everything is `False`.
+
+### The Queue Data Structure
+
+A **Queue** is used to manage vertices that are visited but pending exploration. It follows the "First-In, First-Out" (FIFO) principle.
+
+- **Entry:** Join the queue at one end (append).
+- **Exit:** Move out from the other end (head of the queue).
+
+#### Python Implementation of a Queue Class
+
+```python
+class Queue:
+    def __init__(self):
+        self.queue = []
+
+    def addq(self, v):
+        self.queue.append(v)
+
+    def delq(self):
+        v = None
+        if not self.isempty():
+            v = self.queue[0]
+            self.queue = self.queue[1:]
+        return v
+
+    def isempty(self):
+        return self.queue == []
+
+    def __str__(self):
+        return str(self.queue)
+
+```
+
+<img width="600" height="208" alt="image" src="https://github.com/user-attachments/assets/0ff99e94-2ef4-4295-829c-e910bf8e3481" />
+
+---
+
+## 3. The BFS Algorithm
+
+### Basic Step
+
+For a neighbor $j$ of vertex $i$:
+
+- If `visited[j]` is `False`:
+
+  - Mark `visited[j] = True`.
+  - Add $j$ to the Queue (to explore its neighbors later).
+
+### Initialization
+
+- `visited` is `False` for every $v$.
+- Queue is empty.
+- Start BFS at vertex $j$: mark `visited[j] = True` and add $j$ to the Queue.
+
+### Python Code (Adjacency Matrix Version)
+
+```python
+def BFS(AMat, v):
+    (rows, cols) = AMat.shape
+    visited = {}
+    for i in range(rows):
+        visited[i] = False
+    
+    q = Queue()
+    visited[v] = True
+    q.addq(v)
+    
+    while not q.isempty():
+        j = q.delq()
+        for k in neighbors(AMat, j):
+            if not visited[k]:
+                visited[k] = True
+                q.addq(k)
+                
+    return visited
+
+```
+<img width="857" height="368" alt="image" src="https://github.com/user-attachments/assets/19feafa3-6c18-4dd4-a9dc-27cc37c5fa12" />
+<img width="864" height="463" alt="image" src="https://github.com/user-attachments/assets/84e1d601-c4d3-462f-a358-c6a09468ee13" />
+
+---
+
+## 4. Complexity Analysis
+
+Let $n$ be the number of vertices and $m$ be the number of edges.
+
+### Adjacency Matrix Representation
+
+- **Initialization:** $O(n)$ to set `visited` to `False`.
+- **Exploration:** Each reachable vertex enters and leaves the queue exactly once ($n$ vertices).
+- **Neighbor Scanning:** For each vertex $j$, we scan the entire row in the matrix ($n$ entries) to find neighbors.
+- **Total Complexity:** $n \times n = O(n^2)$.
+
+### Adjacency List Representation (Amortized Analysis)
+
+- **Amortized Analysis:** Instead of looking at individual operations, we look at the cumulative work.
+- **Sum of Degrees:** The sum of degrees across all vertices is $2m$ (each edge $(i, j)$ contributes to the degree of both $i$ and $j$).
+- **Exploration:** The total time spent exploring neighbors across all $n$ vertices is proportional to the sum of their degrees.
+- **Total Complexity:** $O(n + m)$.
+
+  - $n$ for initialization/visiting.
+  - $m$ for exploring all edges.
+
+> [!IMPORTANT]
+> $O(n + m)$ is considered **linear time** for a graph. Since any serious problem requires examining the entire graph (all vertices and edges), this is the best possible complexity.
+>
+>
+
+---
+
+## 5. Enhancing BFS: Paths and Levels
+
+### Recovering the Path (Parent Tracking)
+
+To know how we reached a vertex $k$, we record its **parent** $j$ (the vertex from which $k$ was first visited).
+
+- Maintain a `parent` dictionary.
+- When marking `visited[k] = True`, set `parent[k] = j`.
+- Trace back from the target to the source using parent links.
+
+### Finding Shortest Paths (Level Tracking)
+
+Since BFS explores level by level, the first time we see a vertex, we have reached it via the shortest possible path (in terms of number of edges).
+
+- Maintain a `level` dictionary.
+- `level[source] = 0`.
+- If vertex $k$ is reached from $j$, `level[k] = level[j] + 1`.
+
+### Python Code (Adjacency List with Levels and Parents)
+
+```python
+def BFS_Level_Parent(AList, v):
+    level = {}
+    parent = {}
+    for i in AList.keys():
+        level[i] = -1  # -1 indicates unvisited
+        parent[i] = -1
+    
+    q = Queue()
+    level[v] = 0
+    q.addq(v)
+    
+    while not q.isempty():
+        j = q.delq()
+        for k in AList[j]:
+            if level[k] == -1:
+                level[k] = level[j] + 1
+                parent[k] = j
+                q.addq(k)
+                
+    return (level, parent)
+
+```
+
+<img width="878" height="407" alt="image" src="https://github.com/user-attachments/assets/86cae399-8202-4a8a-b61d-fe1411574a7f" />
+<img width="888" height="446" alt="image" src="https://github.com/user-attachments/assets/d6dad15d-5b26-4f83-85b1-e9954ed824b9" />
+<img width="854" height="452" alt="image" src="https://github.com/user-attachments/assets/8819905e-e8cb-40de-8815-277216eef28f" />
+
+---
+
+## 6. Summary
+
+- **BFS** explores graphs systematically level by level.
+- **Reachability:** Use a `visited` dictionary.
+- **Efficiency:** Adjacency List yields $O(n + m)$, whereas Adjacency Matrix yields $O(n^2)$.
+- **Path Recovery:** Use a `parent` dictionary to trace the path.
+- **Shortest Path:** In unweighted graphs, `level` information provides the shortest path length (number of edges).
+- **Note:** In weighted graphs (where edges have costs/distances), BFS alone is not sufficient for the shortest path; this is covered in later lectures.
