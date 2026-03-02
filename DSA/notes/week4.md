@@ -826,3 +826,73 @@ In directed graphs, cycles are more complex because they must follow the directi
 
 **Conclusion:** While BFS is simpler for distances, **DFS is the preferred tool** for uncovering the deep structure of a graph because its numbering scheme provides significantly more information.
 
+
+
+
+---
+
+
+
+
+# 4.6: Directed Acyclic Graphs (DAGs)
+
+
+
+Formally, we have a directed acyclic graph (DAG) $G=(V,E)$, which is a directed graph without directed cycles.
+
+### Topological Sorting
+
+One of the fundamental problems we want to solve using a DAG is topological sorting.
+
+- **Definition**: Enumerate $V=\{0, 1, \dots, n-1\}$ such that for any $(i,j) \in E$, $i$ appears before $j$.
+- **Purpose**: This represents a **feasible schedule**.
+- **Example Application**: Imagine the DAG represents prerequisites between courses.
+
+  - If task $i$ must appear before $j$, and $j$ must appear before $i$, this is impossible!.
+- **Claim**: Every DAG can be topologically sorted.
+
+<img width="915" height="415" alt="image" src="https://github.com/user-attachments/assets/c6ef2e6a-b2cb-43d8-98f2-17a26204cf73" />
+
+## Tasks and Dependencies
+
+DAGs are useful for telling us about things like tasks and their dependencies.
+
+### Case Study: Construction Schedule
+
+Consider the following constraints on a sequence:
+
+- Lay conduits before tiles and plastering.
+
+<img width="870" height="410" alt="image" src="https://github.com/user-attachments/assets/34cf1972-dba7-4fef-874c-9334eb1ebc43" />
+
+- **Objective**: Find a schedule.
+- **Method**: Enumerate $V=\{0, 1, \dots, n-1\}$ such that for any $(i,j) \in E$, $i$ appears before $j$.
+
+## Longest Paths in DAGs
+
+A common question in project management is: "How long will the work take?". This can be solved by finding the longest path in the DAG.
+
+### Longest Path Algorithm
+
+To compute the longest path to a vertex $i$:
+
+- If $indegree(i) = 0$, $longest\text{-}path\text{-}to(i) = 0$.
+- If $indegree(i) > 0$, the longest path to $i$ is 1 more than the longest path to its incoming neighbours.
+- **Formula**: $longest\text{-}path\text{-}to(i) = 1 + \max \{longest\text{-}path\text{-}to(j) \mid (j,i) \in E\}$.
+
+### Systematic Computation
+
+1. Compute the $indegree$ of each vertex.
+
+   - This is done by scanning each column of the adjacency matrix.
+2. Initialize $longest\text{-}path\text{-}to$ to $0$ for all vertices.
+3. List a vertex with $indegree$ 0 and remove it from the DAG.
+4. Update $indegrees$ and $longest\ path$ values for the remaining vertices.
+5. Repeat until all vertices are listed in topological order.
+
+### Using Topological Ordering
+
+Let $i_0, i_1, \dots, i_{n-1}$ be a topological ordering of $V$.
+
+- In this list, all neighbors of $i_k$ appear before it.
+- From left to right, compute $longest\text{-}path\text{-}to(i_k)$ as $1 + \max \{longest\text{-}path\text{-}to(i_j) \mid (i_j, i_k) \in E\}$.
