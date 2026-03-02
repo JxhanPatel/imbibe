@@ -896,3 +896,178 @@ Let $i_0, i_1, \dots, i_{n-1}$ be a topological ordering of $V$.
 
 - In this list, all neighbors of $i_k$ appear before it.
 - From left to right, compute $longest\text{-}path\text{-}to(i_k)$ as $1 + \max \{longest\text{-}path\text{-}to(i_j) \mid (i_j, i_k) \in E\}$.
+
+
+
+---
+
+
+
+
+# 4.7 Topological Sorting 
+
+---
+
+## **1. Directed Acyclic Graphs (DAGs)**
+A directed graph $G = (V, E)$ without directed cycles is known as a **Directed Acyclic Graph**, or a **DAG** for short.
+
+### **1.1 Conceptual Framework**
+*   **Tasks and Dependencies:** DAGs are a natural way to represent dependencies. 
+*   **Precedence Relations:** Vertices represent tasks, and an edge $(t, u)$ exists if task $t$ has to be completed before task $u$.
+*   **Feasible Schedule:** A topological sort provides a valid sequence to complete a program, respecting all dependencies.
+
+<img width="414" height="316" alt="image" src="https://github.com/user-attachments/assets/566a4129-77b6-45f4-b2ee-0135176302d2" />
+
+---
+
+## **2. Definition: Topological Sorting**
+A topological sort of a directed graph $G$ is an ordering of its nodes as $v_1, v_2, \dots, v_n$ so that for every edge $(v_i, v_j)$, we have $i < j$. In other words, all edges point "forward" or "left to right" in the ordering.
+
+### **2.1 Impossibility in Cyclic Graphs**
+A graph with directed cycles cannot be sorted topologically.
+*   **Reasoning:** A path $i \leadsto j$ means $i$ must be listed before $j$.
+*   **Contradiction:** In a cycle, there are paths $i \leadsto j$ and $j \leadsto i$. This implies $i$ must appear before $j$ AND $j$ must appear before $i$, which is impossible.
+
+> [!TIP]
+> **Theorem:** If $G$ has a topological ordering, then $G$ is a DAG.
+> **Converse:** If $G$ is a DAG, then $G$ has a topological ordering.
+
+---
+
+## **3. The "Indegree 0" Algorithm**
+
+### **3.1 Fundamental Fact**
+**Claim:** Every DAG has at least one vertex with **indegree 0**.
+*   **Definition:** Indegree is the number of edges coming into a vertex. A vertex with no dependencies has $indegree(v) = 0$.
+*   **Proof by Contradiction:** Suppose every vertex has $indegree > 0$. Start at any vertex and follow an edge back to a predecessor. Repeat this $n$ times. Since there are only $n$ vertices, we must eventually hit a vertex seen before, implying a cycle, which is impossible in a DAG.
+
+### **3.2 General Strategy**
+1.  First list vertices with no dependencies ($indegree = 0$).
+2.  Delete the listed vertex and all edges originating from it.
+3.  What remains is again a DAG!.
+4.  Find another vertex with $indegree = 0$ in the remaining graph.
+5.  Repeat until all vertices are listed.
+
+---
+
+## **4. Step-by-Step Algorithm Execution**
+Consider a DAG with $V=\{0, 1, 2, 3, 4, 5, 6, 7\}$ and edges representing dependencies.
+
+### **4.1 Initialization**
+Compute the indegree of each vertex by scanning columns of the adjacency matrix or iterating through the adjacency list.
+
+| Vertex | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Initial Indegree** | 0 | 0 | 2 | 1 | 1 | 2 | 1 | 4 |
+
+<img width="473" height="343" alt="image" src="https://github.com/user-attachments/assets/8319ab92-e28a-45d6-97cb-ae9d7360cc4b" />
+<img width="470" height="416" alt="image" src="https://github.com/user-attachments/assets/2f66fbba-b94d-4a99-87dd-3cc2470674bc" />
+<img width="482" height="379" alt="image" src="https://github.com/user-attachments/assets/afe9950e-0f7c-42e0-8843-b0d4512ef214" />
+
+
+
+### **4.2 Processing Trace**
+1.  **Enumerate 1:** Indegree is 0. List **1**. Update neighbors (2, 7).
+    *   New Indegrees: $2 \rightarrow 1, 7 \rightarrow 3$.
+2.  **Enumerate 0:** Indegree is 0. List **1, 0**. Update neighbors (2, 3, 4).
+    *   New Indegrees: $2 \rightarrow 0, 3 \rightarrow 0, 4 \rightarrow 0$.
+3.  **Choices:** Vertices 2, 3, and 4 now all have indegree 0.
+4.  **Enumerate 3:** List **1, 0, 3**. Update neighbor 5.
+    *   New Indegree: $5 \rightarrow 1$.
+5.  **Enumerate 2:** List **1, 0, 3, 2**. Update neighbor 5.
+    *   New Indegree: $5 \rightarrow 0$.
+6.  **Enumerate 5:** List **1, 0, 3, 2, 5**. Update neighbor 6.
+    *   New Indegree: $6 \rightarrow 0$.
+7.  **Enumerate 6:** List **1, 0, 3, 2, 5, 6**.
+8.  **Enumerate 4:** List **1, 0, 3, 2, 5, 6, 4**. Update neighbor 7.
+    *   New Indegree: $7 \rightarrow 0$.
+9.  **Enumerate 7:** List **1, 0, 3, 2, 5, 6, 4, 7**.
+
+**Final Topologically Sorted Sequence:** `1, 0, 3, 2, 5, 6, 4, 7`.
+
+> [!NOTE]
+> **Non-Uniqueness:** More than one topological sort is possible depending on the choice of which vertex with indegree 0 to list next.
+
+---
+
+## **5. Implementations and Complexity**
+
+### **5.1 Adjacency Matrix Implementation**
+```python
+def toposort(AMat):
+    (rows,cols) = AMat.shape
+    indegree = {}
+    toposortlist = []
+    
+    for c in range(cols): # Initialize indegrees to 0
+        indegree[c] = 0
+        for r in range(rows): # Scan columns for incoming edges
+            if AMat[r,c] == 1:
+                indegree[c] = indegree[c] + 1
+                
+    for i in range(rows):
+        # Identify next vertex to enumerate
+        j = min([k for k in range(cols) if indegree[k] == 0])
+        toposortlist.append(j)
+        indegree[j] = indegree[j] - 1 # Mark as processed
+        
+        # Updating indegrees of neighbors
+        for k in range(cols):
+            if AMat[j,k] == 1:
+                indegree[k] = indegree[k] - 1
+                
+    return(toposortlist)
+```
+**Complexity Analysis ($O(n^2)$):**
+*   Initializing indegrees requires scanning the $n \times n$ matrix: $O(n^2)$.
+*   The outer loop runs $n$ times.
+*   Identifying the next vertex and updating neighbors both take $O(n)$ within the loop.
+*   Total: $O(n^2 + n \times n) = O(n^2)$.
+
+### **5.2 Adjacency List Implementation (Queue-based)**
+This approach uses a queue to explicitly keep track of all vertices eligible to be enumerated.
+
+```python
+def toposortlist(AList):
+    (indegree, toposortlist) = ({}, [])
+    for u in AList.keys():
+        indegree[u] = 0
+    
+    # Compute indegrees
+    for u in AList.keys():
+        for v in AList[u]:
+            indegree[v] = indegree[v] + 1
+            
+    zerodegreeq = Queue() # Maintain queue of indegree 0 vertices
+    for u in AList.keys():
+        if indegree[u] == 0:
+            zerodegreeq.addq(u)
+            
+    while (not zerodegreeq.isempty()):
+        j = zerodegreeq.delq()
+        toposortlist.append(j)
+        
+        for k in AList[j]: # Update neighbors
+            indegree[k] = indegree[k] - 1
+            if indegree[k] == 0:
+                zerodegreeq.addq(k)
+                
+    return (toposortlist)
+```
+**Complexity Analysis ($O(m+n)$):**
+*   Initializing and computing indegrees requires scanning all vertices and edges: $O(m+n)$.
+*   The loop to enumerate vertices runs $n$ times.
+*   Updating indegrees is done once for each edge: Amortized $O(m)$.
+*   Total: $O(m+n)$.
+
+---
+
+## **6. Alternative Strategy: DFS-Based**
+A simple algorithm to topologically sort a DAG using Depth-First Search:
+1.  Call $DFS(G)$ to compute finishing times $v.f$ for each vertex $v$.
+2.  As each vertex is finished, insert it onto the front of a linked list.
+3.  The list will contain vertices in decreasing order of their finishing times.
+
+**Time Complexity:** $\Theta(V+E)$.
+
+<img width="1422" height="975" alt="image" src="https://github.com/user-attachments/assets/40be95d6-5bf6-4d2d-9202-801fb588828e" />
