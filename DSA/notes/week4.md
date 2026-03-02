@@ -492,3 +492,166 @@ def BFS_Level_Parent(AList, v):
 - **Path Recovery:** Use a `parent` dictionary to trace the path.
 - **Shortest Path:** In unweighted graphs, `level` information provides the shortest path length (number of edges).
 - **Note:** In weighted graphs (where edges have costs/distances), BFS alone is not sufficient for the shortest path; this is covered in later lectures.
+
+
+
+
+
+
+---
+
+
+
+# 4.4: Depth First Search (DFS)
+
+## 1. Introduction to Depth First Search
+
+Depth First Search (DFS) is one of the two fundamental strategies to search and find reachability in graphs. In contrast to Breadth First Search (BFS), which explores all neighbors at one level before moving to the next, DFS follows a single path of exploration as far as possible.
+
+### Core Strategy:
+
+- Start from some vertex.
+- Look at any one unexplored neighbor.
+- Instead of coming back to look at more unexplored neighbors of the original vertex, proceed directly from the neighbor.
+- Follow a long path until getting "stuck" (reaching a vertex with no unexplored neighbors).
+- Backtrack systematically to the most recent vertex that has unexplored neighbors and continue the process.
+
+> [!NOTE]
+> It is like reading a web page: instead of reading the rest of the text, you click the first link you see, go to a new page, click the first link there, and continue until you hit a dead end, then backtrack.
+>
+>
+
+---
+
+## 2. Data Structure: The Stack
+
+While BFS uses a **Queue** (First-In, First-Out) to process vertices in the order they are discovered, DFS uses a **Stack** (Last-In, First-Out).
+
+- **Stack Logic:** Imagine a stack of books. The book you take out is the one you put on last.
+- **Backtracking:** The stack ensures that when we backtrack, we return to the most recent vertex from which a choice was made.
+- **Implicit Stack:** In many implementations, the stack is maintained implicitly through **recursion**.
+
+---
+
+## 3. DFS Execution Example
+
+Consider a graph starting from vertex 4:
+
+1. **Start at 4:** Mark 4, pick its smallest neighbor, say **0**. Suspend 4 and move to 0. (Stack: `[4]`)
+2. **Move to 0:** Neighbors are 1 and 2. Pick **1**. Suspend 0 and move to 1. (Stack: `[4, 0]`)
+3. **Move to 1:** Neighbors are 0 and 2. 0 is visited, so pick **2**. Suspend 1 and move to 2. (Stack: `[4, 0, 1]`)
+4. **Stuck at 2:** All neighbors of 2 are already explored. Backtrack to 1.
+5. **Backtrack to 1:** No more unexplored neighbors for 1. Backtrack to 0.
+6. **Backtrack to 0:** Even though 0 has neighbor 2, 2 has already been visited via the path through 1. Backtrack to 4.
+7. **Backtrack to 4:** Pick the next neighbor, **3**. Suspend 4 and move to 3. (Stack: `[4]`)
+8. **Move to 3:** Neighbors are 5 and 6. Pick **5**. Suspend 3 and move to 5. (Stack: `[4, 3]`)
+9. **Move to 5:** Pick **6**. Suspend 5 and move to 6. (Stack: `[4, 3, 5]`)
+10. **Stuck at 6:** Neighbors 3 and 5 are marked visited. Backtrack to 5.
+11. **Backtrack to 5:** Vertex 5 has another neighbor, **7**. Suspend 5 and move to 7. (Stack: `[4, 3, 5]`)
+12. **Move to 7:** Pick **8**. Suspend 7 and move to 8. (Stack: `[4, 3, 5, 7]`)
+13. **Move to 8:** Pick **9**. Suspend 8 and move to 9. (Stack: `[4, 3, 5, 7, 8]`)
+14. **Dead end at 9:** Backtrack through 8, 7, 5, 3, and finally 4. The stack is now empty.
+
+<img width="1178" height="584" alt="image" src="https://github.com/user-attachments/assets/5c38cbb6-3815-4636-91c3-80f4ecb6a334" />
+<img width="1168" height="608" alt="image" src="https://github.com/user-attachments/assets/22de36c0-03cf-4d0c-b20b-4e5f526778c3" />
+
+---
+
+## 4. Implementation in Python
+
+### 4.1. Recursive DFS (Internal State)
+
+This version passes the `visited` and `parent` dictionaries as parameters.
+
+```python
+def DFSInit(AMat):
+    # initialization
+    (rows, cols) = AMat.shape
+    visited = {}
+    parent = {}
+    for i in range(rows):
+        visited[i] = False
+        parent[i] = -1
+    return (visited, parent)
+
+def DFS(AMat, v, visited, parent):
+    visited[v] = True
+    for k in neighbors(AMat, v):
+        if not visited[k]:
+            parent[k] = v
+            (visited, parent) = DFS(AMat, k, visited, parent)
+    return (visited, parent)
+
+```
+> For DFS we don't have to construct The **stack** like we had to construct The **queue** for BFS Because for DFS **Recursion** does the work
+>
+> 
+### 4.2. Global Recursive DFS (Adjacency Matrix)
+
+Using global dictionaries to avoid passing them repeatedly.
+
+```python
+visited = {}
+parent = {}
+
+def DFSInitGlobal(AMat):
+    for i in range(AMat.shape[0]):
+        visited[i] = False
+        parent[i] = -1
+
+def DFSGlobal(AMat, v):
+    visited[v] = True
+    for k in neighbors(AMat, v):
+        if not visited[k]:
+            parent[k] = v
+            DFSGlobal(AMat, k)
+
+```
+
+### 4.3. Global Recursive DFS (Adjacency List)
+
+Preferred for better efficiency in sparse graphs.
+
+```python
+visited = {}
+parent = {}
+
+def DFSInitListGlobal(AList):
+    for i in AList.keys():
+        visited[i] = False
+        parent[i] = -1
+
+def DFSListGlobal(AList, v):
+    visited[v] = True
+    for k in AList[v]:
+        if not visited[k]:
+            parent[k] = v
+            DFSListGlobal(AList, k)
+
+```
+<img width="606" height="523" alt="image" src="https://github.com/user-attachments/assets/442f3783-097d-4219-9f79-6c5afd4f2dfe" />
+
+---
+
+## 5. Complexity Analysis
+
+RepresentationTime Complexity**Adjacency Matrix**$O(n^2)$**Adjacency List**$O(m + n)$Export to Sheets- **Vertex Processing:** Each vertex is visited once and explored once ($O(n)$).
+- **Edge Processing:**
+
+  - In an **Adjacency Matrix**, deciding which neighbors to process takes $O(n)$ for each vertex, leading to $O(n^2)$.
+  - In an **Adjacency List**, we scan the degree of each vertex, totaling $O(m)$ edges, leading to $O(m + n)$.
+
+---
+
+## 6. Comparison: DFS vs. BFS
+
+- **Shortest Paths:** Unlike BFS, DFS **does not** generally find the shortest path. It follows a "roundabout" route based on the order of exploration.
+- **Data Structure:** BFS uses a **Queue**; DFS uses a **Stack** (often implicit via recursion).
+- **Utility:** While DFS lacks the shortest-path advantage, it is often more informative about the **structure of a graph** (e.g., detecting cycles, strongly connected components).
+
+> [!TIP]
+> DFS is often the primary way of exploring a graph because it provides deep structural information that BFS cannot easily capture.
+>
+>
+
+
