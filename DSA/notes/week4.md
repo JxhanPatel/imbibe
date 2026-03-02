@@ -635,7 +635,13 @@ def DFSListGlobal(AList, v):
 
 ## 5. Complexity Analysis
 
-RepresentationTime Complexity**Adjacency Matrix**$O(n^2)$**Adjacency List**$O(m + n)$Export to Sheets- **Vertex Processing:** Each vertex is visited once and explored once ($O(n)$).
+| Representation | Time Complexity |
+| --- | --- |
+| **Adjacency Matrix** | $O(n^2)$ |
+| **Adjacency List** | $O(m+n)$ |
+
+
+- **Vertex Processing:** Each vertex is visited once and explored once ($O(n)$).
 - **Edge Processing:**
 
   - In an **Adjacency Matrix**, deciding which neighbors to process takes $O(n)$ for each vertex, leading to $O(n^2)$.
