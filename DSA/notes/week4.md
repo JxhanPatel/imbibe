@@ -906,7 +906,7 @@ Let $i_0, i_1, \dots, i_{n-1}$ be a topological ordering of $V$.
 
 # 4.7 Topological Sorting 
 
----
+
 
 ## **1. Directed Acyclic Graphs (DAGs)**
 A directed graph $G = (V, E)$ without directed cycles is known as a **Directed Acyclic Graph**, or a **DAG** for short.
@@ -1071,3 +1071,121 @@ A simple algorithm to topologically sort a DAG using Depth-First Search:
 **Time Complexity:** $\Theta(V+E)$.
 
 <img width="1422" height="975" alt="image" src="https://github.com/user-attachments/assets/40be95d6-5bf6-4d2d-9202-801fb588828e" />
+
+
+
+---
+
+# 4.8: Longest Path in DAGs 
+
+## **1. Conceptual Motivation**
+Directed Acyclic Graphs (DAGs) are a natural way to represent dependencies in various contexts, such as prerequisites between courses for completing a degree, recipes for cooking, or construction projects.
+
+### **1.1 The Scheduling Problem**
+Imagine a DAG represents prerequisites between courses in a college program. 
+*   **The Constraint:** Each course takes exactly one semester to complete.
+*   **The Question:** What is the minimum number of semesters required to complete the entire programme?.
+*   **Interpretation:** This minimum time is determined by the length of the dependencies. Even if you have many people working on tasks, you cannot finish a job until the previous job is done. The longest path in the graph forces a dependency that represents the minimum time required.
+
+<img width="471" height="358" alt="image" src="https://github.com/user-attachments/assets/ce0c41a1-b98a-447f-ad66-c31cbfcc048a" />
+
+---
+
+## **2. Problem Definition: Longest Path**
+The goal is to find the longest path in a DAG $G=(V,E)$, where $V$ is a set of vertices and $E$ is a set of directed edges without directed cycles.
+
+### **2.1 Mathematical Recurrence**
+The longest path to a vertex $i$ can be defined inductively:
+*   **Base Case:** If $indegree(i) = 0$, then $longest-path-to(i) = 0$. This means the task can be done immediately on the very first day.
+*   **Inductive Step:** If $indegree(i) > 0$, the longest path to $i$ is 1 more than the longest path to its incoming neighbours. We must wait for all prerequisites to be completed, so we take the maximum among them.
+$$longest-path-to(i) = 1 + \max\{longest-path-to(j) \mid (j, i) \in E\}$$.
+
+---
+
+## **3. Algorithmic Strategy**
+To compute the value for vertex $i$, we need to have already computed the `longest-path-to(k)` for every incoming neighbour $k$.
+
+### **3.1 Dependency on Topological Order**
+In a topologically sorted graph, all neighbours of $i_k$ appear before it in the ordering. Therefore, if we compute the longest path values from left to right following a topological order, we are guaranteed to have the necessary information at each step. We can overlap this computation with the topological sorting process itself in a single pass.
+
+---
+
+## **4. The Longest Path Algorithm (Step-by-Step)**
+
+1.  **Initialize:** Compute the indegree of each vertex by scanning each column of the adjacency matrix or iterating through the adjacency list.
+2.  **Defaults:** Initialize the `longest-path-to` value to 0 for all vertices.
+3.  **Iterate:**
+    *   Identify a vertex with $indegree = 0$ and list it.
+    *   Remove it from the DAG and update the indegrees of its neighbours.
+    *   **Update Path:** For each neighbor $k$ of the removed vertex $j$, update `longest-path-to(k)` as $1 + longest-path-to(j)$.
+4.  **Repeat:** Continue until all vertices are listed.
+
+<img width="468" height="424" alt="image" src="https://github.com/user-attachments/assets/e66b7db9-870a-4ec0-9663-4626d44bf570" />
+<img width="484" height="92" alt="image" src="https://github.com/user-attachments/assets/c3d1eb44-02b1-4ae2-a89e-4601549b9908" />
+
+### **4.1 Execution Example Trace**
+Consider a DAG with nodes $\{0, 1, 2, 3, 4, 5, 6, 7\}$.
+*   **Initial Indegrees:** $0:0, 1:0, 2:2, 3:1, 4:1, 5:2, 6:1, 7:4$.
+*   **Enumerate 1 ($lp=0$):** Neighbors are 2 and 7. Update $2 \rightarrow lp:1$ and $7 \rightarrow lp:1$.
+*   **Enumerate 0 ($lp=0$):** Neighbors are 2, 3, 4. Update $3 \rightarrow lp:1, 4 \rightarrow lp:1$. Vertex 2 remains $lp:1$ because $\max(0,0)+1=1$.
+*   **Enumerate 3 ($lp=1$):** Neighbor is 5. Update $5 \rightarrow lp: 1+1=2$.
+*   **Enumerate 2 ($lp=1$):** Neighbor is 5. No change to 5 ($lp$ is already 2).
+*   **Enumerate 5 ($lp=2$):** Neighbor is 6. Update $6 \rightarrow lp: 2+1=3$.
+*   **Enumerate 6 ($lp=3$):** Neighbor is 7. Update $7 \rightarrow lp: 3+1=4$.
+*   **Enumerate 4 ($lp=1$):** Neighbor is 7. No change to 7 ($lp$ is already 4).
+*   **Final Sequence:** `1, 0, 3, 2, 5, 6, 4, 7` with longest paths: `0, 0, 1, 1, 2, 3, 1, 4`.
+
+---
+
+## **5. Implementation and Complexity**
+
+### **5.1 Adjacency List Implementation (Python)**
+The following function computes the longest path using an adjacency list representation.
+
+```python
+def longestpathlist(AList):
+    (indegree, lpath) = ({}, {})
+    for u in AList.keys():
+        (indegree[u], lpath[u]) = (0, 0)
+    
+    # Compute initial indegrees
+    for u in AList.keys():
+        for v in AList[u]:
+            indegree[v] = indegree[v] + 1
+            
+    zerodegreeq = Queue()
+    for u in AList.keys():
+        if indegree[u] == 0:
+            zerodegreeq.addq(u)
+            
+    while (not zerodegreeq.isempty()):
+        j = zerodegreeq.delq()
+        indegree[j] = indegree[j] - 1 # Mark processed
+        
+        for k in AList[j]:
+            indegree[k] = indegree[k] - 1
+            # Inductively update the longest path to neighbor k
+            lpath[k] = max(lpath[k], lpath[j] + 1)
+            
+            if indegree[k] == 0:
+                zerodegreeq.addq(k)
+                
+    return(lpath)
+```
+.
+
+### **5.2 Complexity Analysis**
+*   **Initialization:** Initializing indegrees and the `lpath` dictionary takes $O(m+n)$.
+*   **Enumeration:** The loop to enumerate vertices runs $n$ times.
+*   **Updates:** Updating indegrees and the longest path is done once for each edge, resulting in an amortized cost of $O(m)$.
+*   **Overall Time:** $O(m+n)$, which is linear in the size of the graph.
+
+---
+
+## **6. Summary and Comparison**
+*   **DAGs:** Provide a simple, efficient $O(m+n)$ algorithm for longest paths.
+*   **Arbitrary Graphs:** The notion of a longest path (without repeating vertices) makes sense for graphs with cycles, where the path can have at most $n-1$ edges.
+*   **Hardness:** Computing the longest path in an arbitrary graph is much harder than for DAGs. No strategy better than exhaustively enumerating all paths is known.
+
+> [!NOTE]
+> **Diameter:** The longest path in a general graph is often referred to as the **diameter** of the graph. While simple in DAGs, it is "hopelessly complicated" in non-DAGs.
