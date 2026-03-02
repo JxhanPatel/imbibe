@@ -1,7 +1,5 @@
 # 4.1: Introduction to Graphs  
 
----
-
 ## **1. Visualizing Relations as Graphs**
 A graph is a useful way to visualize a relation.
 
@@ -109,3 +107,167 @@ Graphs serve as useful abstract representations for a wide range of problems.
 
 > [!NOTE]
 > **Connectivity in Directed Graphs:** Vertices $i$ and $j$ are **strongly connected** if there is a path from $i$ to $j$ and a path from $j$ to $i$. Directed graphs can be decomposed into **strongly connected components (SCCs)**.
+
+
+
+
+---
+
+
+
+
+
+# 4.2: Representing Graphs
+
+
+---
+
+## 1. Introduction to Graph Representation
+
+To work with a graph, we need to transform a visual picture into something that we can manipulate in an algorithm. While a human being can visually identify connectivity or paths, an algorithm must represent the graph in a more concrete way and manipulate this representation to solve problems without relying on visual intuition.
+
+### Vertex Representation
+
+We typically choose a very simple representation for vertices. Regardless of their original names (e.g., names of people, courses, or cities), we label them as integers.
+
+- If there are $n$ vertices, we label them $0, 1, 2, \dots, n-1$.
+- We think of the vertex names as numbers between $0$ and $n-1$.
+
+### Edge Representation
+
+Since vertices are numbers, an edge is represented as a pair of numbers $(i, j)$.
+
+- **No Reflexive Relations:** We do not allow an edge to start at $i$ and end at $i$.
+- For any edge $(i, j)$, both $i$ and $j$ must be between $0$ and $n-1$, and $i \neq j$.
+
+<img width="1138" height="563" alt="image" src="https://github.com/user-attachments/assets/d91833b7-8881-496c-8999-5b0ec109cfdb" />
+
+---
+
+## 2. Adjacency Matrix
+
+The most obvious way to represent a graph is to record which edges are present and which are absent in a table or matrix called an **Adjacency Matrix**.
+
+### Formal Definition
+
+For a graph with $n$ vertices, the adjacency matrix is an $n \times n$ matrix where:
+
+- The entry at row $i$ and column $j$ is **1** if there is an edge from $i$ to $j$.
+- The entry is **0** otherwise.
+- This is a zero-one matrix where ones represent existing edges.
+
+### Python Implementation (using NumPy)
+
+To create an adjacency matrix for a graph with 10 vertices (0 to 9):
+
+1. Initialize a $10 \times 10$ matrix of all zeros.
+2. Scan through the list of edges.
+3. For every pair $(i, j)$ in the edge list, set the entry `matrix[i][j] = 1`.
+
+<img width="565" height="455" alt="image" src="https://github.com/user-attachments/assets/24129b27-9927-433c-a45e-2fb9ec7be6ec" />
+
+### Properties
+
+- **Undirected Graphs:** If the graph is undirected, the matrix is **symmetric** across the main diagonal. If $(i, j)$ is an edge, $(j, i)$ is also an edge. Therefore, the entry at row $i$, column $j$ will be the same as the entry at row $j$, column $i$.
+- <img width="1219" height="544" alt="image" src="https://github.com/user-attachments/assets/5c364e40-bd14-4b17-8dd0-5a94dca1d4a6" />
+
+- **Directed Graphs:** * **Rows** represent outgoing edges (edges from $i$).
+
+  - **Columns** represent incoming edges (edges into $j$).
+  - In general, there is no symmetry; an edge from $i$ to $j$ does not imply an edge from $j$ to $i$.
+  - <img width="1180" height="590" alt="image" src="https://github.com/user-attachments/assets/58a8dced-d885-48cc-980e-666a1c2c9e61" />
+
+
+---
+
+## 3. Operations on Adjacency Matrices
+
+### Finding Neighbors
+
+In a picture, neighbors are found by looking at outgoing arrows. In an adjacency matrix, this corresponds to looking along a **row**.
+
+**Python Function to find neighbors:**
+
+```python
+def neighbors(adj_matrix, i):
+    # adj_matrix is a numpy array, i is the vertex
+    neighbor_list = []
+    (rows, cols) = adj_matrix.shape 
+    for j in range(cols):
+        if adj_matrix[i][j] == 1:
+            neighbor_list.append(j)
+    return neighbor_list
+
+```
+
+- **Example:** For vertex 7 in the sample graph, row 7 contains ones at columns 4, 5, and 8. The function returns `[4, 5, 8]`.
+
+### Degree
+
+- **Undirected Graph:** The degree of a vertex is the number of ones in its row (or column).
+- **Directed Graph:**
+
+  - **Out-degree:** Number of ones in row $i$ (edges going out).
+  - **In-degree:** Number of ones in column $i$ (edges coming in).
+  - Out-degree and In-degree are not necessarily equal.
+
+---
+
+## 4. Reachability and Graph Exploration
+
+To find if there is a path from a source vertex to a target vertex (e.g., finding an airline route from city 9 to city 0):
+<img width="590" height="518" alt="image" src="https://github.com/user-attachments/assets/bd613ae5-9d75-425a-ae07-65f090ae41ec" />
+
+1. **Mark the source:** Start at vertex 9 and mark it as reachable.
+2. **Systematic Exploration:** Look at all places reachable from 9 (its neighbors). If 8 is a neighbor, mark 8 as reachable.
+3. **Iterate:** Look at neighbors of 8 (e.g., 5 and 7) and mark them.
+4. **Termination:** Stop when the target (0) is marked or no more new nodes can be marked.
+
+> [!IMPORTANT]
+> To avoid infinite loops (going from 8 back to 9 and 9 back to 8), we must ensure we do not re-explore already marked nodes.
+>
+>
+
+**Exploration Strategies:**
+
+- **Breadth First Search (BFS):** Explores layer by layer (1 step away, 2 steps away, etc.).
+- **Depth First Search (DFS):** Follows a path as far as possible until stuck, then backtracks.
+
+---
+
+## 5. Adjacency List
+
+In many realistic situations, graphs are **sparse**. While $n$ vertices allow for $O(n^2)$ possible edges, the actual number of edges is often closer to $O(n)$. An adjacency matrix for such a graph would be mostly zeros.
+
+### Formal Definition
+
+An **Adjacency List** records only the existing edges. For every vertex $i$, we store a list of vertices $j$ such that $(i, j)$ is an edge.
+
+### Python Representation
+<img width="778" height="471" alt="image" src="https://github.com/user-attachments/assets/50822e72-2acd-479e-aebc-66c1b6e28c67" />
+
+The simplest way to build this in Python is using a **dictionary**:
+
+- **Keys:** Vertex names ($0$ to $n-1$).
+- **Values:** A list of neighbors for that vertex.
+
+**Example Construction:**
+If edges are $(0,1)$ and $(0,4)$, then `adj_list[0] = [1, 4]`. It is often convenient to keep these lists in ascending order.
+
+<img width="553" height="596" alt="image" src="https://github.com/user-attachments/assets/9d7bdee7-5138-48b7-ace4-c5c893b01155" />
+
+---
+
+## 6. Comparison of Representations
+
+| Feature | Adjacency Matrix | Adjacency List |
+| --- | --- | --- |
+| **Space Complexity** | $O(n^2)$ | O(n+number of edges) |
+| **Checking if (i,j) is an edge** | O(1) (Direct lookup at `matrix[i][j]`) | O(degree of i) (Must scan the list) |
+| **Finding all neighbors of i** | O(n) (Must scan the entire row) | O(degree of i) (Only scan existing neighbors) |
+| **Efficiency for Sparse Graphs** | Less efficient (mostly zeros) | Highly efficient (compact) |
+
+
+**Summary:** Adjacency lists are generally better for the types of problems we explore because they require less space and allow faster neighbor discovery in sparse graphs.
+
+
