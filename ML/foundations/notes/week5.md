@@ -116,5 +116,206 @@ $$
 
 
 
+# 5.2 Hermitian Matrices
+
+Symmetric matrices $A = A^T$ are the most important class of real matrices. With complex entries, this idea of symmetry has to be extended. The right generalization is not to matrices that equal their transpose, but to matrices that equal their conjugate transpose. These are the **Hermitian matrices**.
+
+## 5.2.1 Definition and Basic Structure
+
+A complex matrix is Hermitian if $A = A^H$ (also denoted by $A^\star$ ★).
+
+* **Entry-wise Definition**: The diagonal entries must be real; they are unchanged by conjugation. Each off-diagonal entry is matched with its mirror image across the main diagonal, and $a_{ij} = \overline{a_{ji}}$.
+* **Example**:
+
+$$
+A =
+\begin{bmatrix}
+2 & 3-3i \\\
+3+3i & 5
+\end{bmatrix}
+= A^H
+$$
+
+$3-3i$ is the conjugate of $3+3i$. The diagonal entries $2$ and $5$ are real.
+
+> [!NOTE]
+> A real symmetric matrix is certainly Hermitian. For real matrices there is no difference between $A^T$ and $A^H$.
+
+## 5.2.2 Property 1: The Quadratic Form $x^H Ax$
+
+**If $A = A^H$, then for all complex vectors $x$, the number $x^H Ax$ is real**.
+
+**Derivation in the 2 by 2 case with $x = (u, v)$**:
+
+$$
+x^H A x =
+\begin{bmatrix}
+\overline{u} & \overline{v}
+\end{bmatrix}
+\begin{bmatrix}
+2 & 3-3i \\\
+3+3i & 5
+\end{bmatrix}
+\begin{bmatrix}
+u \\\
+v
+\end{bmatrix}
+$$
+
+$$
+= 2\overline{u}u + 5\overline{v}v + (3-3i)\overline{u}v + (3+3i)u\overline{v}
+$$
+
+$$
+= \text{real} + \text{real} + (\text{sum of complex conjugates})
+$$
+
+**General Proof**:
+$(x^H Ax)^H$ is the conjugate of the 1 by 1 matrix $x^H Ax$. Since $(x^H Ax)^H = x^H A^H x^{HH} = x^H Ax$, that number must be real.
+
+## 5.2.3 Property 2: Real Eigenvalues
+
+**If $A = A^H$, every eigenvalue is real**.
+
+**Proof**:
+Suppose $Ax = \lambda x$. Multiply by $x^H$:
+
+$$
+x^H A x = \lambda x^H x
+$$
+
+The left-hand side is real by Property 1. The right-hand side $x^H x = |x|^2$ is real and positive because $x \ne 0$. Therefore, $\lambda = x^H Ax / x^H x$ must be real.
+
+> [!CAUTION]
+> If $A$ is real but not symmetric, the eigenvalues might not be real. If $A = A^T$, we can be sure $\lambda$ and $x$ stay real.
+
+#### 5.2.4 Property 3: Orthogonality of Eigenvectors
+
+**Two eigenvectors of a real symmetric matrix or a Hermitian matrix, if they come from different eigenvalues, are orthogonal to one another**.
+
+**Proof**:
+Start with $Ax = \lambda_1 x$, $Ay = \lambda_2 y$, and $A = A^H$:
+
+$$
+(\lambda_1 x)^H y = (Ax)^H y = x^H A^H y = x^H Ay = x^H (\lambda_2 y)
+$$
+
+The outside numbers are $\lambda_1 x^H y = \lambda_2 x^H y$ (since $\lambda$ are real). If $\lambda_1 \ne \lambda_2$, this forces the conclusion that $x^H y = 0$.
+
+## 5.2.5 Example: Finding Complex Eigenvectors
+
+For the Hermitian matrix
+
+$$
+A = \begin{bmatrix} 2 & 3-3i \\\ 3+3i & 5 \end{bmatrix}
+$$
+
+, the eigenvalues are $\lambda_1 = 8$ and $\lambda_2 = -1$.
+
+1. **For $\lambda_1 = 8$**:
 
 
+
+$$
+(A-8I)x =
+\begin{bmatrix}
+-6 & 3-3i \\\
+3+3i & -3
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\\
+x_2
+\end{bmatrix} =
+\begin{bmatrix}
+0 \\\
+0
+\end{bmatrix}
+$$
+
+
+
+$$
+\implies
+x =
+\begin{bmatrix}
+1 \\\
+1+i
+\end{bmatrix}
+$$
+
+
+2. **For $\lambda_2 = -1$**:
+
+$$
+(A+I)y =
+\begin{bmatrix}
+3 & 3-3i \\\
+3+3i & 6
+\end{bmatrix}
+\begin{bmatrix}
+y_1 \\\
+y_2
+\end{bmatrix} =
+\begin{bmatrix}
+0 \\\
+0
+\end{bmatrix}
+$$
+
+$$
+\implies
+y =
+\begin{bmatrix}
+1-i \\\
+-1
+\end{bmatrix}
+$$
+
+**Verification of Orthogonality**:
+
+$$
+x^H y =
+\begin{bmatrix}
+1 \\\ 1-i
+\end{bmatrix}
+\begin{bmatrix}
+1-i \\\
+-1
+\end{bmatrix}
+= (1-i) - (1-i) = 0
+$$
+
+## 5.2.6 The Spectral Theorem for Hermitian Matrices
+
+**Every Hermitian matrix can be diagonalized by a unitary $U$**:
+
+$$
+U^{-1}AU = \Lambda \quad \text{or} \quad A = U \Lambda U^H
+$$
+
+* The columns of $U$ contain orthonormal eigenvectors of $A$.
+* **Spectral Decomposition**: If we multiply columns by rows, $A$ becomes a combination of one-dimensional projections:
+
+$$
+A = \lambda_1 x_1 x_1^H + \lambda_2 x_2 x_2^H + \cdot\cdot\cdot + \lambda_n x_n x_n^H
+$$
+
+<img width="1687" height="1265" alt="image" src="https://github.com/user-attachments/assets/043a909c-becd-4bd0-b1eb-cd33501efd81" />
+
+> A diagram illustrating the four fundamental subspaces for a singular matrix where the row space and nullspace are perpendicular
+
+#### Comparison Table: Real Symmetric vs. Complex Hermitian
+
+| Property               | Real Symmetric      | Complex Hermitian   |
+| :--------------------- | :------------------ | :------------------ |
+| **Symmetry Condition** | $A^T = A$           | $A^H = A$           |
+| **Eigenvalues**        | Real                | Real                |
+| **Eigenvectors**       | Orthonormal $Q$     | Orthonormal $U$     |
+| **Diagonalization**    | $A = Q \Lambda Q^T$ | $A = U \Lambda U^H$ |
+| **Inner Product**      | $x^T y = 0$         | $x^H y = 0$         |
+| **Length Squared**     | $x^2 = x^T x$     | $x^2 = x^H x$     |
+
+---
+# Random Questions
+
+---
