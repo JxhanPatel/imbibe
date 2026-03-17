@@ -325,3 +325,66 @@ $$
 <img width="356" height="127" alt="image" src="https://github.com/user-attachments/assets/00db7a21-c4e0-4f9b-b900-444b46d6a11a" />
 
 ---
+
+
+
+
+
+# 5.3 Unitary Matrices
+
+A complex matrix with orthonormal columns is called a **unitary matrix**. These matrices represent the complex analog of real orthogonal matrices $Q$.
+
+# 5.3.1 Definition and Fundamental Relation
+A square matrix $U$ is unitary if its columns are orthonormal unit vectors. This property is expressed through the following identities:
+$$U^H U = I, \quad UU^H = I, \quad \text{and} \quad U^H = U^{-1}$$.
+
+A unitary matrix can be compared to a number on the unit circle: a complex number of absolute value 1. The rows point in completely different directions from the columns, but they are forced to be orthonormal if the columns are.
+
+## 5.3.2 Property 1: Preservation of Inner Products and Lengths
+Multiplication by $U$ has no effect on inner products, angles, or lengths. 
+
+**Inner Product Preservation**:
+$$(Ux)^H (Uy) = x^H U^H U y = x^H y$$.
+
+**Length Preservation**:
+The length of a vector $x$ is not changed when multiplied by $U$:
+$$\|Ux\|^2 = x^H U^H U x = \|x\|^2$$.
+
+## 5.3.3 Property 2: Eigenvalues on the Unit Circle
+Every eigenvalue $\lambda$ of a unitary matrix $U$ has absolute value $|\lambda| = 1$. 
+
+**Proof**:
+Starting from $Ux = \lambda x$, we compare the lengths of the two sides:
+1. $\|Ux\| = \|x\|$ by Property 1.
+2. $\|\lambda x\| = |\lambda| \|x\|$ always.
+Therefore, $|\lambda| = 1$.
+
+
+<img width="770" height="705" alt="image" src="https://github.com/user-attachments/assets/fbde52db-2021-4a60-9e15-7c9d5348d078" />
+
+> The complex plane showing $a+ib=re^{i\theta}$ and its conjugate $a-ib=re^{-i\theta}$ as mirror images across the real axis. This illustrates values on the unit circle where $r=1$
+
+
+
+## 5.3.4 Property 3: Orthogonality of Eigenvectors
+Eigenvectors corresponding to different eigenvalues of a unitary matrix are orthonormal.
+
+**Proof**:
+Start with $Ux = \lambda_1 x$ and $Uy = \lambda_2 y$, and take inner products by Property 1:
+$$x^H y = (Ux)^H (Uy) = (\lambda_1 x)^H (\lambda_2 y) = \overline{\lambda}_1 \lambda_2 x^H y$$.
+Comparing the left to the right, $\overline{\lambda}_1 \lambda_2 = 1$ or $x^H y = 0$. Since $|\lambda_1| = 1$, we have $\overline{\lambda}_1 \lambda_1 = 1$. If $\lambda_1 \ne \lambda_2$, then $\overline{\lambda}_1 \lambda_2 \ne 1$, which forces $x^H y = 0$.
+
+## 5.3.5 The Fourier Matrix
+The most important unitary matrix is the Fourier matrix divided by $\sqrt{n}$:
+$$U = \frac{1}{\sqrt{n}} F$$.
+The entries of the Fourier matrix are $w^{jk}$ where $w = e^{2\pi i/n}$. The factor $\sqrt{n}$ shrinks the columns into unit vectors. The fundamental identity of the finite Fourier transform is $U^H U = I$.
+
+## 5.3.6 Connection to Skew-Hermitian Matrices
+If $A$ is a Hermitian matrix ($A^H = A$), then $K = iA$ is a **skew-Hermitian matrix** ($K^H = -K$).
+*   The eigenvalues of $K$ are purely imaginary.
+*   The matrix exponential $e^{Kt}$ is always a unitary matrix.
+*   The derivative of $e^{Kt}$ at $t=0$ is $K$.
+
+
+
+
