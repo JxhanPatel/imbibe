@@ -11,7 +11,7 @@ The goal is to finally arrive at the most important theorem in linear algebra, t
 *   **Complex Conjugate:** The complex conjugate of $(a+ib)$ is $(a-ib)$.
 *   **Polar Form:** A complex number can be represented as $re^{i\\theta}$, where $r$ is the length and $\\theta$ is the angle with the real axis.
 
-<img width="595" height="327" alt="image" src="https://github.com/user-attachments/assets/743b0de3-4c9a-4315-9438-2dcb94665ac8" />
+<img width="757" height="513" alt="image" src="https://github.com/user-attachments/assets/c80ae71c-253b-4d80-8d91-dce93a6c86a2" />
 
 ---
 
