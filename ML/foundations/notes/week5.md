@@ -395,3 +395,277 @@ If $A$ is a Hermitian matrix ($A^H = A$), then $K = iA$ is a **skew-Hermitian ma
 
 
 ---
+
+
+
+
+
+# 5.4 Diagonalization of Hermitian Matrices
+
+## 5.4.1 Schur's Theorem (Schur's Lemma)
+
+Every square matrix is unitarily similar to a triangular matrix.
+
+**Theorem (Schur's Lemma)**: There is a unitary matrix $U$ such that
+$U^{-1} A U = T$ is triangular.
+
+The eigenvalues of $A$ appear along the diagonal of this similar matrix $T$.
+
+> [!NOTE]
+> This lemma applies to all matrices, with no assumption that $A$ is diagonalizable. It can be used to prove properties of matrix powers and exponentials even without a full set of eigenvectors.
+
+### Derivation and Proof
+
+The proof proceeds by mathematical induction:
+
+1. **Step 1**: Every matrix has at least one eigenvalue $\lambda_1$.
+
+2. **Step 2**: $A$ has at least one unit eigenvector $x_1$, which is placed in the first column of a unitary matrix $U_1$.
+
+3. **Step 3**: The other columns are completed using the Gram–Schmidt process to ensure the matrix remains unitary.
+
+4. **Step 4**: Because $A x_1 = \lambda_1 x_1$ is in column 1, the product begins in triangular form:
+
+   
+$$
+   U_1^{-1} A U_1 =
+   \begin{bmatrix}
+   \lambda_1 & * \\\
+   0 & *
+   \end{bmatrix}
+$$
+   
+
+6. **Step 5**: Repeat the process for the $(n-1)\times(n-1)$ submatrix until $T$ is fully triangular.
+
+---
+
+## 5.4.2 Example: Verifying Schur's Theorem
+
+Consider
+
+$$
+A =
+\begin{bmatrix}
+2 & -1 \\\
+1 & 0
+\end{bmatrix}
+$$
+
+which has the eigenvalue $\lambda = 1$ (repeated).
+
+1. **Find Eigenvector**: The eigenvectors lie along $(1,1)$.
+
+2. **Normalize**
+
+$$
+    x_1 =
+   \begin{bmatrix}
+   \frac{1}{\sqrt{2}} \
+   \frac{1}{\sqrt{2}}
+   \end{bmatrix}
+$$
+
+4. **Construct Unitary Matrix**:
+
+$$
+   U =
+   \begin{bmatrix}
+   \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \
+   \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+   \end{bmatrix}
+$$
+
+5. **Compute Triangular Form**:
+
+$$
+   U^{-1} A U =
+   \begin{bmatrix}
+   \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\\
+   \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+   \end{bmatrix}
+   \begin{bmatrix}
+   2 & -1 \
+   1 & 0
+   \end{bmatrix}
+   \begin{bmatrix}
+   \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\\
+   \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+   \end{bmatrix} =
+   \begin{bmatrix}
+   1 & 2 \\\
+   0 & 1
+   \end{bmatrix}
+   = T
+$$
+
+The eigenvalues (1 and 1) appear on the diagonal.
+
+---
+
+## 5.4.3 The Spectral Theorem
+
+Schur's theorem implies that any Hermitian matrix can be diagonalized.
+
+If $A = A^H$, then the triangular matrix $T$ must also be Hermitian:
+
+$$
+T^H = (U^{-1} A U)^H = U^H A^H (U^{-1})^H = U^{-1} A U = T
+$$
+
+A triangular matrix equal to its conjugate transpose must be diagonal.
+
+### Theorem 5S (Spectral Theorem)
+
+Every real symmetric matrix can be diagonalized by an orthogonal matrix $Q$.
+Every Hermitian matrix can be diagonalized by a unitary matrix $U$:
+
+**Real case**
+
+$$
+Q^{-1} A Q = \Lambda
+\quad \text{or} \quad
+A = Q \Lambda Q^T
+$$
+
+**Complex case**
+
+$$
+U^{-1} A U = \Lambda
+\quad \text{or} \quad
+A = U \Lambda U^H
+$$
+
+* Columns of $Q$ or $U$ are orthonormal eigenvectors
+* Diagonal entries of $\Lambda$ are real eigenvalues
+
+---
+
+## 5.4.4 Example: Verifying the Spectral Theorem
+
+Consider
+
+$$
+A =
+\begin{bmatrix}
+2 & 3 - 3i \\\
+3 + 3i & 5
+\end{bmatrix}
+$$
+
+### 1. Eigenvalues
+
+$$
+\lambda^2 - 7\lambda - 8 = (\lambda - 8)(\lambda + 1) = 0
+$$
+
+$$
+\lambda_1 = 8, \quad \lambda_2 = -1
+$$
+
+### 2. Eigenvectors
+
+For $\lambda_1 = 8$:
+
+$$
+(A - 8I)x =
+\begin{bmatrix}
+-6 & 3 - 3i \\\
+3 + 3i & -3
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\\
+x_2
+\end{bmatrix}
+= 0
+\Rightarrow
+x =
+\begin{bmatrix}
+1 \\\
+1 + i
+\end{bmatrix}
+$$
+
+For $\lambda_2 = -1$:
+
+$$
+(A + I)y =
+\begin{bmatrix}
+3 & 3 - 3i \\\
+3 + 3i & 6
+\end{bmatrix}
+\begin{bmatrix}
+y_1 \\\
+y_2
+\end{bmatrix}
+= 0
+\Rightarrow
+y =
+\begin{bmatrix}
+1 - i \\\
+-1
+\end{bmatrix}
+$$
+
+### 3. Orthogonality Check
+
+$$
+x^H y =
+\begin{bmatrix}
+1 & 1 - i
+\end{bmatrix}
+\begin{bmatrix}
+1 - i \\\
+-1
+\end{bmatrix}
+= (1 - i) - (1 - i) = 0
+$$
+
+### 4. Diagonalization
+
+$$
+U =
+\frac{1}{\sqrt{3}}
+\begin{bmatrix}
+1 & 1 - i \\\
+1 + i & -1
+\end{bmatrix}
+$$
+
+$$
+U^{-1} A U =
+\begin{bmatrix}
+8 & 0 \\\
+0 & -1
+\end{bmatrix}
+= \Lambda
+$$
+
+---
+
+## 5.4.5 Spectral Decomposition (Projection Form)
+
+$$
+A = \lambda_1 x_1 x_1^H + \lambda_2 x_2 x_2^H + \cdots + \lambda_n x_n x_n^H
+$$
+
+* Each $x_i x_i^H$ is a rank-1 matrix
+* These are projections onto eigenvector directions
+<img width="1028" height="314" alt="image" src="https://github.com/user-attachments/assets/5584b206-3f57-44db-90db-cf31e1a90d58" />
+
+---
+
+### Summary Table: Matrix Types and Diagonalization
+
+| Matrix Type   | Condition       | Diagonalization | Eigenvalue Property | 
+| :------------ | :-------------- | :-------------- | :------------------ |
+| **Hermitian** | $A = A^H$       | $U \Lambda U^H$ | Real                | 
+| **Unitary**   | $U^H U = I$     | $V \Lambda V^H$ | $\|lambda\| = 1$ |
+| **Normal**    | $A A^H = A^H A$ | $U \Lambda U^H$ | Complex             
+
+
+---
+# Questions
+<img width="1025" height="542" alt="image" src="https://github.com/user-attachments/assets/5bfa890d-ade2-4b02-a7e1-0ad87e6e598e" />
+
+---
