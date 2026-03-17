@@ -317,5 +317,11 @@ $$
 
 ---
 # Random Questions
+<img width="544" height="247" alt="image" src="https://github.com/user-attachments/assets/bfb7cec3-93a7-4936-90ed-d7c050dd80dc" />
+<img width="682" height="139" alt="image" src="https://github.com/user-attachments/assets/6ce2a866-8c59-4217-91bb-495deedc1bd5" />
+<img width="577" height="205" alt="image" src="https://github.com/user-attachments/assets/ca95fbe2-d91d-4025-88de-10304b4f5b96" />
+<img width="353" height="232" alt="image" src="https://github.com/user-attachments/assets/fc2a156d-b971-4d27-8b5e-78578451e869" />
+<img width="727" height="131" alt="image" src="https://github.com/user-attachments/assets/c334cb7d-634a-43b5-ac1d-fa943e76e778" />
+<img width="356" height="127" alt="image" src="https://github.com/user-attachments/assets/00db7a21-c4e0-4f9b-b900-444b46d6a11a" />
 
 ---
