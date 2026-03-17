@@ -99,3 +99,22 @@ $$
 | **Inner Product**  | $x^T y = x_1 y_1 + \cdots + x_n y_n$          | $x^H y = \overline{x}_1 y_1 + \cdots + \overline{x}_n y_n$           |
 | **Orthogonality**  | $x^T y = 0$                                   | $x^H y = 0$                                                          |
 | **Adjoint Rule**   | $(Ax)^T y = x^T (A^T y)$                      | $(Ax)^H y = x^H (A^H y)$                                             |
+
+
+
+---
+# Random Questions
+<img width="711" height="149" alt="image" src="https://github.com/user-attachments/assets/cb0afa3c-18db-40fc-8027-1545def1190f" />
+<img width="950" height="245" alt="image" src="https://github.com/user-attachments/assets/1bdf1fe4-d47c-4cd4-b5b3-ed6fb09271de" />
+<img width="445" height="232" alt="image" src="https://github.com/user-attachments/assets/65bc3af4-5423-41d0-a223-0d997566a280" />
+<img width="295" height="246" alt="image" src="https://github.com/user-attachments/assets/9759e3c1-6584-49a9-9dbc-084c2fc1e569" />
+<img width="712" height="376" alt="image" src="https://github.com/user-attachments/assets/32d48a6f-fb13-46c7-806b-6245ddf07013" />
+<img width="451" height="358" alt="image" src="https://github.com/user-attachments/assets/8c4015df-4599-48b3-a32a-172d969179d7" />
+
+
+---
+
+
+
+
+
