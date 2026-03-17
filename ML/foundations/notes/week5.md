@@ -388,3 +388,10 @@ If $A$ is a Hermitian matrix ($A^H = A$), then $K = iA$ is a **skew-Hermitian ma
 
 
 
+---
+# Random Questions
+<img width="520" height="571" alt="image" src="https://github.com/user-attachments/assets/ec39f112-09e5-46f6-9f44-8bcae983b665" /><img width="611" height="717" alt="image" src="https://github.com/user-attachments/assets/c812f8ea-5967-4dc3-bdb1-75ca493d77ba" />
+
+
+
+---
