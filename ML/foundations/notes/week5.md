@@ -667,5 +667,7 @@ $$
 ---
 # Questions
 <img width="1025" height="542" alt="image" src="https://github.com/user-attachments/assets/5bfa890d-ade2-4b02-a7e1-0ad87e6e598e" />
+<img width="1022" height="567" alt="image" src="https://github.com/user-attachments/assets/2543ddc4-6240-489e-ada9-14e855fd074c" />
+<img width="463" height="363" alt="image" src="https://github.com/user-attachments/assets/5c25b1df-a902-4e8a-947b-7c4da3f5cdc6" />
 
 ---
