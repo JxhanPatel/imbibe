@@ -133,3 +133,209 @@ Complex matrices are fundamental to the **Discrete Fourier Transform (DFT)**, wh
 
 
 
+
+
+# 5.2: Hermitian Matrices
+
+## 1. Definition of a Hermitian Matrix
+
+The concept of symmetry in real matrices ($A = A^T$) is extended to complex matrices through the notion of a **Hermitian matrix**.
+
+### The Conjugate Transpose ($A^★$)
+
+Before defining the matrix, we recall the **conjugate transpose** (also denoted as $A^H$ or $A^★$):
+
+* **Definition:** $A^★ = \bar{A}^T$.
+* It is obtained by taking the transpose of $A$ and then the complex conjugate of every entry.
+* **Example:**
+
+$$
+A =
+\begin{bmatrix}
+2+i & 3i \\\
+4-i & 5 \\\
+0 & 0
+\end{bmatrix}
+$$
+
+$$
+A^★ =
+\begin{bmatrix}
+2-i & 4+i & 0 \\\
+-3i & 5 & 0
+\end{bmatrix}
+$$
+
+
+### Formal Definition
+
+A matrix $A$ is **Hermitian** if it equals its own conjugate transpose:
+
+$$
+A^★ = A
+$$
+
+> [!NOTE]
+> **Key Observation:** The diagonal entries of a Hermitian matrix must be **real numbers** because they are unchanged by conjugation ($a_{ii} = \bar{a}_{ii}$).
+
+**Example of a Hermitian Matrix:**
+
+$$
+A =
+\begin{bmatrix}
+2 & 3-3i \\\
+3+3i & 5
+\end{bmatrix}
+$$
+
+In this case, $a_{12} = 3-3i$ is the conjugate of $a_{21} = 3+3i$, and the diagonal entries (2 and 5) are real.
+
+---
+
+## 2. Fundamental Properties of Hermitian Matrices
+
+There are three basic properties of Hermitian matrices that also apply to real symmetric matrices.
+
+### Property 1: Real Quadratic Form
+
+If $A = A^★$, then for all complex vectors $x$, the number $x^H Ax$ is real.
+
+* **Proof:** $(x^H Ax)^H = x^H A^H x^{HH} = x^H Ax$. Since the number equals its own conjugate, it must be real.
+
+### Property 2: Real Eigenvalues
+
+**Theorem:** If $A$ is Hermitian, every eigenvalue $\lambda$ is a real number.
+
+**Derivation/Proof:**
+
+1. Suppose $Ax = \lambda x$ with $x \neq 0$.
+2. Multiply both sides by $x^H$: $x^H Ax = \lambda x^H x$.
+3. The left side $x^H Ax$ is real by Property 1.
+4. The right side $x^H x = |x|^2$ is real and positive because $x \neq 0$.
+5. Therefore, $\lambda = \frac{x^H Ax}{x^H x}$ must be real.
+
+**Example Calculation:**
+
+$$
+A =
+\begin{bmatrix}
+2 & 3-3i \\\
+3+3i & 5
+\end{bmatrix}
+$$
+
+$$
+\det(A - \lambda I) =
+\begin{vmatrix}
+2-\lambda & 3-3i \\\
+3+3i & 5-\lambda
+\end{vmatrix}
+$$
+
+$$
+= \lambda^2 - 7\lambda + 10 - |3-3i|^2
+$$
+
+$$
+= \lambda^2 - 7\lambda - 8 = (\lambda - 8)(\lambda + 1)
+$$
+
+The eigenvalues are $\lambda_1 = 8$ and $\lambda_2 = -1$, which are real.
+
+
+### Property 3: Orthogonal Eigenvectors
+
+**Theorem:** Two eigenvectors of a Hermitian matrix, if they come from different eigenvalues, are orthogonal to one another ($x^H y = 0$).
+
+**Derivation/Proof:**
+
+1. Let $Ax = \lambda_1 x$ and $Ay = \lambda_2 y$ with $\lambda_1 \neq \lambda_2$.
+2. Consider the inner product $(\lambda_1 x)^H y = (Ax)^H y = x^H A^H y = x^H Ay = x^H (\lambda_2 y)$.
+3. This gives $\bar{\lambda}_1 x^H y = \lambda_2 x^H y$.
+4. Since $\lambda_1$ is real, $\bar{\lambda}_1 = \lambda_1$. Thus, $\lambda_1(x^H y) = \lambda_2(x^H y)$.
+5. Since $\lambda_1 \neq \lambda_2$, it forces $x^H y = 0$.
+
+**Example continued:**
+
+$$
+x =
+\begin{bmatrix}
+1 \\
+1+i
+\end{bmatrix}
+\quad
+y =
+\begin{bmatrix}
+1-i \\\
+-1
+\end{bmatrix}
+$$
+
+**Check orthogonality:**
+
+$$
+x^H y =
+\begin{bmatrix}
+1 \\1-i
+\end{bmatrix}
+\begin{bmatrix}
+1-i \\\
+-1
+\end{bmatrix}
+$$
+
+$$
+= (1-i) - (1-i) = 0
+$$
+
+---
+
+## 3. Diagonalization and the Spectral Theorem
+
+### Unitary Diagonalizability
+
+A matrix $A$ is **unitarily diagonalizable** if there exists a unitary matrix $U$ (where $U^H U = I$) and a diagonal matrix $\Lambda$ such that:
+
+$$
+A = U\Lambda U^★
+$$
+
+> [!IMPORTANT]
+> **The Spectral Theorem:** Every Hermitian matrix is unitarily diagonalizable. Its orthonormal eigenvectors are the columns of $U$ and its real eigenvalues are on the diagonal of $\Lambda$.
+
+**Example of Diagonalized Form:**
+For the matrix $A$ used above:
+
+$$
+A =
+\begin{bmatrix}
+1 & 1-i \\\
+1+i & -1
+\end{bmatrix}
+\begin{bmatrix}
+8 & 0 \\\
+0 & -1
+\end{bmatrix}
+\begin{bmatrix}
+1 & 1-i \\\
+1+i & -1
+\end{bmatrix}^{-1}
+$$
+
+*(Note: Vectors in the matrix above must be normalized to unit length to make the matrix unitary)*
+
+### Converse Remark
+
+* **Hermitian $\implies$ Unitarily Diagonalizable** is true.
+* **Unitarily Diagonalizable $\implies$ Hermitian** is **not** always true.
+* **Example:**
+
+$$
+A =
+\begin{bmatrix}
+0 & -1 \\\
+1 & 0
+\end{bmatrix}
+$$
+
+is unitarily diagonalizable (it has distinct eigenvalues $i$ and $-i$) but it is not Hermitian ($A^★ \neq A$).
