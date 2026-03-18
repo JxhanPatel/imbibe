@@ -119,3 +119,144 @@ A relational schema $R$ is in First Normal Form (1NF) if:
 *   Decompose into two relations: `Customer Name(Customer ID, First Name, Surname)` and `Customer Telephone Number(Customer ID, Telephone Number)`.
 *   This establishes a one-to-many relationship between parent and child relations.
 *   This decomposition helps attain 1NF and satisfies requirements for higher normal forms like 2NF and 3NF.
+
+
+
+
+
+
+
+
+
+
+---
+
+
+# **5.2: Relational Database Design/2**
+
+---
+
+## **1. Recap**
+*   Identified the features of good relational design.
+*   Familiarized with the First Normal Form (1NF).
+*   Discussed the basic issues of why normalization is needed to reduce redundancy and anomaly.
+
+---
+
+## **2. Objectives**
+*   To Introduce **Functional Dependencies (FDs)**.
+
+---
+
+## **3. Goal: Devise a Theory for Good Relations**
+*   Decide whether a particular relation $R$ is in "good" form.
+*   In the case that a relation $R$ is not in "good" form, decompose it into a set of relations $\{R_1, R_2, ..., R_n\}$ such that:
+    *   Each relation is in good form.
+    *   The decomposition is a **lossless-join decomposition**.
+*   The theory is based on:
+    *   Functional dependencies.
+    *   Multivalued dependencies.
+    *   Other dependencies.
+
+---
+
+## **4. Functional Dependencies (FDs)**
+
+**Definition:**
+*   Constraints on the set of legal relations.
+*   Require that the value for a certain set of attributes determines uniquely the value for another set of attributes.
+*   A functional dependency is a generalization of the notion of a key.
+*   Functional dependencies are an encoding of constraints or business rules that exist in the real world.
+
+**Formal Definition:**
+*   Let $R$ be a relation schema, $\alpha \subseteq R$ and $\beta \subseteq R$.
+*   The functional dependency or FD $\alpha \rightarrow \beta$ holds on $R$ if and only if for any legal relations $r(R)$, whenever any two tuples $t_1$ and $t_2$ of $r$ agree on the attributes $\alpha$, they also agree on the attributes $\beta$.
+*   **Mathematical Expression:**
+    $$t_1[\alpha] = t_2[\alpha] \Rightarrow t_1[\beta] = t_2[\beta]$$.
+
+<img width="1042" height="745" alt="image" src="https://github.com/user-attachments/assets/6dbfc1df-600f-4b2b-8bd2-7991ec4dfbbf" />
+
+**Example Workout: Hold vs. Not Hold**
+Consider $r(A, B)$ with the following instance:
+| A | B |
+| :--- | :--- |
+| 1 | 4 |
+| 1 | 5 |
+| 3 | 7 |
+
+*   On this instance, **$A \rightarrow B$ does NOT hold** because tuples (1, 4) and (1, 5) match on $A$ but differ on $B$.
+*   However, **$B \rightarrow A$ does hold** on this instance because every value in column $B$ is distinct, ensuring matching $B$ values (if they existed) would match on $A$.
+*   **Note:** We cannot have tuples like (2, 4), or (3, 5), or (4, 7) added to the current instance if $B \rightarrow A$ is to continue holding.
+
+---
+
+## **5. Keys and Functional Dependencies**
+
+*   $K$ is a **superkey** for relation schema $R$ if and only if $K \rightarrow R$ holds on $R$.
+*   $K$ is a **candidate key** for $R$ if and only if:
+    1.  $K \rightarrow R$ holds.
+    2.  For no $\alpha \subset K$, $\alpha \rightarrow R$ holds (minimal).
+*   Functional dependencies allow us to express constraints that cannot be expressed using superkeys alone.
+
+---
+
+## **6. Practical Examples of FDs**
+
+**University Schema `inst_dept` Example:**
+$inst\_dept(ID, name, salary, dept\_name, building, budget)$
+*   **Expected to hold:**
+    *   $dept\_name \rightarrow building$.
+    *   $dept\_name \rightarrow budget$.
+    *   $ID \rightarrow salary$.
+    *   $ID \rightarrow dept\_name$.
+*   **NOT expected to hold:**
+    *   $dept\_name \rightarrow salary$ (Department name does not decide instructor salary).
+
+**Student Data Example:**
+| StudentID | Semester | Lecture | TA |
+| :--- | :--- | :--- | :--- |
+| 1234 | 6 | Numerical Methods | John |
+| 1221 | 4 | Numerical Methods | Smith |
+| 1234 | 6 | Visual Computing | Bob |
+| 1201 | 2 | Numerical Methods | Peter |
+| 1201 | 2 | Physics II | Simon |
+
+*   **FDs observed:**
+    *   $StudentID \rightarrow Semester$.
+    *   $StudentID, Lecture \rightarrow TA$.
+    *   $\{StudentID, Lecture\} \rightarrow \{TA, Semester\}$.
+
+<img width="811" height="422" alt="image" src="https://github.com/user-attachments/assets/b6786f5e-df43-48be-ad82-788dcdb167d6" />
+
+**Employee Data Example:**
+*   $EmployeeID \rightarrow EmployeeName$.
+*   $EmployeeID \rightarrow DepartmentID$.
+*   $DepartmentID \rightarrow DepartmentName$.
+
+---
+
+## **7. Satisfaction vs. Holding**
+
+*   **Satisfies:** If a relation $r$ is legal under a set $F$ of functional dependencies, we say that $r$ **satisfies** $F$.
+*   **Holds:** We say that $F$ **holds** on $R$ if **all** legal relations on $R$ satisfy the set of functional dependencies $F$.
+*   **Caution:** A specific instance of a relation schema may satisfy a functional dependency by chance (e.g., if all instructor names happen to be unique), but in such cases we **do not** say that the FD holds on the schema $R$.
+
+---
+
+## **8. Trivial Functional Dependencies**
+*   A functional dependency is **trivial** if it is satisfied by all instances of a relation.
+*   In general, $\alpha \rightarrow \beta$ is trivial if $\beta \subseteq \alpha$.
+*   **Examples:**
+    *   $ID, name \rightarrow ID$.
+    *   $name \rightarrow name$.
+
+---
+
+## **9. Closure of a Set of FDs (Introduction)**
+*   Given a set of Functional Dependencies $F$, we can infer new dependencies.
+*   The set of all functional dependencies logically implied by $F$ is called the **Closure Set $F^+$**.
+*   **Example:**
+    *   If $F = \{A \rightarrow B, B \rightarrow C\}$, then by transitivity, $A \rightarrow C$ is logically implied.
+    *   $F^+ = \{A \rightarrow B, B \rightarrow C, A \rightarrow C\}$ (plus all trivial dependencies).
+
+---
