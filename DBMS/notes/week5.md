@@ -260,3 +260,8 @@ $inst\_dept(ID, name, salary, dept\_name, building, budget)$
     *   $F^+ = \{A \rightarrow B, B \rightarrow C, A \rightarrow C\}$ (plus all trivial dependencies).
 
 ---
+# Quick Questions
+
+<img width="1148" height="3394" alt="image" src="https://github.com/user-attachments/assets/407735a2-71cd-433f-9348-dc2ae886dbcf" />
+
+---
