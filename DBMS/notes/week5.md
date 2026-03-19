@@ -310,6 +310,8 @@ The following rules can be inferred from basic Armstrong’s axioms:
     *   $AG \rightarrow I$ (by augmenting $A \rightarrow C$ with $G$ to get $AG \rightarrow CG$ and then transitivity with $CG \rightarrow I$).
     *   $CG \rightarrow HI$ (by augmenting $CG \rightarrow I$ with $CG$ to infer $CG \rightarrow CGI$, and augmenting $CG \rightarrow H$ with $I$ to infer $CGI \rightarrow HI$, then transitivity).
 
+<img width="897" height="400" alt="image" src="https://github.com/user-attachments/assets/66d57d5a-3e5f-4030-918c-b1ab9d0b5893" />
+
 ---
 
 ## **2. Closure of Attribute Sets**
