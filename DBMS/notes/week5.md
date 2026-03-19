@@ -553,12 +553,22 @@ To identify whether a decomposition is lossy or lossless, it must satisfy the fo
 
 
 ### **Examples**
-*   **Lossy Example (Employee):** Decomposing `employee(ID, name, street, city, salary)` into `employee1(ID, name)` and `employee2(name, street, city, salary)`. If two employees have the same name, the natural join creates extra tuples, losing information about which ID corresponds to which address/salary.
-*   **Lossy vs. Lossless (Supplier Parts):**
-    *   **Lossy:** $Supplier\_Parts(S\#, Sname, City, P\#, Qty)$ decomposed into $Supplier(S\#, Sname, City, Qty)$ and $Parts(P\#, Qty)$. The common attribute `Qty` is not a superkey in either, resulting in extra tuples.
-    *   **Lossless:** Decomposed into $Supplier(S\#, Sname, City)$ and $Parts(S\#, P\#, Qty)$. The common attribute $S\#$ is a superkey in `Supplier`, resulting in a lossless join.
-*   **BCNF Property:** If a relation is in BCNF, its decomposition will be lossless.
+**Lossy vs. Lossless (Supplier Parts):**
 
+**Lossy:**  
+Supplier_Parts(S#, Sname, City, P#, Qty) decomposed into  
+Supplier(S#, Sname, City, Qty) and  
+Parts(P#, Qty).  
+The common attribute Qty is not a superkey in either, resulting in extra tuples.
+
+**Lossless:**  
+Decomposed into  
+Supplier(S#, Sname, City) and  
+Parts(S#, P#, Qty).  
+The common attribute S# is a superkey in Supplier, resulting in a lossless join.
+
+
+*   **BCNF Property:** If a relation is in BCNF, its decomposition will be lossless.
 ---
 
 ## **2. Dependency Preservation**
@@ -582,7 +592,6 @@ To check if a decomposition of $R$ into $D = \{R_1, R_2, \dots, R_n\}$ is depend
 
 Note: This procedure takes exponential time due to computing $F^+$.
 
---- 📸 INSERT IMAGE: [Flowchart or algorithm steps for testing dependency preservation showing restrictions of F+ | Figure 7.10 on page 328 of DatabaseSystem-pages-2.pdf] ---
 
 ### **Polynomial-Time Testing for $\alpha \rightarrow \beta$**
 To check if a specific dependency $\alpha \rightarrow \beta$ is preserved in a decomposition:
