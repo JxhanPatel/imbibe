@@ -486,6 +486,9 @@ A Canonical Cover for $F$ is a minimal set of functional dependencies $F_c$ such
 3.  No functional dependency in $F_c$ contains an extraneous attribute.
 4.  Each left side of functional dependency in $F_c$ is unique. There are no two dependencies $\alpha_1 \to \beta_1$ and $\alpha_2 \to \beta_2$ such that $\alpha_1 = \alpha_2$.
 
+<img width="1013" height="408" alt="image" src="https://github.com/user-attachments/assets/b89cdcc9-578d-4c17-af25-bdb7f9f00d34" />
+
+
 **Example Workout:**
 *   $R = (A, B, C)$, $F = \{A \to BC, B \to C, A \to B, AB \to C\}$.
 *   Combine $A \to BC$ and $A \to B$ into $A \to BC$.
@@ -493,6 +496,8 @@ A Canonical Cover for $F$ is a minimal set of functional dependencies $F_c$ such
 *   $A$ is extraneous in $AB \to C$ because the result of deleting $A$ (which is $B \to C$) is already present in the set.
 
 ---
+
+
 
 ## **3. Practice Problems on Functional Dependencies**
 
@@ -502,6 +507,11 @@ A Canonical Cover for $F$ is a minimal set of functional dependencies $F_c$ such
 *   **Problem Examples:**
     *   Find Super Key for $R(A, B, C, D, E)$ with $F = \{AB \to C, DE \to B, CD \to E\}$.
     *   Find Candidate Key for $R(A, B, C, D, E)$ with $F = \{AB \to C, C \to D, B \to EA\}$.
+
+---
+<img width="1020" height="505" alt="image" src="https://github.com/user-attachments/assets/62f81eed-5753-417c-a78d-e8ba0d9e4f4e" />
+
+---
 
 ### **3.2 Implication and Equivalence**
 *   **Check Implication:** For $F = \{A \to BC, CD \to E, E \to C, D \to AEH, ABH \to BD, DH \to BC\}$, check if $BCD \to H$ and $AED \to C$ hold.
