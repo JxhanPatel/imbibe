@@ -415,3 +415,94 @@ There are database schemas in BCNF that are not sufficiently normalized.
 *   This suggests the need for **Fourth Normal Form (4NF)**.
 
 <img width="1263" height="3145" alt="image" src="https://github.com/user-attachments/assets/665186a7-da78-4078-89aa-41554e08630c" />
+
+
+---
+
+
+# Relational Database Design/4
+
+
+
+## **Objectives**
+*   To learn algorithms for properties of functional dependencies.
+
+## **1. Algorithms for Functional Dependencies**
+
+### **1.1 Attribute Set Closure**
+The closure of an attribute set $\alpha$ under a set of functional dependencies $F$ (denoted by $\alpha^+$) is the set of attributes that are functionally determined by $\alpha$ under $F$.
+
+**Algorithm to compute $\alpha^+$:**
+1.  `result` $\leftarrow \alpha$.
+2.  While (changes to `result`) do:
+    *   For each $\beta \to \gamma$ in $F$ do:
+        *   Begin
+        *   If $\beta \subseteq$ `result` then `result` $\leftarrow$ `result` $\cup$ $\gamma$
+        *   End.
+
+**Example Workout:**
+*   $R = (A, B, C, G, H, I)$.
+*   $F = \{A \to B, A \to C, CG \to H, CG \to I, B \to H\}$.
+*   To compute $(AG)^+$:
+    *   a) `result` = $AG$.
+    *   b) `result` = $ABCG$ (because $A \to C$ and $A \to B$).
+    *   c) `result` = $ABCGH$ (because $CG \to H$ and $CG \subseteq AGBC$).
+    *   d) `result` = $ABCGHI$ (because $CG \to I$ and $CG \subseteq AGBCH$).
+
+**Uses of Attribute Closure:**
+*   **Testing for superkey:** To test if $\alpha$ is a superkey, compute $\alpha^+$ and check if $\alpha^+$ contains all attributes of $R$.
+*   **Testing functional dependencies:** To check if a functional dependency $\alpha \to \beta$ holds (is in $F^+$), check if $\beta \subseteq \alpha^+$.
+*   **Computing closure of $F$:** For each $\gamma \subseteq R$, find the closure $\gamma^+$, and for each $S \subseteq \gamma^+$, output a functional dependency $\gamma \to S$.
+
+<img width="746" height="492" alt="image" src="https://github.com/user-attachments/assets/0617ed2d-4587-4460-b8b0-c58468883c0c" />
+
+### **1.2 Extraneous Attributes**
+An attribute of a functional dependency is extraneous if we can remove it without changing the closure of the set of functional dependencies.
+
+*   **Test for attribute $A \in \alpha$ in $\alpha \to \beta$:**
+    1.  Compute $(\alpha - \{A\})^+$ using the dependencies in $F$.
+    2.  Check that $(\alpha - \{A\})^+$ contains $\beta$; if it does, $A$ is extraneous in $\alpha$.
+*   **Test for attribute $A \in \beta$ in $\alpha \to \beta$:**
+    1.  Compute $\alpha^+$ using only the dependencies in $F' = (F - \{\alpha \to \beta\}) \cup \{\alpha \to (\beta - A)\}$.
+    2.  Check that $\alpha^+$ contains $A$; if it does, $A$ is extraneous in $\beta$.
+
+### **1.3 Equivalence of FD Sets**
+The equivalence of two FD sets $F$ and $G$ is determined by whether $F$ covers $G$ and $G$ covers $F$. $F$ covers $G$ if every functional dependency in $G$ can be logically implied from $F$.
+
+| Condition | CASE 1 | CASE 2 | CASE 3 | CASE 4 |
+| :--- | :--- | :--- | :--- | :--- |
+| **F Covers G** | True | True | False | False |
+| **G Covers F** | True | False | True | False |
+| **Result** | $F=G$ | $F \supset G$ | $G \supset F$ | No Comparison |
+
+---
+
+## **2. Canonical Cover**
+A Canonical Cover for $F$ is a minimal set of functional dependencies $F_c$ such that $F^+ = F_c^+$.
+
+**Properties of Canonical Cover:**
+1.  $F$ logically implies all dependencies in $F_c$.
+2.  $F_c$ logically implies all dependencies in $F$.
+3.  No functional dependency in $F_c$ contains an extraneous attribute.
+4.  Each left side of functional dependency in $F_c$ is unique. There are no two dependencies $\alpha_1 \to \beta_1$ and $\alpha_2 \to \beta_2$ such that $\alpha_1 = \alpha_2$.
+
+**Example Workout:**
+*   $R = (A, B, C)$, $F = \{A \to BC, B \to C, A \to B, AB \to C\}$.
+*   Combine $A \to BC$ and $A \to B$ into $A \to BC$.
+*   Set is now $\{A \to BC, B \to C, AB \to C\}$.
+*   $A$ is extraneous in $AB \to C$ because the result of deleting $A$ (which is $B \to C$) is already present in the set.
+
+---
+
+## **3. Practice Problems on Functional Dependencies**
+
+### **3.1 Super Keys and Candidate Keys**
+*   **Prime attribute:** An attribute that is a member of some candidate key.
+*   **Non-prime attribute:** An attribute that is not a member of any candidate key.
+*   **Problem Examples:**
+    *   Find Super Key for $R(A, B, C, D, E)$ with $F = \{AB \to C, DE \to B, CD \to E\}$.
+    *   Find Candidate Key for $R(A, B, C, D, E)$ with $F = \{AB \to C, C \to D, B \to EA\}$.
+
+### **3.2 Implication and Equivalence**
+*   **Check Implication:** For $F = \{A \to BC, CD \to E, E \to C, D \to AEH, ABH \to BD, DH \to BC\}$, check if $BCD \to H$ and $AED \to C$ hold.
+*   **Check Equivalence:** Compare set $F = \{A \to C, AC \to D, E \to AD, E \to H\}$ with $G = \{A \to CD, E \to AH\}$.
