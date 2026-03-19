@@ -265,3 +265,161 @@ $inst\_dept(ID, name, salary, dept\_name, building, budget)$
 <img width="1148" height="3394" alt="image" src="https://github.com/user-attachments/assets/407735a2-71cd-433f-9348-dc2ae886dbcf" />
 
 ---
+
+
+
+# 5.3 Relational Database Design/3
+
+
+
+
+
+## **Objectives**
+*   To develop the theory of functional dependencies.
+*   To understand how a schema can be decomposed for a ‘good’ design using functional dependencies.
+
+
+
+## **1. Functional Dependency Theory**
+
+### **1.1 Functional Dependencies: Armstrong’s Axioms**
+Given a set of Functional Dependencies $F$, we can infer new dependencies by the **Armstrong’s Axioms**:
+*   **Reflexivity:** if $\beta \subseteq \alpha$, then $\alpha \rightarrow \beta$.
+*   **Augmentation:** if $\alpha \rightarrow \beta$, then $\gamma\alpha \rightarrow \gamma\beta$.
+*   **Transitivity:** if $\alpha \rightarrow \beta$ and $\beta \rightarrow \gamma$, then $\alpha \rightarrow \gamma$.
+
+These axioms can be repeatedly applied to generate new FDs and added to $F$. A new FD obtained by applying the axioms is said to be **logically implied** by $F$. The process of generations of FDs terminates after a finite number of steps, and we call it the **Closure Set $F^+$** for FDs $F$. This is the set of all FDs logically implied by $F$.
+*   Clearly, $F \subseteq F^+$.
+*   These axioms are **Sound** (generate only functional dependencies that actually hold) and **Complete** (eventually generate all functional dependencies that hold).
+
+### **1.2 Additional Derived Rules**
+The following rules can be inferred from basic Armstrong’s axioms:
+*   **Union:** if $\alpha \rightarrow \beta$ holds and $\alpha \rightarrow \gamma$ holds, then $\alpha \rightarrow \beta\gamma$ holds.
+*   **Decomposition:** if $\alpha \rightarrow \beta\gamma$ holds, then $\alpha \rightarrow \beta$ holds and $\alpha \rightarrow \gamma$ holds.
+*   **Pseudotransitivity:** if $\alpha \rightarrow \beta$ holds and $\gamma\beta \rightarrow \delta$ holds, then $\alpha\gamma \rightarrow \delta$ holds.
+
+### **1.3 Examples of Closure $F^+$**
+**Example 1:**
+*   $F = \{A \rightarrow B, B \rightarrow C\}$.
+*   $F^+ = \{A \rightarrow B, B \rightarrow C, A \rightarrow C\}$.
+
+**Example 2:**
+*   $R = (A, B, C, G, H, I)$.
+*   $F = \{A \rightarrow B, A \rightarrow C, CG \rightarrow H, CG \rightarrow I, B \rightarrow H\}$.
+*   **Some members of $F^+$:**
+    *   $A \rightarrow H$ (by transitivity from $A \rightarrow B$ and $B \rightarrow H$).
+    *   $AG \rightarrow I$ (by augmenting $A \rightarrow C$ with $G$ to get $AG \rightarrow CG$ and then transitivity with $CG \rightarrow I$).
+    *   $CG \rightarrow HI$ (by augmenting $CG \rightarrow I$ with $CG$ to infer $CG \rightarrow CGI$, and augmenting $CG \rightarrow H$ with $I$ to infer $CGI \rightarrow HI$, then transitivity).
+
+--- 📸 INSERT IMAGE: [Computational steps for computing F+ using augmentation and transitivity | timestamp 07:15 in week5t.pdf / slide 23.11] ---
+
+---
+
+## **2. Closure of Attribute Sets**
+
+### **2.1 Definition and Algorithm**
+Given a set of attributes $\alpha$, the **closure of $\alpha$ under $F$** (denoted by $\alpha^+$) is the set of attributes that are functionally determined by $\alpha$ under $F$.
+
+**Algorithm to compute $\alpha^+$:**
+```text
+result := alpha;
+while (changes to result) do
+    for each beta -> gamma in F do
+        begin
+            if beta ⊆ result then result := result ∪ gamma;
+        end
+```
+
+
+### **2.2 Attribute Closure Example**
+*   $R = (A, B, C, G, H, I)$.
+*   $F = \{A \rightarrow B, A \rightarrow C, CG \rightarrow H, CG \rightarrow I, B \rightarrow H\}$.
+*   **Computing $(AG)^+$:**
+    1.  `result` = $AG$.
+    2.  `result` = $ABCG$ ($A \rightarrow C$ and $A \rightarrow B$).
+    3.  `result` = $ABCGH$ ($CG \rightarrow H$ and $CG \subseteq ABCG$).
+    4.  `result` = $ABCGHI$ ($CG \rightarrow I$ and $CG \subseteq ABCGH$).
+
+**Testing for Candidate Key:**
+1.  **Is $AG$ a superkey?** Does $AG \rightarrow R$? (Check if $(AG)^+ \supseteq R$).
+2.  **Is any subset of $AG$ a superkey?**
+    *   Does $A \rightarrow R$? (Check if $(A)^+ \supseteq R$).
+    *   Does $G \rightarrow R$? (Check if $(G)^+ \supseteq R$).
+
+### **2.3 Uses of Attribute Closure**
+*   **Testing for superkey:** Compute $\alpha^+$ and check if it contains all attributes of $R$.
+*   **Testing functional dependencies:** To check if $\alpha \rightarrow \beta$ holds, check if $\beta \subseteq \alpha^+$.
+*   **Computing closure of $F$:** For each $\gamma \subseteq R$, find $\gamma^+$, and for each $S \subseteq \gamma^+$, output $\gamma \rightarrow S$.
+
+---
+
+## **3. Decomposition Using Functional Dependencies**
+
+### **3.1 Boyce-Codd Normal Form (BCNF)**
+A relation schema $R$ is in **BCNF** with respect to a set $F$ of FDs if for all FDs in $F^+$ of the form $\alpha \rightarrow \beta$, where $\alpha \subseteq R$ and $\beta \subseteq R$, at least one of the following holds:
+1.  $\alpha \rightarrow \beta$ is **trivial** (that is, $\beta \subseteq \alpha$).
+2.  $\alpha$ is a **superkey** for $R$.
+
+**Example of schema NOT in BCNF:**
+`instr_dept (ID, name, salary, dept_name, building, budget)` is not in BCNF because `dept_name` $\rightarrow$ `building, budget` holds, but `dept_name` is not a superkey.
+
+### **3.2 BCNF Decomposition Rule**
+If a non-trivial dependency $\alpha \rightarrow \beta$ causes a violation of BCNF in schema $R$, decompose $R$ into:
+1.  $(\alpha \cup \beta)$
+2.  $(R - (\beta - \alpha))$
+
+**Example Workout:**
+In `instr_dept`, $\alpha = \text{dept\_name}$ and $\beta = \{\text{building, budget}\}$.
+Replacing `instr_dept` with:
+*   $(\alpha \cup \beta) = (\text{dept\_name, building, budget})$ where `dept\_name` $\rightarrow$ `building, budget`.
+*   $(R - (\beta - \alpha)) = (\text{ID, name, salary, dept\_name})$ where `ID` $\rightarrow$ `name, salary, dept\_name`.
+
+### **3.3 Lossless Join Decomposition**
+A decomposition of $R$ into $R_1, R_2$ is a **lossless join** if $R_1 \bowtie R_2 = R$. To identify if a decomposition is lossless using an FD set, the following must hold:
+1.  $R_1 \cup R_2 = R$
+2.  $R_1 \cap R_2 \neq \emptyset$
+3.  **$R_1 \cap R_2 \rightarrow R_1$** or **$R_1 \cap R_2 \rightarrow R_2$** (Common attribute must be a key for at least one relation).
+
+### **3.4 Dependency Preservation**
+A decomposition is **dependency preserving** if it is sufficient to test only those dependencies on each individual relation in order to ensure that all functional dependencies hold.
+
+**Example of BCNF non-preservation:**
+$R = (C, S, Z)$, $F = \{CS \rightarrow Z, Z \rightarrow C\}$. Key = $CS$.
+*   $CS \rightarrow Z$ satisfies BCNF, but $Z \rightarrow C$ violates it.
+*   Decompose: $R_1 = (Z, C)$ and $R_2 = (S, Z)$.
+*   Intersection $\{Z\}$ is a key for $R_1$ ($Z \rightarrow C$), so it is lossless.
+*   However, $CS \rightarrow Z$ cannot be checked without a join. It is **not** dependency preserving.
+
+### **3.5 Third Normal Form (3NF)**
+A relation schema $R$ is in **3NF** if for all $\alpha \rightarrow \beta \in F^+$, at least one of the following holds:
+1.  $\alpha \rightarrow \beta$ is trivial.
+2.  $\alpha$ is a superkey for $R$.
+3.  Each attribute $A$ in $\beta - \alpha$ is contained in a candidate key for $R$.
+
+3NF is a **minimal relaxation** of BCNF to ensure dependency preservation.
+
+---
+
+## **4. Goals of Normalization**
+Decide whether a relation scheme $R$ is in “good” form; if not, decompose into $\{R_1, R_2, ..., R_n\}$ such that:
+*   Each relation scheme is in good form.
+*   Decomposition is **lossless-join**.
+*   Preferably, decomposition is **dependency preserving**.
+
+> [!CAUTION]
+> **Problems with Decomposition:**
+> 1. **Lossiness:** Impossible to reconstruct original relation.
+> 2. **Joins:** Dependency checking and queries may require joins, becoming expensive.
+
+---
+
+## **5. Shortcomings of BCNF**
+There are database schemas in BCNF that are not sufficiently normalized.
+
+**Example:** `inst_info (ID, child_name, phone)`
+*   An instructor has more than one phone and multiple children.
+*   There are no non-trivial FDs, so it is in BCNF.
+*   **Insertion Anomaly:** Adding a phone number requires adding two tuples.
+*   **Solution:** Decompose into `inst_child(ID, child_name)` and `inst_phone(ID, phone)`.
+*   This suggests the need for **Fourth Normal Form (4NF)**.
+
