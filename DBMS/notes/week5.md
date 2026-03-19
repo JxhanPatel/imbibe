@@ -414,3 +414,4 @@ There are database schemas in BCNF that are not sufficiently normalized.
 *   **Solution:** Decompose into `inst_child(ID, child_name)` and `inst_phone(ID, phone)`.
 *   This suggests the need for **Fourth Normal Form (4NF)**.
 
+<img width="1263" height="3145" alt="image" src="https://github.com/user-attachments/assets/665186a7-da78-4078-89aa-41554e08630c" />
