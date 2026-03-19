@@ -516,3 +516,88 @@ A Canonical Cover for $F$ is a minimal set of functional dependencies $F_c$ such
 ### **3.2 Implication and Equivalence**
 *   **Check Implication:** For $F = \{A \to BC, CD \to E, E \to C, D \to AEH, ABH \to BD, DH \to BC\}$, check if $BCD \to H$ and $AED \to C$ hold.
 *   **Check Equivalence:** Compare set $F = \{A \to C, AC \to D, E \to AD, E \to H\}$ with $G = \{A \to CD, E \to AH\}$.
+
+
+
+---
+
+# 5.5 Relational Database Design/5
+
+
+
+## **Objectives**
+*   To understand the characterizations for Lossless Join Decomposition.
+*   To understand the characterizations for Dependency Preservation.
+
+
+
+## **1. Lossless Join Decomposition**
+
+### **Definition and Properties**
+For the case of $R = (R_1, R_2)$, we require that for all possible relations $r$ on schema $R$, $r = \Pi_{R_1}(r) \bowtie \Pi_{R_2}(r)$. A decomposition of $R$ into $R_1$ and $R_2$ is a **lossless decomposition** if there is no loss of information by replacing $R$ with two relation schemas $R_1$ and $R_2$. 
+
+Loss of information occurs if it is possible to have an instance of a relation $r(R)$ that includes information that cannot be represented if instead of the instance of $r(R)$ we must use instances of $r_1(R_1)$ and $r_2(R_2)$. Conversely, a decomposition is **lossy** if when we compute the natural join of the projection results, we get a proper superset of the original relation: $r \subset \Pi_{R_1}(r) \bowtie \Pi_{R_2}(r)$.
+
+### **Characterization for Lossless Join**
+A decomposition of $R$ into $R_1$ and $R_2$ is lossless join if at least one of the following dependencies is in $F^+$:
+*   $R_1 \cap R_2 \rightarrow R_1$
+*   $R_1 \cap R_2 \rightarrow R_2$.
+
+These functional dependencies are a **sufficient condition** for lossless join decomposition; the dependencies are a necessary condition only if all constraints are functional dependencies.
+
+### **Conditions to Identify Lossless Decomposition**
+To identify whether a decomposition is lossy or lossless, it must satisfy the following conditions:
+1.  **Attribute Coverage:** $R_1 \cup R_2 = R$.
+2.  **Non-null Intersection:** $R_1 \cap R_2 \neq \emptyset$ (There must be some common attribute because if there is no common attribute, information cannot be correlated).
+3.  **Key Constraint:** $R_1 \cap R_2 \rightarrow R_1$ **OR** $R_1 \cap R_2 \rightarrow R_2$. In other words, the intersection set of attributes must be a key for at least one of the decomposed relations.
+
+
+### **Examples**
+*   **Lossy Example (Employee):** Decomposing `employee(ID, name, street, city, salary)` into `employee1(ID, name)` and `employee2(name, street, city, salary)`. If two employees have the same name, the natural join creates extra tuples, losing information about which ID corresponds to which address/salary.
+*   **Lossy vs. Lossless (Supplier Parts):**
+    *   **Lossy:** $Supplier\_Parts(S\#, Sname, City, P\#, Qty)$ decomposed into $Supplier(S\#, Sname, City, Qty)$ and $Parts(P\#, Qty)$. The common attribute `Qty` is not a superkey in either, resulting in extra tuples.
+    *   **Lossless:** Decomposed into $Supplier(S\#, Sname, City)$ and $Parts(S\#, P\#, Qty)$. The common attribute $S\#$ is a superkey in `Supplier`, resulting in a lossless join.
+*   **BCNF Property:** If a relation is in BCNF, its decomposition will be lossless.
+
+---
+
+## **2. Dependency Preservation**
+
+### **Definition**
+Constraints, including FDs, are costly to check in practice unless they pertain to only one relation. If it is sufficient to test only those dependencies on each individual relation of a decomposition in order to ensure that all functional dependencies hold, then that decomposition is **dependency preserving**. 
+
+Let $F_i$ be the set of dependencies $F^+$ that include only attributes in $R_i$. A decomposition is dependency preserving if:
+$$(F_1 \cup F_2 \cup \dots \cup F_n)^+ = F^+$$.
+
+If it is not preserved, checking updates for violation of functional dependencies may require computing joins, which is expensive.
+
+### **General Testing Procedure**
+To check if a decomposition of $R$ into $D = \{R_1, R_2, \dots, R_n\}$ is dependency preserving:
+1.  Compute $F^+$.
+2.  For each schema $R_i$ in $D$, compute $F_i = $ the restriction of $F^+$ to $R_i$.
+3.  Let $F' = \emptyset$.
+4.  For each restriction $F_i$, $F' = F' \cup F_i$.
+5.  Compute $F'^+$.
+6.  If $F'^+ = F^+$ then return **true**, else return **false**.
+
+Note: This procedure takes exponential time due to computing $F^+$.
+
+--- 📸 INSERT IMAGE: [Flowchart or algorithm steps for testing dependency preservation showing restrictions of F+ | Figure 7.10 on page 328 of DatabaseSystem-pages-2.pdf] ---
+
+### **Polynomial-Time Testing for $\alpha \rightarrow \beta$**
+To check if a specific dependency $\alpha \rightarrow \beta$ is preserved in a decomposition:
+1.  `result` := $\alpha$.
+2.  While (changes to `result`) do:
+    *   For each $R_i$ in the decomposition:
+        *   $t = (\text{result} \cap R_i)^+ \cap R_i$
+        *   `result` := `result` $\cup t$.
+3.  If `result` contains all attributes in $\beta$, then $\alpha \rightarrow \beta$ is preserved.
+
+### **Examples**
+*   **Non-Preserving Example:** $R = (A, B, C), F = \{A \rightarrow B, B \rightarrow C\}$. Decomposing into $R_1 = (A, B)$ and $R_2 = (A, C)$ is lossless, but the dependency $B \rightarrow C$ cannot be checked without computing a join. Hence, it is **not** dependency preserving.
+*   **Preserving Example:** $R = (A, B, C, D), F = \{A \rightarrow B, B \rightarrow C, C \rightarrow D, D \rightarrow A\}$. Decomposing into $R_1(A, B), R_2(B, C), R_3(C, D)$ allows checking $A \rightarrow B$, $B \rightarrow C$, and $C \rightarrow D$ directly. The remaining FD $D \rightarrow A$ is preserved via transitivity in the closure of the union set: $D \rightarrow C \rightarrow B \rightarrow A$.
+
+---
+
+
+
