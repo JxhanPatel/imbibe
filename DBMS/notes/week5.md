@@ -1,6 +1,5 @@
 # **5.1: Relational Database Design/1**
 
----
 
 ## **1. Recap**
 *   Relational algebra was discussed with accompanying examples.
@@ -12,13 +11,13 @@
 *   The translation of ER Models to Relational Schema and extended features of the ER Model were discussed.
 *   Various design issues were deliberated upon.
 
----
+
 
 ## **2. Objectives**
 *   To identify the features of good relational design.
 *   To familiarize with the First Normal Form (1NF).
 
----
+
 
 ## **3. Features of Good Relational Design**
 
@@ -134,19 +133,19 @@ A relational schema $R$ is in First Normal Form (1NF) if:
 
 # **5.2: Relational Database Design/2**
 
----
+
 
 ## **1. Recap**
 *   Identified the features of good relational design.
 *   Familiarized with the First Normal Form (1NF).
 *   Discussed the basic issues of why normalization is needed to reduce redundancy and anomaly.
 
----
+
 
 ## **2. Objectives**
 *   To Introduce **Functional Dependencies (FDs)**.
 
----
+
 
 ## **3. Goal: Devise a Theory for Good Relations**
 *   Decide whether a particular relation $R$ is in "good" form.
@@ -158,7 +157,7 @@ A relational schema $R$ is in First Normal Form (1NF) if:
     *   Multivalued dependencies.
     *   Other dependencies.
 
----
+
 
 ## **4. Functional Dependencies (FDs)**
 
@@ -311,8 +310,6 @@ The following rules can be inferred from basic Armstrong’s axioms:
     *   $AG \rightarrow I$ (by augmenting $A \rightarrow C$ with $G$ to get $AG \rightarrow CG$ and then transitivity with $CG \rightarrow I$).
     *   $CG \rightarrow HI$ (by augmenting $CG \rightarrow I$ with $CG$ to infer $CG \rightarrow CGI$, and augmenting $CG \rightarrow H$ with $I$ to infer $CGI \rightarrow HI$, then transitivity).
 
---- 📸 INSERT IMAGE: [Computational steps for computing F+ using augmentation and transitivity | timestamp 07:15 in week5t.pdf / slide 23.11] ---
-
 ---
 
 ## **2. Closure of Attribute Sets**
@@ -363,16 +360,8 @@ A relation schema $R$ is in **BCNF** with respect to a set $F$ of FDs if for all
 **Example of schema NOT in BCNF:**
 `instr_dept (ID, name, salary, dept_name, building, budget)` is not in BCNF because `dept_name` $\rightarrow$ `building, budget` holds, but `dept_name` is not a superkey.
 
-### **3.2 BCNF Decomposition Rule**
-If a non-trivial dependency $\alpha \rightarrow \beta$ causes a violation of BCNF in schema $R$, decompose $R$ into:
-1.  $(\alpha \cup \beta)$
-2.  $(R - (\beta - \alpha))$
+<img width="1322" height="483" alt="image" src="https://github.com/user-attachments/assets/14c92fe7-6b33-47ea-90a6-82941fffd39b" />
 
-**Example Workout:**
-In `instr_dept`, $\alpha = \text{dept\_name}$ and $\beta = \{\text{building, budget}\}$.
-Replacing `instr_dept` with:
-*   $(\alpha \cup \beta) = (\text{dept\_name, building, budget})$ where `dept\_name` $\rightarrow$ `building, budget`.
-*   $(R - (\beta - \alpha)) = (\text{ID, name, salary, dept\_name})$ where `ID` $\rightarrow$ `name, salary, dept\_name`.
 
 ### **3.3 Lossless Join Decomposition**
 A decomposition of $R$ into $R_1, R_2$ is a **lossless join** if $R_1 \bowtie R_2 = R$. To identify if a decomposition is lossless using an FD set, the following must hold:
