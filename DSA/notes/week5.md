@@ -521,3 +521,116 @@ Based on the properties above, two natural greedy strategies emerge:
 
 
 
+# 5.6: Minimum Cost Spanning Trees (Prim's Algorithm)
+
+
+## **1. Introduction to Prim's Algorithm**
+Prim’s algorithm is a greedy strategy used to find a minimum cost spanning tree (MCST) in a connected, undirected graph $G = (V, E)$ with a weight function $w: E \rightarrow \mathbb{R}$.
+
+### **1.1 The High-Level Strategy**
+The algorithm has the property that the edges in the set $A$ always form a single tree.
+*   **Initialization:** Start with an arbitrary root vertex $r$ (or a smallest weight edge overall).
+*   **Incremental Growth:** The tree grows until it spans all the vertices in $V$.
+*   **Greedy Choice:** In each iteration, add the "lightest" edge connecting the current tree to a vertex not yet in the tree.
+*   **Constraint:** Adding an edge that connects two parts already in the tree would create a cycle and is forbidden.
+
+<img width="1142" height="540" alt="image" src="https://github.com/user-attachments/assets/76457c6a-7b4a-4fb1-8ba9-e4f35ff5567b" />
+
+---
+
+## **2. Correctness: The Minimum Separator Lemma**
+The correctness of Prim's method follows from the **Cut Property** (also known as the Minimum Separator Lemma).
+
+*   **Lemma Statement:** Let $V$ be partitioned into two non-empty sets $U$ and $W = V \setminus U$. Let $e = (u, w)$ be the minimum cost edge with $u \in U$ and $w \in W$. Every MCST must include $e$.
+*   **Application to Prim's:** At any point, the vertices already in the tree ($TV$) and the vertices outside the tree ($V \setminus TV$) partition the graph. By picking the smallest edge connecting these two partitions, the algorithm is guaranteed to make a correct choice that belongs to every MCST.
+*   **Corollary:** The smallest weight edge leaving *any* vertex must belong to every MCST.
+
+<img width="1107" height="535" alt="image" src="https://github.com/user-attachments/assets/d8c5a2cd-1ac4-46ca-aade-e0f557886009" />
+
+---
+
+## **3. Algorithmic Implementation**
+
+### **3.1 Priority Queue Logic (Cormen)**
+To implement Prim's algorithm efficiently, all vertices not yet in the tree reside in a min-priority queue $Q$ based on a `key` attribute.
+*   **$v.key$**: The minimum weight of any edge connecting $v$ to a vertex in the tree ($v.key = \infty$ if no such edge exists).
+*   **$v.\pi$**: The parent of $v$ in the tree.
+
+#### **MST-PRIM(G, w, r) Pseudocode**
+```text
+1  for each u ∈ G.V
+2      u.key = ∞
+3      u.π = NIL
+4  r.key = 0
+5  Q = G.V
+6  while Q ≠ ∅
+7      u = EXTRACT-MIN(Q)
+8      for each v ∈ G.Adj[u]
+9          if v ∈ Q and w(u, v) < v.key
+10             v.π = u
+11             v.key = w(u, v)
+```
+
+### **3.2 Adjacency List Implementation (Mukund)**
+This version maintains `nbr[v]` to track the nearest neighbor of $v$ currently in the tree.
+```python
+def primlist2(WList):
+    infinity = 1 + max([d for u in WList.keys() for (v,d) in WList[u]])
+    (visited, distance, nbr) = ({}, {}, {})
+    for v in WList.keys():
+        (visited[v], distance[v], nbr[v]) = (False, infinity, -1)
+    
+    visited = True # Start with vertex 0
+    for (v, d) in WList:
+        (distance[v], nbr[v]) = (d, 0)
+        
+    for i in range(1, len(WList.keys())):
+        # Find unvisited vertex with minimum distance
+        nextd = min([distance[v] for v in WList.keys() if not visited[v]])
+        nextvlist = [v for v in WList.keys() if (not visited[v]) and distance[v] == nextd]
+        if nextvlist == []:
+            break
+        nextv = min(nextvlist)
+        visited[nextv] = True
+        
+        # Update distances of neighbours
+        for (v, d) in WList[nextv]:
+            if not visited[v] and d < distance[v]:
+                (distance[v], nbr[v]) = (d, nextv)
+```
+
+---
+
+## **4. Complexity Analysis**
+The running time of Prim’s algorithm depends heavily on the priority queue implementation.
+
+| Implementation | Extract-Min | Decrease-Key | Total Complexity |
+| :--- | :--- | :--- | :--- |
+| **Array** | $O(V)$ | $O(1)$ | $O(V^2)$ |
+| **Binary Heap** | $O(\log V)$ | $O(\log V)$ | $O(E \log V)$ |
+| **Fibonacci Heap**| $O(\log V)$ (amortized) | $O(1)$ (amortized) | $O(E + V \log V)$ |
+
+*   **Adjacency List Bottleneck:** Even with adjacency lists, an $O(V)$ scan to find the minimum distance vertex in each of the $V$ iterations results in $O(V^2)$.
+*   **Heaps:** Using a binary heap improves performance for sparse graphs ($E < V^2 / \log V$). Fibonacci heaps are faster for dense graphs.
+
+---
+
+## **5. Step-by-Step Example Execution**
+Consider a 5-node graph with weights: $(1, 3)=6, (2, 4)=8, (0, 1)=10, (1, 2)=20$.
+1.  **Start with vertex 0:** Initial tree is $\{0\}$.
+2.  **Edge (0, 1) weight 10:** Added to tree. $TV = \{0, 1\}$.
+3.  **Explore neighbors of 1:** Edges are $(1, 3)=6$ and $(1, 2)=20$.
+4.  **Pick smallest:** Add $(1, 3)$ weight 6. $TV = \{0, 1, 3\}$.
+5.  **Next smallest edge to $TV$:** Edge $(1, 2)$ weight 20 and $(3, 4)$ (assumed edge).
+6.  **Progress:** Continue picking the smallest available edge that connects to an unvisited vertex until all vertices are in $TV$.
+
+
+---
+
+## **6. Comparison with Dijkstra's Algorithm**
+Prim’s algorithm is strongly reminiscent of Dijkstra’s algorithm, but they differ in their objective.
+*   **Dijkstra Update:** `v.key = min(v.key, u.d + w(u, v))` — seeks the shortest path weight from a *source* to $v$.
+*   **Prim Update:** `v.key = min(v.key, w(u, v))` — seeks the shortest distance from the *current tree* to $v$.
+
+> [!NOTE]
+> **Uniqueness:** If all edge weights are distinct, the minimum spanning tree is unique. If weights repeat, different choices of minimum edges can lead to multiple valid spanning trees.
