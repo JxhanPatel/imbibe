@@ -440,3 +440,84 @@ The algorithm can be reduced from $O(n^3)$ space to $O(n^2)$ space.
 
 
 
+# 5.5: Minimum Cost Spanning Trees 
+
+
+
+## **1. Motivation and Examples**
+Spanning trees are used to recover a connected part of a graph while retaining a minimal set of edges.
+
+*   **Road Restoration:** After a cyclone damages roads in a district, the priority is to ensure all parts are reachable. The goal is to choose a set of roads to restore so that every town is reachable from every other town.
+*   **Fibre Optic Cables:** An Internet service provider wants to ensure redundancy against cable faults by laying secondary cables. The goal is to find the minimum number of cables to be doubled up so that the entire network remains connected via redundant links.
+
+---
+
+## **2. Problem Definitions**
+
+### **2.1 Spanning Tree**
+*   **Definition:** A tree that connects all the vertices in a graph.
+*   **Minimally Connected:** A tree is a minimally connected graph. Adding any edge to a tree creates a loop (cycle), and removing any edge disconnects the graph.
+*   **Non-Uniqueness:** In general, a graph can have more than one spanning tree.
+
+
+<img width="924" height="470" alt="image" src="https://github.com/user-attachments/assets/4ce23238-1b38-4a01-b325-7454cbeeb966" />
+<img width="980" height="506" alt="image" src="https://github.com/user-attachments/assets/14f161c2-507e-4ed6-afba-f410909aa8bf" />
+
+### **2.2 Minimum Cost Spanning Tree (MCST)**
+*   **Input:** A connected undirected graph $G = (V, E)$ with edge weights $w_e$.
+*   **Output:** A tree $T = (V, E')$, where $E' \subseteq E$, that minimizes the total weight: $weight(T) = \sum_{e \in E'} w_e$.
+*   **Objective:** Among all different spanning trees, choose one with the minimum total cost.
+
+---
+
+## **3. Fundamental Facts About Trees**
+1.  **Connectivity and Edges:** A tree on $n$ vertices has exactly $n-1$ edges.
+2.  **Cycle Formation:** Adding an edge to a tree must create a cycle.
+3.  **Connectivity Robustness:** Removing an edge from a cycle cannot disconnect a graph.
+4.  **Edge Deletion:** Deleting an edge from a tree splits it into exactly two connected components.
+5.  **Unique Paths:** For any two nodes in a tree, there is exactly one simple path between them.
+
+> [!TIP]
+> **Tree Equivalence:** Any two of the following properties imply the third: (1) $G$ is connected, (2) $G$ is acyclic, (3) $G$ has $n-1$ edges.
+
+---
+
+## **4. Foundations of Correctness: The Properties**
+
+### **4.1 The Cut Property (Minimum Separator Lemma)**
+The cut property provides the rule for recognizing "safe" edges to add to an MST.
+
+*   **Definition of a Cut:** A partition of the vertices into two non-empty groups, $S$ and $V-S$.
+*   **Crossing Edge:** An edge crosses the cut if one endpoint is in $S$ and the other is in $V-S$.
+*   **Theorem:** Let $V$ be partitioned into two non-empty sets $U$ and $W = V \setminus U$. Let $e = (u, w)$ be the minimum cost edge with $u \in U, w \in W$. Every MCST must include $e$.
+*   **Proof Sketch (Exchange Argument):** If an MST $T$ does not contain $e$, it must contain some other path $P$ between $u$ and $w$. This path must cross the cut at some edge $f$. Since $e$ is the minimum weight edge crossing the cut, $w(e) < w(f)$. Replacing $f$ with $e$ in $T$ yields a spanning tree with a smaller total weight, contradicting the optimality of $T$.
+
+
+### **4.2 The Cycle Property**
+The cycle property provides a rule for recognizing edges that are "safe" to eliminate.
+
+*   **Theorem:** Assume all edge costs are distinct. Let $C$ be any cycle in $G$, and let edge $e = (v, w)$ be the most expensive edge belonging to $C$. Then $e$ does not belong to any minimum spanning tree of $G$.
+*   **Proof Sketch:** If an MST $T$ contains the most expensive edge $e$, deleting $e$ partitions $T$ into two components $S$ and $V-S$. Since $e$ was part of cycle $C$, there must be another edge $e'$ in $C$ that also crosses the cut. Since $e$ is the most expensive edge on $C$, $w(e') < w(e)$. Replacing $e$ with $e'$ creates a cheaper spanning tree.
+
+---
+
+## **5. General Algorithmic Strategies**
+Based on the properties above, two natural greedy strategies emerge:
+
+| Strategy | Algorithm Name | High-Level Logic |
+| :--- | :--- | :--- |
+| **Grow a Tree** | **Prim’s Algorithm** | Start with a single vertex or the smallest edge and "grow" the tree one edge at a time by picking the smallest edge connecting the tree to an outside vertex. |
+| **Connect Components**| **Kruskal’s Algorithm** | Start with $n$ components (isolated vertices). Scan all edges in ascending order of weight and include an edge if it merges two disjoint components without forming a cycle. |
+
+> [!NOTE]
+> **Uniqueness:** If all edge weights in a graph are distinct, the minimum spanning tree is unique. If edge weights repeat, there may be a large number of possible minimum cost spanning trees.
+
+
+
+
+
+
+---
+
+
+
