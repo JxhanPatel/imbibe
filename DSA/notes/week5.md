@@ -25,7 +25,11 @@ To operate on weighted graphs, representations must be adapted to store the weig
 
 ### **3.1 Weighted Adjacency Matrix**
 An $n \times n$ matrix $A$ where:
-$$A[i, j] = \begin{cases} \text{weight of edge } (i, j) & \text{if } (i, j) \in E \\ 0, \infty, \text{ or NIL} & \text{if there is no edge} \end{cases}$$
+
+$$
+A[i, j] = \begin{cases} \text{weight of edge } (i, j) & \text{if } (i, j) \in E \\\ 0, \infty, \text{ or NIL} & \text{if there is no edge} \end{cases}
+$$
+
 *   Entries capture edge weights.
 *   In Python implementations, each cell may store a pair: `(edge_information, weight_information)`.
 
@@ -70,3 +74,124 @@ A **negative cycle** is a directed cycle where the sum of the edge weights is ne
 
 > [!NOTE]
 > **Subpaths Property:** Shortest-path algorithms typically rely on the property that any subpath of a shortest path is also a shortest path.
+
+
+
+
+---
+
+
+# 5.2: Single Source Shortest Paths (Dijkstra's Algorithm)
+
+
+## **1. The Problem Definition**
+The single-source shortest-paths problem is to find a shortest path from a designated source vertex $s \in V$ to each vertex $v \in V$ in a weighted, directed graph $G=(V, E)$ with a weight function $w: E \rightarrow \mathbb{R}$.
+
+### **1.1 Formal Setup**
+*   **Path Weight:** The weight $w(p)$ of path $p = \langle v_0, v_1, \dots, v_k \rangle$ is the sum of the weights of its constituent edges: $w(p) = \sum_{i=1}^{k} w(v_{i-1}, v_i)$.
+*   **Shortest-Path Weight:** Defined as $\delta(u, v) = \min \{w(p) : u \leadsto v\}$ if a path exists, otherwise $\infty$.
+*   **Constraint:** Dijkstra’s algorithm specifically requires that all edge weights are **non-negative** ($w(u, v) \ge 0$ for each edge $(u, v) \in E$).
+
+---
+
+## **2. Conceptual Intuition**
+
+### **2.1 The Burning Pipeline Analogy**
+*   Imagine vertices as oil depots and edges as pipelines.
+*   Set fire to the oil depot at source vertex $s$ at time $t=0$.
+*   Fire travels at a uniform speed along each pipeline. The "burn time" for each depot corresponds to its shortest-path distance from the source.
+*   The first oil depot to catch fire after $s$ is the nearest vertex; the next is the second nearest, and so on.
+<img width="763" height="426" alt="image" src="https://github.com/user-attachments/assets/50438dec-f93f-4f3c-b21f-753097b0a1ea" />
+
+
+
+### **2.2 The Water Pipe / Wavefront Analogy**
+*   Suppose edges are pipes filled with water. A droplet falls at $s$, starting a wave.
+*   The expanding sphere of the wavefront reaches nodes in increasing order of their distance from $s$. The order of discovery is exactly the order used by Dijkstra's algorithm.
+
+---
+
+## **3. The Algorithm Strategy**
+
+Dijkstra's algorithm is a **greedy algorithm**. it maintains a set $S$ of vertices whose final shortest-path weights from the source have already been determined.
+
+### **3.1 High-Level Logic**
+1.  **Initialize:** Set $S = \{s\}$ and $d(s) = 0$. For all other nodes $v$, $d(v) = \infty$.
+2.  **Greedy Selection:** In each iteration, select a node $v \notin S$ that is "closest" to the explored part. Specifically, minimize the quantity:
+    $$d'(v) = \min_{e=(u,v): u \in S} (d(u) + l_e)$$.
+3.  **Explore:** Add $v$ to $S$ and define $d(v) = d'(v)$.
+4.  **Repeat:** Continue until $S = V$.
+
+<img width="772" height="445" alt="image" src="https://github.com/user-attachments/assets/c81d6d09-4320-4e00-aecc-14d7379f18e1" />
+<img width="793" height="423" alt="image" src="https://github.com/user-attachments/assets/61b940b1-6c19-4a5d-900e-c861419450e7" />
+
+---
+
+## **4. Pseudocode**
+
+### **4.1 General Implementation (Cormen)**
+```Python
+DIJKSTRA(G, w, s)
+1  INITIALIZE-SINGLE-SOURCE(G, s)
+2  S = ∅
+3  Q = G.V
+4  while Q ≠ ∅
+5      u = EXTRACT-MIN(Q)
+6      S = S ∪ {u}
+7      for each vertex v ∈ G.Adj[u]
+8          RELAX(u, v, w)
+```
+
+### **4.2 The Relaxation Step**
+Relaxing an edge $(u, v)$ tests whether the shortest path to $v$ found so far can be improved by going through $u$.
+```text
+RELAX(u, v, w)
+1  if v.d > u.d + w(u, v)
+2      v.d = u.d + w(u, v)
+3      v.π = u
+```
+
+
+---
+
+## **5. Proof of Correctness**
+
+Dijkstra’s algorithm works because each new shortest path discovered extends an earlier one.
+
+### **5.1 The Inductive Argument**
+*   **Base Case:** $|S|=1$. We have $S=\{s\}$ and $d(s)=0$, which is correct.
+*   **Inductive Step:** Suppose for each $u \in S$, $d(u)$ is the true shortest-path distance. When we add $v$ to $S$ via edge $(u, v)$, we claim $d(v)$ is the true shortest-path distance.
+*   **Contradiction:** Suppose there is some other path $P$ from $s$ to $v$. If $P$ leaves the set $S$ to some node $y$, then at the time $v$ was selected, the path to $y$ was already at least as long as the path to $v$ (because Dijkstra's picks the minimum). Since edge lengths are non-negative, any further extension of the path to $y$ cannot make it shorter than the path already found to $v$.
+
+<img width="1042" height="563" alt="image" src="https://github.com/user-attachments/assets/bec4fb10-7989-4c19-9cac-5e937d6e7d1f" />
+
+---
+
+## **6. Complexity and Implementation**
+
+The running time depends heavily on the data structure used for the priority queue.
+
+### **6.1 Complexity Comparison Table**
+| Implementation | Selection/ExtractMin | DecreaseKey | Total Running Time |
+| :--- | :--- | :--- | :--- |
+| **Array** | $O(V)$ | $O(1)$ | $O(V^2)$ |
+| **Binary Heap** | $O(\log V)$ | $O(\log V)$ | $O((V+E)\log V)$ |
+| **Fibonacci Heap**| $O(\log V)$ (amortized) | $O(1)$ (amortized) | $O(V \log V + E)$ |
+
+### **6.2 Python implementation note**
+Even using adjacency lists, the $O(n)$ bottleneck remains to find the next vertex to visit unless a better data structure (like a heap) is used to identify and remove the minimum from the collection.
+<img width="1125" height="549" alt="image" src="https://github.com/user-attachments/assets/6f8caaeb-e841-4b02-8ed0-9eb357e1916b" />
+
+---
+
+## **7. Limitations: Negative Edge Weights**
+Dijkstra’s algorithm **does not work** if the graph contains negative edges.
+
+*   **The Reason:** The greedy assumption (that the shortest path to $v$ must pass through nodes closer than $v$) breaks down. A path starting with an expensive edge might eventually become cheaper by using subsequent negative-weight edges.
+*   **Example:** If $s \rightarrow a$ has weight 3, but $s \rightarrow b \rightarrow a$ has weights 4 and -2, Dijkstra will incorrectly freeze the distance to $a$ as 3.
+
+> [!CAUTION]
+> Adding a large constant to every edge weight to make them positive **does not** solve the problem. This changes the identity of the shortest path because paths with more edges are penalized more than paths with fewer edges.
+
+> [!TIP]
+> For graphs with negative edge weights (but no negative cycles), use the **Bellman-Ford Algorithm** instead.
