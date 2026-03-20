@@ -534,7 +534,6 @@ The algorithm has the property that the edges in the set $A$ always form a singl
 *   **Greedy Choice:** In each iteration, add the "lightest" edge connecting the current tree to a vertex not yet in the tree.
 *   **Constraint:** Adding an edge that connects two parts already in the tree would create a cycle and is forbidden.
 
-<img width="1142" height="540" alt="image" src="https://github.com/user-attachments/assets/76457c6a-7b4a-4fb1-8ba9-e4f35ff5567b" />
 
 ---
 
@@ -623,6 +622,8 @@ Consider a 5-node graph with weights: $(1, 3)=6, (2, 4)=8, (0, 1)=10, (1, 2)=20$
 4.  **Pick smallest:** Add $(1, 3)$ weight 6. $TV = \{0, 1, 3\}$.
 5.  **Next smallest edge to $TV$:** Edge $(1, 2)$ weight 20 and $(3, 4)$ (assumed edge).
 6.  **Progress:** Continue picking the smallest available edge that connects to an unvisited vertex until all vertices are in $TV$.
+7.  
+<img width="1142" height="540" alt="image" src="https://github.com/user-attachments/assets/76457c6a-7b4a-4fb1-8ba9-e4f35ff5567b" />
 
 
 ---
@@ -634,3 +635,106 @@ Prim’s algorithm is strongly reminiscent of Dijkstra’s algorithm, but they d
 
 > [!NOTE]
 > **Uniqueness:** If all edge weights are distinct, the minimum spanning tree is unique. If weights repeat, different choices of minimum edges can lead to multiple valid spanning trees.
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+# 5.7: Minimum Cost Spanning Trees (Kruskal's Algorithm) 
+
+
+## **1. Overview and Strategy**
+Kruskal's algorithm is a greedy strategy for finding a Minimum Cost Spanning Tree (MCST) in a connected, undirected graph $G = (V, E)$ with a weight function $w: E \rightarrow \mathbb{R}$. Unlike Prim's algorithm, which grows a single tree from a root, Kruskal's algorithm builds the MCST "bottom-up" by merging disjoint components.
+
+### **1.1 The High-Level Logic**
+1.  **Start Small:** Begin with $n$ components, where each vertex is an isolated component (a singleton set).
+2.  **Order Edges:** Sort all edges in the graph in ascending order of their weights.
+3.  **Greedy Selection:** Scan the sorted edges. For each edge $e = (u, v)$:
+    *   If $u$ and $v$ belong to **different components**, adding the edge will not create a cycle. Add $e$ to the MCST and merge the components of $u$ and $v$.
+    *   If $u$ and $v$ are already in the **same component**, adding the edge would create a cycle (loop). Discard the edge.
+4.  **Termination:** Continue until all vertices are connected in a single component (which will require exactly $n-1$ edges).
+
+<img width="1128" height="519" alt="image" src="https://github.com/user-attachments/assets/743146c9-5039-4629-8751-41a2a0776d8f" />
+<img width="1130" height="520" alt="image" src="https://github.com/user-attachments/assets/cd6bc3db-96cf-4bbc-aa21-249ce12c085f" />
+
+---
+
+## **2. Correctness: The Minimum Separator Lemma**
+The correctness of Kruskal’s method is justified by the **Cut Property** (Minimum Separator Lemma).
+
+*   **Lemma Statement:** Let $V$ be partitioned into two non-empty sets $U$ and $W = V \setminus U$. Let $e = (u, w)$ be the minimum cost edge with $u \in U$ and $w \in W$. Every MCST must include $e$.
+*   **Application to Kruskal's:** Consider an edge $e = (u, v)$ being added. Let $U$ be the component containing $u$ and $W$ be all other vertices ($V \setminus U$). Because edges are processed in ascending order, $e$ is the cheapest edge connecting $U$ to any vertex not in $U$ that hasn't been used yet. Since no edge connecting $U$ to $W$ has been encountered yet, $e$ is the absolute cheapest edge crossing this partition and must belong to the MCST.
+
+---
+
+## **3. Implementation and Data Structures**
+
+### **3.1 Modeling the Algorithm State**
+The algorithm's state is modeled as a **collection of disjoint sets**, where each set contains the nodes of a particular connected component.
+
+*   **`makeset(x)`**: Creates a singleton set containing just $x$.
+*   **`find(x)`**: Returns the name/representative of the set containing $x$. Two nodes $u$ and $v$ are in the same component if `find(u) == find(v)`.
+*   **`union(u, v)`**: Merges the sets containing $u$ and $v$ into a single new set.
+
+### **3.2 Naive Implementation (Python)**
+A simple implementation uses a dictionary to track the component ID of each vertex.
+
+```python
+def kruskal(WList):
+    (edges, component, TE) = ([], {}, [])
+    for u in WList.keys():
+        # Weight as first component for easy sorting
+        edges.extend([(d, u, v) for (v, d) in WList[u]])
+        component[u] = u
+    
+    edges.sort() # O(m log m)
+    
+    for (d, u, v) in edges:
+        if component[u] != component[v]: # If in different components
+            TE.append((u, v))
+            # Merge components: rename all nodes in u's component to v's component
+            old_comp = component[u]
+            for w in WList.keys():
+                if component[w] == old_comp:
+                    component[w] = component[v]
+    return(TE)
+```
+
+---
+
+## **4. Complexity Analysis**
+
+| Operation | Complexity (Naive) | Complexity (Efficient) |
+| :--- | :--- | :--- |
+| **Sorting Edges** | $O(m \log m)$ | $O(m \log m)$ |
+| **Set Lookups (`find`)** | $O(1)$ | $O(\alpha(n))$ |
+| **Merging Sets (`union`)** | $O(n)$ (scan all vertices) | $O(\alpha(n))$ |
+| **Total Running Time** | **$O(n^2)$** or **$O(m \log n + n^2)$** | **$O(m \log n)$** |
+
+*   **The Bottleneck:** In the naive implementation, merging components takes $O(n)$ time. Since we perform $n-1$ successful unions, the total time for unions is $O(n^2)$.
+*   **Improvement:** Using an efficient **Union-Find** data structure with "union by rank" and "path compression" reduces the cost of set operations to almost constant time—specifically $O(m \alpha(n))$, where $\alpha$ is the inverse Ackermann function.
+*   **Final Bound:** With efficient Union-Find, the complexity is dominated by sorting the edges: **$O(m \log m)$**, which is equivalent to **$O(m \log n)$** since $m \le n^2$.
+
+---
+
+## **5. Uniqueness and Multiple trees**
+*   **Distinct Edge Weights:** If all edge weights are unique, the minimum separator lemma implies there is only one possible MCST.
+*   **Duplicate Edge Weights:** If weights repeat, there may be multiple valid MCSTs. The algorithm chooses one based on how ties are broken during sorting or selection.
+*   **Example:** In a triangle graph where all edges have weight 10, any two edges form an MCST. There are three possible trees.
+
+> [!IMPORTANT]
+> **Greedy Choice Property:** Kruskal’s is a greedy algorithm because at each step it adds the edge of least possible weight that contributes to the final goal without looking ahead.
+
+> [!NOTE]
+> **Forest vs. Tree:** Throughout the execution, the set of edges $A$ forms a **forest** (a collection of trees). Only upon termination does it become a single **spanning tree**.
