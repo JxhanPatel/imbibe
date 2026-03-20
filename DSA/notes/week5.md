@@ -195,3 +195,125 @@ Dijkstra’s algorithm **does not work** if the graph contains negative edges.
 
 > [!TIP]
 > For graphs with negative edge weights (but no negative cycles), use the **Bellman-Ford Algorithm** instead.
+
+
+
+
+
+---
+
+
+
+
+
+# 5.3: Single Source Shortest Paths with Negative Weights (Bellman-Ford Algorithm)
+
+
+## **1. Motivation: Why Dijkstra’s Algorithm Fails**
+Dijkstra’s algorithm is a greedy strategy that assumes non-negative edge weights.
+*   **The "Burning" Analogy:** In Dijkstra’s, once a vertex "burns" (is visited), its shortest path distance is frozen.
+*   **The Breakdown:** If negative edge weights are allowed, a shorter path to a vertex could be discovered *after* it has already been burned. Because Dijkstra does not reconsider distances once a vertex is marked, it can produce incorrect results.
+*   **Example Case:** If $s \rightarrow v$ has weight 5, but $s \rightarrow w \rightarrow v$ has weights 7 and -3, Dijkstra will pick 5 and freeze it, missing the path with total weight 4.
+
+--- 📸 **INSERT IMAGE**: [Graph showing Dijkstra's failure with nodes $s, A, B$ and weights $s \rightarrow A = 3, s \rightarrow B = 4, B \rightarrow A = -2$ | Dasgupta Figure 4.12, page 128] ---
+
+---
+
+## **2. Negative Edge Weights and Negative Cycles**
+While we can extend algorithms to handle negative edge weights, **negative cycles** present a fundamental problem.
+*   **Definition of Negative Cycle:** A cycle where the sum of the edge weights is negative.
+*   **Consequence:** By repeatedly traversing a negative cycle, the total path cost keeps decreasing to $-\infty$.
+*   **The Rule:** Shortest paths are not defined in a graph containing a negative cycle reachable from the source.
+*   **Path Assumption:** Without negative cycles, the shortest route to every vertex is a simple path (no loops). Because the graph has $n$ vertices, a simple path can have at most $n-1$ edges.
+
+---
+
+## **3. The Bellman-Ford Strategy**
+Instead of the greedy "freeze" rule, the Bellman-Ford algorithm uses **Dynamic Programming** to iteratively update distances.
+
+### **3.1 The Principle of Optimality**
+Every prefix of a shortest path must itself be a shortest path.
+*   If the minimum weight path from 0 to $k$ follows $l$ edges: $0 \xrightarrow{w_1} j_1 \xrightarrow{w_2} \dots \xrightarrow{w_l} k$.
+*   Once the shortest path to $j_{l-1}$ is discovered, the next update will fix the shortest path to $k$.
+
+### **3.2 The Core Observation**
+After $l$ updates, all shortest paths using $\le l$ edges have stabilized. Since any shortest path has at most $n-1$ edges, we only need to perform $n-1$ rounds of updates.
+
+---
+
+## **4. The Bellman-Ford Algorithm**
+
+### **4.1 Initialization (Source vertex 0)**
+*   $D(j)$ = minimum distance known so far to vertex $j$.
+*   $D(0) = 0$.
+*   $D(j) = \infty$ for all $j \neq 0$.
+
+### **4.2 Processing (Iterative Updates)**
+```text
+Repeat n-1 times:
+    For each vertex j:
+        For each edge (j, k) in E:
+            D(k) = min( D(k), D(j) + W(j, k) )
+```
+
+### **4.3 Python Implementation (Adjacency Matrix)**
+```python
+def bellmanford(WMat, s):
+    (rows, cols, x) = WMat.shape
+    infinity = np.max(WMat) * rows + 1
+    distance = {}
+    for v in range(rows):
+        distance[v] = infinity
+    distance[s] = 0
+    
+    for i in range(rows): # Update loop (n times)
+        for u in range(rows):
+            for v in range(cols):
+                if WMat[u, v, 0] == 1:
+                    distance[v] = min(distance[v], distance[u] + WMat[u, v, 1])
+    return(distance)
+```
+
+---
+
+## **5. Example Execution Trace**
+Consider a directed graph with nodes $0..7$:
+1.  **Initialize:** $D(0)=0$, all others $\infty$.
+2.  **Pass 1:** Update neighbors of 0. $D(1)=10, D(7)=8$.
+3.  **Pass 2:** Use new values for 1 and 7 to update their neighbors. $D(5)=12, D(6)=9$.
+4.  **Pass 3:** $D(1)$ updates via node 6 (weight -4). New $D(1) = 9-4=5$. $D(2)$ updates via node 5 (weight -2). New $D(2)=10$.
+5.  **Passes 4–7:** Continue until values stabilize.
+
+<img width="1041" height="551" alt="image" src="https://github.com/user-attachments/assets/f974c3bf-56ae-4378-bb7e-6be5457c7651" />
+<img width="499" height="186" alt="image" src="https://github.com/user-attachments/assets/1f120be7-2af9-4c6e-a2ba-0fa55c54871d" />
+
+---
+
+## **6. Complexity Analysis**
+The complexity depends on the graph representation.
+
+| Feature | Adjacency Matrix | Adjacency List |
+| :--- | :--- | :--- |
+| **Initializing Infinity** | $O(n^2)$ | $O(m)$ |
+| **Number of Outer Passes** | $O(n)$ | $O(n)$ |
+| **Work per Pass** | $O(n^2)$ (scan all rows/cols) | $O(m)$ (scan all edges) |
+| **Total Running Time** | **$O(n^3)$** | **$O(mn)$** |
+
+> [!NOTE]
+> Adjacency lists provide a significant speedup for **sparse graphs**, where $m \approx n$.
+
+---
+
+## **7. Negative Cycle Detection**
+The Bellman-Ford algorithm can be extended to detect negative cycles.
+*   **The Method:** Run the update loop one extra time (the $n$-th time).
+*   **The Logic:** If the graph has no negative cycles, all shortest paths must have stabilized after $n-1$ iterations.
+*   **The Criterion:** If any distance $D(v)$ reduces during the $n$-th pass, the graph contains a negative cycle.
+
+---
+
+## **8. Summary Comparison**
+*   **Dijkstra's Algorithm:** Requires non-negative edge weights; uses a greedy "burn and freeze" strategy; faster complexity ($O(n^2)$ or $O(m \log n)$).
+*   **Bellman-Ford Algorithm:** Allows negative edge weights but not negative cycles; uses an iterative "blind update" strategy; slower complexity ($O(mn)$); can detect negative cycles.
+
+
