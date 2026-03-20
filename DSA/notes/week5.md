@@ -317,3 +317,126 @@ The Bellman-Ford algorithm can be extended to detect negative cycles.
 *   **Bellman-Ford Algorithm:** Allows negative edge weights but not negative cycles; uses an iterative "blind update" strategy; slower complexity ($O(mn)$); can detect negative cycles.
 
 
+
+
+
+---
+
+
+
+
+
+# 5.4: All Pairs Shortest Paths (Floyd-Warshall Algorithm)
+
+
+## **1. The All-Pairs Shortest Path Problem**
+While Single Source Shortest Paths (SSSP) fix a starting point and find paths to every other vertex, the **All-Pairs Shortest Path (APSP)** problem seeks the shortest path between every pair of vertices $i$ and $j$ in a weighted graph.
+
+### **1.1 Conceptual Motivation**
+*   **SSSP Analogy:** A warehouse or factory shipping items to all retail outlets.
+*   **APSP Analogy:** A travel service or website needing to answer shortest-route queries (in terms of time, cost, or distance) between any two arbitrary cities.
+
+### **1.2 Initial Strategies**
+A simple way to solve APSP is to run an SSSP algorithm $n$ times, treating each vertex as a potential source:
+*   **Non-negative weights:** Run Dijkstra’s algorithm from each vertex. Using a binary heap, the time is $O(V \cdot E \log V)$; with a Fibonacci heap, it is $O(V^2 \log V + VE)$.
+*   **Negative weights:** Run the Bellman-Ford algorithm from each vertex. This takes $O(V^2 E)$, which can be as high as $O(V^4)$ for dense graphs.
+
+**Goal:** Find a more direct way to solve APSP that does not require repeatedly running SSSP algorithms from every starting point.
+
+---
+
+## **2. Foundations: Transitive Closure and Warshall’s Algorithm**
+The Floyd-Warshall algorithm is rooted in the concept of **transitive closure**.
+
+*   **Adjacency Matrix ($A$):** Represents paths of length 1.
+*   **Matrix Multiplication ($A^2 = A \times A$):** $A^2[i, j] = 1$ if there is a path of length 2 from $i$ to $j$.
+*   **Transitive Closure ($A^+$):** $A^+ = A + A^2 + \dots + A^{n-1}$ represents paths of any length.
+
+### **2.1 The "Intermediate Vertex" Approach**
+An alternative to measuring path length is to constrain the **choice of vertices** allowed on the path.
+*   **Definition:** Let $B^k[i, j] = 1$ if there is a path from $i$ to $j$ via intermediate vertices only from the set $\{0, 1, \dots, k-1\}$.
+*   **Warshall’s Update Rule:** $B^{k+1}[i, j] = 1$ if:
+    1.  $B^k[i, j] = 1$ (already reachable via vertices $\{0, \dots, k-1\}$).
+    2.  $B^k[i, k] = 1$ AND $B^k[k, j] = 1$ (reachable by going from $i \to k$ and $k \to j$ using intermediate vertices $\{0, \dots, k-1\}$).
+
+---
+
+## **3. The Floyd-Warshall Algorithm**
+This algorithm adapts Warshall’s transitive closure approach to compute shortest path weights.
+
+### **3.1 Recursive Formulation**
+Let $SP^k[i, j]$ (or $d_{ij}^{(k)}$) be the length of the shortest path from vertex $i$ to vertex $j$ for which all intermediate vertices are in the set $\{0, 1, \dots, k-1\}$.
+
+1.  **Base Case ($k=0$):** No intermediate vertices are allowed. The shortest path is simply the weight of the direct edge $W[i, j]$.
+    *   $SP^0[i, j] = W[i, j]$ if $(i, j) \in E$, else $\infty$.
+2.  **Recursive Step:** For $k \ge 1$:
+    $$SP^{k+1}[i, j] = \min(SP^k[i, j], SP^k[i, k] + SP^k[k, j])$$
+    *   The first term represents not using vertex $k$ as an intermediate point.
+    *   The second term represents using vertex $k$ as an intermediate point (combining the shortest path $i \to k$ and $k \to j$).
+
+3.  **Final Answer:** $SP^n[i, j]$ provides the length of the shortest path overall, as all vertices are now permitted as intermediate points.
+
+<img width="1088" height="567" alt="image" src="https://github.com/user-attachments/assets/cef6abaf-407b-4df9-860d-bbce24519815" />
+<img width="1078" height="565" alt="image" src="https://github.com/user-attachments/assets/594bc558-5831-42f4-8165-2305cb2275ce" />
+<img width="1076" height="566" alt="image" src="https://github.com/user-attachments/assets/0966a021-55bf-46df-bd3e-8bbb6b2040b1" />
+
+---
+
+## **4. Algorithm Implementation**
+
+### **4.1 Implementation Logic**
+The shortest path matrix $SP$ is effectively an $n \times n \times (n+1)$ structure.
+```python
+def floydwarshall(WMat):
+    (rows, cols, x) = WMat.shape
+    infinity = np.max(WMat) * rows * rows + 1
+    SP = np.zeros(shape=(rows, cols, cols + 1))
+    
+    # Initialization (SP[i, j, 0])
+    for i in range(rows):
+        for j in range(cols):
+            SP[i, j, 0] = infinity
+            if WMat[i, j, 0] == 1:
+                SP[i, j, 0] = WMat[i, j, 1]
+    
+    # Main Iteration (Nested Loops)
+    for k in range(1, cols + 1):
+        for i in range(rows):
+            for j in range(cols):
+                SP[i, j, k] = min(SP[i, j, k-1], 
+                                 SP[i, k-1, k-1] + SP[k-1, j, k-1])
+    return(SP[:, :, cols])
+```
+
+### **4.2 Space Optimization**
+The algorithm can be reduced from $O(n^3)$ space to $O(n^2)$ space.
+*   **Reasoning:** To compute slice $SP^k$, we only need the entries from slice $SP^{k-1}$.
+*   **Technique:** Maintain only two $n \times n$ matrices (slices), overwriting the older one once the current one is computed.
+
+---
+
+## **5. Complexity and Characteristics**
+
+### **5.1 Performance**
+*   **Time Complexity:** $\Theta(n^3)$ due to the triply nested loops.
+*   **Graph Representation:** Adjacency lists do **not** help improve complexity. Because the algorithm must update every pair $(i, j)$ at every iteration $k$, it is independent of the number of edges.
+
+### **5.2 Constraints and Features**
+*   **Weights:** Works with negative edge weights.
+*   **Negative Cycles:** Shortest paths are not defined if negative cycles exist. The algorithm can detect negative cycles by checking if any diagonal entry $SP^n[i, i]$ becomes negative.
+*   **Shortest-Path Construction:** To recover the actual paths, a predecessor matrix $\Pi$ is maintained, where $\pi_{ij}^{(k)}$ records the predecessor of $j$ on a shortest path from $i$ using intermediate vertices up to $k$.
+
+
+> [!IMPORTANT]
+> **Key Property:** The Floyd-Warshall algorithm is a classic example of dynamic programming where the "dag" of subproblems is implicit, defined by the order of intermediate vertices added one by one.
+
+
+
+
+
+---
+
+
+
+
+
