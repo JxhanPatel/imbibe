@@ -7,8 +7,8 @@
 | **Week 2** | Calculus | Derivatives & Gradients | 🟢 Done |
 | **Week 3** | Linear Algebra I | Least Squares Regression | 🟢 Done |
 | **Week 4** | Linear Algebra II | Eigenvalues & Eigenvectors | 🟢 Done |
-| **Week 5** | Linear Algebra III | Symmetric Matrices | 🟡 In Progress |
-| **Week 6** | Linear Algebra IV | SVD & PCA (Image Processing) | ⚪ Planned |
+| **Week 5** | Linear Algebra III | Symmetric Matrices | 🟢 Done |
+| **Week 6** | Linear Algebra IV | SVD & PCA (Image Processing) | 🟡 In Progress |
 | **Week 7** | Optimization I | Unconstrained Optimization | ⚪ Planned |
 | **Week 8** | Optimization II | Convex Sets & Functions | ⚪ Planned |
 | **Week 9** | Optimization III | Lagrange Multipliers & Logistic Reg. | ⚪ Planned |
