@@ -301,3 +301,187 @@ A relation schema $R$ is in BCNF with respect to a set $F$ of FDs if for all FDs
 | 2. | Redundancy is high as compared to BCNF | 0% redundancy (w.r.t functional dependencies) |
 | 3. | It preserves all the dependencies | It may not preserve the dependencies |
 | 4. | A dependency $X \rightarrow Y$ is allowed in 3NF if $X$ is a super key or $Y$ is a part of some key | A dependency $X \rightarrow Y$ is allowed if $X$ is a super key |
+
+
+
+
+
+---
+
+
+
+
+
+# 6.3: Relational Database Design/8: Case Study
+
+
+
+## **Objectives**
+*   To design the schema for a Library Information System (LIS).
+
+
+
+## **Library Information System (LIS)**
+
+<img width="1139" height="672" alt="image" src="https://github.com/user-attachments/assets/0ac1466d-9068-49ca-8fcf-49cbedf0aba9" />
+
+
+### **1. Introduction**
+The objective is to design a relational database schema for a Library Information System of an Institute based on a provided specification document.
+
+**Tasks to be carried out:**
+*   Identify the Entity Sets with attributes.
+*   Identify the Relationships.
+*   Build the initial set of relational schema.
+*   Refine the set of schema with FDs that hold on them.
+*   Finalize the design of the schema.
+
+### **2. LIS Specification Excerpts**
+*   An institute library has 200,000+ books and 10,000+ members.
+*   Books are regularly issued by members on loan and returned after a period.
+*   The library needs an LIS to manage the books, the members, and the issue-return process.
+*   **Book Details:**
+    *   Title, author (only the first author is maintained), publisher, year of publication.
+    *   ISBN number (unique for the publication).
+    *   Accession number (unique number for the specific copy of the book in the library).
+    *   There may be multiple copies of the same book.
+*   **Member Categories:**
+    *   Undergraduate students, post graduate students, research scholars, and faculty members.
+*   **Student Details:** Name, roll number, department, gender, mobile number, date of birth, and degree (undergrad, grad, doctoral).
+*   **Faculty Details:** Name, employee id, department, gender, mobile number, and date of joining.
+*   **Library Rules for Issue:**
+    *   A book may be issued to a member if it is not already issued to someone else.
+    *   A book may not be issued to a member if another copy of the same book is already issued to the same member.
+*   **Member Quotas:**
+    | Member Type | Max Books | Max Duration (Days) |
+    | :--- | :--- | :--- |
+    | Undergraduate (ug) | 2 | 14 |
+    | Graduate (pg) | 4 | 30 |
+    | Research Scholar (rs) | 6 | 90 |
+    | Faculty (fc) | 10 | 180 |
+
+### **3. Initial Identification: Entity Sets**
+
+#### **3.1. Entity Set: books**
+*   **Attributes:** `title`, `author_name` (composite), `publisher`, `year`, `ISBN_no`, `accession_no` (unique).
+
+#### **3.2. Entity Set: students**
+*   **Attributes:** `member_no` (unique), `name` (composite), `roll_no` (unique), `department`, `gender`, `mobile_no` (nullable), `dob`, `degree`.
+
+#### **3.3. Entity Set: faculty**
+*   **Attributes:** `member_no` (unique), `name` (composite), `id` (unique), `department`, `gender`, `mobile_no` (nullable), `doj`.
+
+#### **3.4. Entity Set: members**
+*   A unique membership number is issued to every member across all four categories.
+
+#### **3.5. Entity Set: quota**
+*   Defines `max_books` and `max_duration` for each `member_type`.
+
+#### **3.6. Entity Set: staff (Speculated)**
+*   Required to manage the LIS.
+*   **Attributes:** `name` (composite), `id` (unique), `gender`, `mobile_no`, `doj`.
+
+### **4. Initial Identification: Relationships**
+
+#### **4.1. Relationship: book_issue**
+*   **Involved Entity Sets:** `members` (referenced by `member_no`) and `books` (referenced by `accession_no`).
+*   **Relationship Attribute:** `doi` (date of issue).
+*   **Relationship Type:** Many-to-one from `books` (a copy is issued to at most one member).
+
+--- 📸 INSERT IMAGE: [Diagram showing the relationship 'book_issue' connecting members and books with attribute 'doi' | Timestamp 17:59 in week7t.pdf] ---
+
+---
+
+## **Initial Relational Schema**
+From the ER identification, the first-cut schemas are:
+*   `books(title, author_fname, author_lname, publisher, year, ISBN_no, accession_no)`
+*   `book_issue(member_no, accession_no, doi)`
+*   `members(member_no, member_type)`
+*   `quota(member_type, max_books, max_duration)`
+*   `students(member_no, student_fname, student_lname, roll_no, department, gender, mobile_no, dob, degree)`
+*   `faculty(member_no, faculty_fname, faculty_lname, id, department, gender, mobile_no, doj)`
+*   `staff(staff_fname, staff_lname, id, gender, mobile_no, doj)`
+
+---
+
+## **Schema Refinement**
+
+### **1. Refinement of 'books'**
+*   **Functional Dependencies:**
+    *   `ISBN_no` → `title, author_fname, author_lname, publisher, year`
+    *   `accession_no` → `ISBN_no`
+*   **Problem:** Redundancy of book information across multiple copies.
+*   **Decomposition (BCNF):**
+    *   `book_catalogue(title, author_fname, author_lname, publisher, year, ISBN_no)`
+        *   **Key:** `ISBN_no`
+    *   `book_copies(ISBN_no, accession_no)`
+        *   **Key:** `accession_no`
+
+### **2. Refinement of 'book_issue'**
+*   `book_issue(member_no, accession_no, doi)`
+*   **FD:** `member_no, accession_no` → `doi`
+*   **Key:** `(member_no, accession_no)`. Note: `accession_no` alone is sufficient if many-to-one is strict.
+*   In BCNF.
+
+### **3. Refinement of 'quota' and 'members'**
+*   `quota(member_type, max_books, max_duration)` is in BCNF with Key: `member_type`.
+*   `members(member_no, member_type)` is in BCNF with Key: `member_no`.
+
+### **4. Refinement of 'students' and 'faculty'**
+*   Both schemas are in BCNF.
+*   **Issues:** `member_no` is required for issue/return queries, but repeating student/faculty details with it is unnecessary.
+
+### **5. Specialization Refinement (IS_A Relationship)**
+To better support queries (e.g., getting a member's name from an accession number), we exploit the fact that `students` and `faculty` are specializations of `members`.
+
+**New Entity: members**
+*   **Attributes:**
+    *   `member_no`
+    *   `member_class` (‘student’ or ‘faculty’)
+    *   `member_type` (ug, pg, rs, fc)
+    *   `roll_no` (nullable; present if `member_class` = ‘student’)
+    *   `id` (nullable; present if `member_class` = ‘faculty’)
+
+**Specialization:**
+*   `students` **IS_A** `members`
+*   `faculty` **IS_A** `members`
+*   Relationship is **One-to-one**.
+
+**Sample Query Implementation (Refined):**
+*   *Task:* Get the name of the member who issued book accession 162715.
+```sql
+SELECT ((SELECT faculty_fname AS First_Name, faculty_lname AS Last_Name 
+         FROM faculty 
+         WHERE member_class = 'faculty' AND members.id = faculty.id) 
+        UNION 
+        (SELECT student_fname AS First_Name, student_lname AS Last_Name 
+         FROM students 
+         WHERE member_class = 'student' AND members.roll_no = students.roll_no))
+FROM members, book_issue
+WHERE accession_no = 162715 AND book_issue.member_no = members.member_no;
+```
+
+
+---
+
+## **Final Design of the Schema**
+The refined final relational schema is:
+1.  `book_catalogue(title, author_fname, author_lname, publisher, year, ISBN_no)`
+2.  `book_copies(ISBN_no, accession_no)`
+3.  `book_issue(member_no, accession_no, doi)`
+4.  `quota(member_type, max_books, max_duration)`
+5.  `members(member_no, member_class, member_type, roll_no, id)`
+6.  `students(student_fname, student_lname, roll_no, department, gender, mobile_no, dob, degree)`
+7.  `faculty(faculty_fname, faculty_lname, id, department, gender, mobile_no, doj)`
+8.  `staff(staff_fname, staff_lname, id, gender, mobile_no, doj)`
+
+
+
+
+---
+
+
+
+
+
+
