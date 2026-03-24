@@ -341,3 +341,101 @@ The simple greedy algorithm sorts requests by deadline and processes them in tha
 
 
 
+---
+
+
+
+
+# 7.4: Greedy Algorithms - Huffman Coding
+
+## 7.4.1: Efficient Communication
+Digital communication uses $\{0, 1\}$. To send messages in a language like English, we must encode the alphabet $\{a, b, \dots, z\}$ using $\{0, 1\}$.
+
+*   **Fixed length encoding**: Since there are 26 letters and $2^4 < 26 \le 2^5$, binary strings of length 5 are required.
+*   **Variable length encoding**: Shorter strings are used for more frequent letters to optimize data transfer.
+
+### Morse Code Example
+Morse code encodes letters using dots (0) and dashes (1). For example:
+*   $e$ is 0
+*   $t$ is 1
+*   $a$ is 01
+
+**The Decoding Problem**: A sequence like `0101` is ambiguous. It could be decoded as `aa`, `etet`, `aet`, or `eta`. Morse code solves this by using pauses between letters, effectively adding a third symbol for encoding.
+
+## 7.4.2: Prefix Codes
+To avoid ambiguity without a third symbol, we use **prefix codes**.
+*   **Definition**: The encoding of $x$, $E(x)$, is not a prefix of $E(y)$ for any $x, y$.
+*   In Morse code, $E(e) = 0$ is a prefix of $E(a) = 01$, so it is not a prefix code.
+
+| $X$ | $a$ | $b$ | $C$ | $d$ | $e$ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| $E(x)$ | 11 | 01 | 001 | 10 | 000 |
+
+**Unambiguous Decoding**: Using the prefix code above, the sequence `0010000011101` is decoded by identifying the first valid encoding boundary: `001` (C), `000` (e), `001` (C), `11` (a), `01` (b).
+
+## 7.4.3: Optimal Prefix Codes
+The goal is to produce the most efficient prefix code possible for a given set of letters $A$ and frequencies $f(x)$.
+
+*   **Frequency $f(x)$**: The fraction of occurrences of $x$ over a large text corpus. The sum of frequencies $\sum f(x_i) = 1$.
+*   **Average Bits per Letter (ABL)**: If a message has $n$ symbols, the total length is $\sum_{x \in A} n \cdot f(x) \cdot |E(x)|$. Dividing by $n$ gives the average number of bits per letter:
+$$\sum_{x \in A} f(x) \cdot |E(x)|$$
+
+### Comparison Example
+Using frequencies: $a: 0.32, b: 0.25, C: 0.20, d: 0.18, e: 0.05$.
+*   **Standard Prefix Code**: ABL = $(0.32 \cdot 2) + (0.25 \cdot 2) + (0.20 \cdot 3) + (0.18 \cdot 2) + (0.05 \cdot 3) = 2.25$.
+*   **Fixed Length Encoding**: Requires 3 bits per letter. Variable length saves 25%.
+*   **A Better Encoding**: $a: 11, b: 10, C: 01, d: 001, e: 000$. ABL = 2.23.
+
+## 7.4.4: Codes as Trees
+Encoding can be viewed as a binary tree where:
+*   Letters are at the **leaves**.
+*   The path to the leaf describes the encoding ($0$ is left, $1$ is right).
+*   In a prefix code, no internal nodes encode letters.
+
+<img width="454" height="330" alt="image" src="https://github.com/user-attachments/assets/72c253f2-5b27-45d5-a19e-18293e7f6fca" />
+
+### Optimality Claims
+*   **Claim 1**: Any optimal prefix code produces a **full tree** (each node has 0 or 2 children). If a node has one child, you can "promote" it to get a shorter tree.
+*   **Claim 2**: In an optimal tree, if leaf $x$ is at a smaller depth (higher) than leaf $y$, then $f(x) \ge f(y)$. Otherwise, exchanging labels would improve the tree.
+*   **Claim 3**: In an optimal tree, for any leaf at maximum depth, its sibling is also a leaf.
+
+## 7.4.5: A Recursive Algorithm (Huffman's Algorithm)
+Based on the claims, leaves at maximum depth occur in pairs and have the lowest frequencies.
+
+1.  Pick $x, y$ with smallest frequencies $f(x), f(y)$.
+2.  "Combine" $x, y$ into a new letter $xy$ with $f(xy) = f(x) + f(y)$.
+3.  Update the alphabet: $A' = (A \setminus \{x, y\}) \cup \{xy\}$.
+4.  Recursively find an optimal tree $T'$ for $A'$.
+5.  $T'$ will have a leaf labeled $xy$. Replace this leaf with an internal node with two children labeled $x, y$.
+
+
+<img width="1131" height="481" alt="image" src="https://github.com/user-attachments/assets/e09e93fa-ea39-4b87-b3c9-e239b02983b0" />
+<img width="1152" height="525" alt="image" src="https://github.com/user-attachments/assets/6881398e-6b01-406a-b7b9-99c091f26975" />
+<img width="1169" height="486" alt="image" src="https://github.com/user-attachments/assets/02249197-5f51-4203-ba9d-9e2f66f94d70" />
+
+
+
+## 7.4.6: Optimality of Huffman's Algorithm
+Proof by induction on the size of alphabet $A$.
+*   **Base case**: $|A| = 2$. A single letter code $\{0, 1\}$ is optimal.
+*   **Inductive Step**: For $|A| = k$, combine the lowest frequency $x, y$ into $xy$. $ABL(T')$ is optimal for $A'$ by induction.
+
+**Claim**: $ABL(T) - ABL(T') = f(xy)$.
+The only change to ABL from $T'$ to $T$ is due to replacing $xy$ with $x$ and $y$.
+*   Subtract $depth(xy)f(xy)$.
+*   Add $depth(x)f(x) + depth(y)f(y)$.
+*   Since $f(xy) = f(x) + f(y)$ and $depth(x) = depth(y) = 1 + depth(xy)$:
+*   Net increase = $(1 + depth(xy))(f(x) + f(y)) - depth(xy)(f(x) + f(y)) = f(x) + f(y) = f(xy)$.
+
+This transformation preserves optimality. Any optimal tree $S$ for $A$ can be shuffled so $x, y$ are siblings and contracted to $S'$ over $A'$. Since $ABL(T') \le ABL(S')$, it follows that $ABL(T) \le ABL(S)$.
+
+## 7.4.7: Implementation and Complexity
+*   **Naive implementation**: Store frequencies in an array and use a linear scan to find minimum values. Number of recursive calls is $k-1$. Complexity: $O(k^2)$.
+*   **Heap-based implementation**: Maintain frequencies in a **min-heap**. Extracting two minimums and adding the compound letter takes $O(\log k)$.
+*   **Overall complexity**: **$O(k \log k)$**.
+
+## 7.4.8: Historical Notes
+*   **Greedy Nature**: Huffman coding is greedy because it recursively combines letters with lowest frequencies based on a locally optimal choice and never reconsiders other pairings.
+*   **Claude Shannon**: Invented information theory and established mathematical lower bounds on optimal encodings but did not describe how to construct them.
+*   **Shannon-Fano codes**: A recursive solution by Shannon and Robert Fano that was not always optimal.
+*   **David Huffman**: Discovered his algorithm as a graduate student in Fano's class at MIT while working on a term paper.
