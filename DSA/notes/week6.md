@@ -114,3 +114,96 @@ For each $i$, the size of `Component[i]` at least doubles each time it is relabe
 > `Members[k]` can also be maintained as a tree rather than as a list.
 > *   `Union()` becomes $O(1)$ by taking the root of one tree and putting it as a child of the root of the other tree.
 > *   With clever updates like path compression, `Find()` has amortised complexity very close to $O(1)$.
+
+
+
+
+---
+
+
+
+
+
+# 6.2: Priority Queues
+
+## 6.2.1: Dealing with Priorities - Job Scheduler
+A job scheduler maintains a list of pending jobs with their priorities. When the processor is free, the scheduler picks out the job with maximum priority in the list and schedules it. New jobs may join the list at any time. How should the scheduler maintain the list of pending jobs and their priorities?.
+
+> [!NOTE]
+> **Queue vs. Priority Queue**: In a normal queue, it is first-in, first-out (FIFO). In a priority queue, you look at all the elements that are there and you take out the one with the highest priority. A good analogy is a crowded temple where people stand in line, but VIPs with higher priority can jump the queue.
+
+## 6.2.2: Priority Queue Operations
+A priority queue needs to maintain a collection of items with priorities to optimize the following operations:
+*   **delete_max()**: Identify and remove the item with the highest priority. Note: The highest priority item need not be unique; if there are duplicates, you can pick any one.
+*   **insert()**: Add a new item to the collection/list.
+
+Dually, one could also take out the one with the lowest priority, in which case the operation is **delete_min()**.
+
+
+## 6.2.3: Implementing Priority Queues with One-Dimensional Structures
+If the collection is maintained as a simple sequence (array or list), we have two main naive options:
+
+### 1. Unsorted List
+*   **insert()**: Is $O(1)$ because you can just put it anywhere, such as at the end of the list.
+*   **delete_max()**: Is $O(n)$ because you have to scan the whole list to identify the maximum.
+
+### 2. Sorted List
+*   **insert()**: Is $O(n)$ because you have to find the correct place to insert and shift elements to maintain the sorted property.
+*   **delete_max()**: Is $O(1)$ because the maximum is always at one end of the list.
+
+### Performance Summary for 1D Structures
+Processing $n$ items (doing $n$ inserts and $n$ deletions) requires $O(n^{2})$ time because one of the two operations will always be linear.
+
+## 6.2.4: Moving to Two Dimensions - The Square Grid
+To improve performance, we can move from a one-dimensional list to a two-dimensional grid. 
+
+**The $\sqrt{N} \times \sqrt{N}$ Array Strategy**:
+*   Assume $N$ processes enter/leave the queue.
+*   Maintain a $\sqrt{N} \times \sqrt{N}$ array.
+*   Each row in the array is kept in sorted order from left to right.
+*   Keep track of the size of each row separately in a size column.
+
+<img width="1131" height="383" alt="image" src="https://github.com/user-attachments/assets/7d8117c5-100b-4fe3-ae09-055dbcd59666" />
+
+<img width="1127" height="477" alt="image" src="https://github.com/user-attachments/assets/c608911d-a978-41b7-8c07-6644e01f2fc4" />
+
+
+### 2D Insert Operation
+To insert a new value (e.g., Insert 15):
+1.  Scan the size column to locate the first row that has free space.
+2.  Use the size of the row to determine where to insert.
+3.  Insert the element into the correct position in that row to maintain sorted order.
+4.  Update the size of that row in the size column.
+
+**Complexity of 2D Insert**: $O(\sqrt{N})$
+*   Scanning the size column takes $O(\sqrt{N})$.
+*   Inserting into a row of size $\approx \sqrt{N}$ takes $O(\sqrt{N})$.
+
+### 2D Delete_max Operation
+To identify and remove the maximum:
+1.  The maximum in each row is its last element.
+2.  The position of each row's maximum is available through the size column.
+3.  Identify the overall maximum among these last entries (at most $\sqrt{N}$ values to check).
+4.  Logically delete it by reducing the size count for that row.
+
+**Complexity of 2D Delete_max**: $O(\sqrt{N})$
+*   Finding the maximum among last entries takes $O(\sqrt{N})$.
+*   Deletion and updating size takes $O(1)$.
+
+## 6.2.5: Complexity Comparison and Summary
+
+| Implementation Structure | Insert Complexity | Delete_max Complexity | Processing $N$ Items |
+| :--- | :--- | :--- | :--- |
+| **Unsorted List** | $O(1)$ | $O(N)$ | $O(N^{2})$ |
+| **Sorted List** | $O(N)$ | $O(1)$ | $O(N^{2})$ |
+| **2D $\sqrt{N} \times \sqrt{N}$ Array** | $O(\sqrt{N})$ | $O(\sqrt{N})$ | $O(N\sqrt{N})$ |
+| **Heap (Target)** | $O(\log N)$ | $O(\log N)$ | $O(N \log N)$ |
+
+> [!TIP]
+> **Moving Forward**: While the 2D grid improves complexity from $N^{2}$ to $N\sqrt{N}$, we can do much better by using a special binary tree called a **heap**, which reduces operation costs to $O(\log N)$. Unlike the fixed $N$ required for the grid, heaps are flexible and do not require fixing $N$ in advance.
+
+
+
+
+
+
