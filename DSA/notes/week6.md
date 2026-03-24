@@ -407,3 +407,259 @@ Heaps can also be used to sort a list of $n$ elements.
 
 This results in an **in-place $O(n \log n)$ sort**. This is an improvement over Merge Sort, which also takes $O(n \log n)$ but requires extra space for merging.
 
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+# 6.5: Search Trees
+
+## 6.5.1: Context - Dynamic Sorted Data
+Sorting is useful for efficient searching. However, problems arise if the data is changing dynamically, where items are periodically inserted and deleted. 
+
+*   In a sorted list, both **insert** and **delete** take time $O(n)$. 
+*   To handle dynamic data efficiently, we move to a tree structure, similar to how heaps are used for priority queues.
+
+## 6.5.2: Binary Search Tree (BST) Definition
+A binary search tree is a rooted binary tree where for each node with value $v$:
+*   All values in the left subtree are $< v$.
+*   All values in the right subtree are $> v$.
+*   No duplicate values are allowed in the tree.
+
+<img width="1086" height="388" alt="image" src="https://github.com/user-attachments/assets/d9b606d6-1de1-47b5-965b-46f699a80da7" />
+
+
+
+## 6.5.3: Implementing a Binary Search Tree
+Each node in a BST has a value and pointers to its children. 
+
+<img width="1114" height="512" alt="image" src="https://github.com/user-attachments/assets/86cbfc02-0013-45aa-a6f0-a5271adae79d" />
+
+
+> [!NOTE]
+> **Frontier Strategy**: To make implementation easier, we add a frontier with empty nodes. An empty tree is represented as a single empty node, and leaf nodes point to empty nodes. This structure makes it easier to implement operations recursively.
+>
+> 
+
+<img width="1128" height="555" alt="image" src="https://github.com/user-attachments/assets/ccb8202e-bfd8-4a24-b95d-679da956bf4f" />
+
+
+
+
+
+## 6.5.4: The Class Tree
+The implementation uses a class called `Tree` with three local fields: `value`, `left`, and `right`. 
+
+*   **Value None**: Used for an empty value.
+*   **Empty Tree**: An empty tree has all fields set to `None`.
+*   **Leaf Node**: A leaf has a non-empty value and empty `left` and `right` children.
+
+### Implementation Code
+```python
+class Tree:
+    # Constructor:
+    def __init__(self, initval=None):
+        self.value = initval
+        if self.value:
+            self.left = Tree()
+            self.right = Tree()
+        else:
+            self.left = None
+            self.right = None
+        return
+
+    # Only empty node has value None
+    def isempty(self):
+        return (self.value == None)
+
+    # Leaf nodes have both children empty
+    def isleaf(self):
+        return (self.value != None and 
+                self.left.isempty() and 
+                self.right.isempty())
+```
+
+
+
+## 6.5.5: Inorder Traversal
+An inorder traversal lists the left subtree, then the current node, then the right subtree. 
+
+*   **Sorted Output**: This traversal lists values in sorted order.
+*   **Printing**: It can be used as the string representation to print the tree.
+
+### Implementation Code
+```python
+class Tree:
+    # Inorder traversal
+    def inorder(self):
+        if self.isempty():
+            return([])
+        else:
+            return(self.left.inorder() + 
+                   [self.value] + 
+                   self.right.inorder())
+
+    # Display Tree as a string
+    def __str__(self):
+        return(str(self.inorder()))
+```
+
+
+## 6.5.6: Searching for a Value
+To find a value $v$ in the tree:
+1.  Check the value at the current node.
+2.  If $v$ is smaller than the current node, go left.
+3.  If $v$ is larger than the current node, go right.
+
+This is a natural generalization of binary search.
+
+### Implementation Code
+```python
+class Tree:
+    # Check if value v occurs in tree
+    def find(self, v):
+        if self.isempty():
+            return (False)
+        if self.value == v:
+            return (True)
+        if v < self.value:
+            return(self.left.find(v))
+        if v > self.value:
+            return(self.right.find(v))
+```
+
+
+## 6.5.7: Minimum and Maximum
+*   **Minimum**: The leftmost node in the tree.
+*   **Maximum**: The rightmost node in the tree.
+
+### Implementation Code
+```python
+class Tree:
+    def minval(self):
+        if self.left.isempty():
+            return(self.value)
+        else:
+            return(self.left.minval())
+
+    def maxval(self):
+        if self.right.isempty():
+            return(self.value)
+        else:
+            return(self.right.maxval())
+```
+
+
+## 6.5.8: Insert a Value
+To insert a value $v$:
+1.  Try to find $v$ in the tree.
+2.  Insert at the position where the `find` operation fails.
+
+### Implementation Code
+```python
+class Tree:
+    def insert(self, v):
+        if self.isempty():
+            self.value = v
+            self.left = Tree()
+            self.right = Tree()
+        
+        if self.value == v:
+            return
+
+        if v < self.value:
+            self.left.insert(v)
+            return
+
+        if v > self.value:
+            self.right.insert(v)
+            return
+```
+
+
+<img width="524" height="567" alt="image" src="https://github.com/user-attachments/assets/ea97702a-94d3-480f-85da-c32a80ae3955" />
+<img width="537" height="437" alt="image" src="https://github.com/user-attachments/assets/05240c0c-dd5f-4b4f-9201-68b802ecfef5" />
+<img width="534" height="559" alt="image" src="https://github.com/user-attachments/assets/69ba77fd-bf38-468e-a60b-3af186abb94e" />
+
+
+
+## 6.5.9: Delete a Value
+If $v$ is present in the tree, delete it based on the following cases:
+
+1.  **Leaf Node**: No problem, simply remove it.
+2.  **One Child**: Promote that subtree to the current position.
+3.  **Two Children**: Replace $v$ with the maximum value of the left subtree (`self.left.maxval()`) and then delete that maximum value from the left subtree. 
+
+> [!TIP]
+> **Deletion Property**: The node `self.left.maxval()` is guaranteed to have no right child, simplifying its subsequent deletion.
+
+### Implementation Code
+```python
+class Tree:
+    def delete(self, v):
+        if self.isempty():
+            return
+        if v < self.value:
+            self.left.delete(v)
+            return
+        if v > self.value:
+            self.right.delete(v)
+            return
+        if v == self.value:
+            if self.isleaf():
+                self.makeempty()
+            elif self.left.isempty():
+                self.copyright()
+            elif self.right.isempty():
+                self.copyleft()
+            else:
+                self.value = self.left.maxval()
+                self.left.delete(self.left.maxval())
+            return
+```
+
+
+### Helper Functions for Deletion
+```python
+    # Convert leaf node to empty node
+    def makeempty(self):
+        self.value = None
+        self.left = None
+        self.right = None
+        return
+
+    # Promote left child
+    def copyleft(self):
+        self.value = self.left.value
+        self.right = self.left.right
+        self.left = self.left.left
+        return
+
+    # Promote right child
+    def copyright(self):
+        self.value = self.right.value
+        self.left = self.right.left
+        self.right = self.right.right
+        return
+```
+
+
+## 6.5.10: Complexity Analysis
+*   **Operation Path**: `find()`, `insert()`, and `delete()` all walk down a single path in the tree.
+*   **Worst-case Complexity**: The time taken is proportional to the **height of the tree**.
+
+> [!WARNING]
+> **Balance Concerns**: 
+> *   An **unbalanced tree** with $n$ nodes may have a height of $O(n)$.
+> *   **Balanced trees** have a height of $O(\log n)$.
+> *   To ensure all operations remain $O(\log n)$, techniques must be used to keep the tree balanced.
