@@ -485,3 +485,121 @@ The refined final relational schema is:
 
 
 
+# 4.4: Relational Database Design/9: MVD and 4NF
+
+
+## **Objectives**
+*   To understand multi-valued dependencies arising out of attributes that can have multiple values.
+*   To define Fourth Normal Form (4NF) and learn the decomposition algorithm to 4NF.
+
+
+## **1. Multivalued Dependency (MVD)**
+
+### **1.1. Motivation and Basic Concept**
+*   **Problem:** If two or more independent relations are kept in a single relation, then Multivalued Dependency is possible.
+*   **Example (Person):** Consider a relation `Person(Man, Phones, Dogs_Like)`. A man's phones are independent of the dogs they like. However, in a 1NF relation, each of a man's phones appears with each of the dogs they like in all combinations.
+*   **Notation:** Multivalued dependencies are written with two head arrows. We say $X$ multidetermines $Y$, denoted as $X \rightarrow\rightarrow Y$.
+
+<img width="1102" height="532" alt="image" src="https://github.com/user-attachments/assets/de15f683-2a4f-480e-8a28-639bdda2d350" />
+
+### **1.2. Formal Definition**
+Let $R$ be a relation schema and let $\alpha \subseteq R$ and $\beta \subseteq R$. The multivalued dependency $\alpha \rightarrow\rightarrow \beta$ holds on $R$ if in any legal relation $r(R)$, for all pairs for tuples $t_1$ and $t_2$ in $r$ such that $t_1[\alpha] = t_2[\alpha]$, there exist tuples $t_3$ and $t_4$ in $r$ such that:
+*   $t_1[\alpha] = t_2[\alpha] = t_3[\alpha] = t_4[\alpha]$
+*   $t_3[\beta] = t_1[\beta]$
+*   $t_3[R-\beta] = t_2[R-\beta]$
+*   $t_4[\beta] = t_2[\beta]$
+*   $t_4[R-\beta] = t_1[R-\beta]$
+
+### **1.3. MVD Example: University Courses**
+Consider a relation of university courses, the books recommended, and the lecturers teaching the course:
+*   **Dependencies:** `course` $\rightarrow\rightarrow$ `book` and `course` $\rightarrow\rightarrow$ `lecturer`.
+
+<img width="1127" height="558" alt="image" src="https://github.com/user-attachments/assets/2840a129-7b10-4cb4-ae0c-0ce252cfbf54" />
+
+
+| Course | Book | Lecturer | Tuples |
+| :--- | :--- | :--- | :--- |
+| AHA | Silberschatz | John D | $t_1$ |
+| AHA | Nederpelt | William M | $t_2$ |
+| AHA | Silberschatz | William M | $t_3$ |
+| AHA | Nederpelt | John D | $t_4$ |
+
+*Explanation:* Because $t_1$ and $t_2$ agree on `Course` (AHA), the definition requires that $t_3$ and $t_4$ (swapping the books and lecturers) must also exist in the relation.
+
+### **1.4. Theory of MVDs**
+The closure $D^+$ is the set of all functional and multivalued dependencies logically implied by $D$.
+
+| Name | Rule |
+| :--- | :--- |
+| **Complementation** | If $X \rightarrow\rightarrow Y$, then $X \rightarrow\rightarrow (R - (X \cup Y))$. |
+| **Augmentation** | If $X \rightarrow\rightarrow Y$ and $W \supseteq Z$, then $WX \rightarrow\rightarrow YZ$. |
+| **Transitivity** | If $X \rightarrow\rightarrow Y$ and $Y \rightarrow\rightarrow Z$, then $X \rightarrow\rightarrow (Z - Y)$. |
+| **Replication** | If $X \rightarrow Y$, then $X \rightarrow\rightarrow Y$ (but the reverse is not true). |
+| **Coalescence** | If $X \rightarrow\rightarrow Y$ and there is a $W$ such that $W \cap Y$ is empty, $W \rightarrow Z$ and $Y \supseteq Z$, then $X \rightarrow Z$. |
+
+*Source:*
+
+**Trivial MVD:** An MVD $X \rightarrow\rightarrow Y$ in $R$ is called trivial if:
+*   $Y \subseteq X$ or
+*   $X \cup Y = R$.
+
+---
+
+## **2. Fourth Normal Form (4NF)**
+
+### **2.1. Definition**
+A relation schema $R$ is in 4NF with respect to a set $D$ of functional and multivalued dependencies if for all multivalued dependencies in $D^+$ of the form $\alpha \rightarrow\rightarrow \beta$, where $\alpha \subseteq R$ and $\beta \subseteq R$, at least one of the following holds:
+1.  $\alpha \rightarrow\rightarrow \beta$ is trivial (that is, $\beta \subseteq \alpha$ or $\alpha \cup \beta = R$).
+2.  $\alpha$ is a superkey for schema $R$.
+
+> [!IMPORTANT]
+> If a relation is in 4NF, it is also in BCNF.
+
+### **2.2. 4NF Decomposition Algorithm**
+1.  **Initialize:** `result := {R}`.
+2.  **Compute:** $D^+$.
+3.  **Loop:** While there is a schema $R_i$ in `result` that is not in 4NF:
+    *   Find a non-trivial MVD $\alpha \rightarrow\rightarrow \beta$ that holds on $R_i$ such that $\alpha$ is not a superkey for $R_i$ and $\alpha \cap \beta = \emptyset$.
+    *   Decompose $R_i$ into:
+        *   $R_{i,1} = (\alpha \cup \beta)$
+        *   $R_{i,2} = (R_i - \beta)$
+    *   Replace $R_i$ in `result` with $R_{i,1}$ and $R_{i,2}$.
+
+<img width="747" height="389" alt="image" src="https://github.com/user-attachments/assets/bc3abe41-e2fa-47cb-bd45-9eda298d81e8" />
+
+### **2.3. Example: 4NF Decomposition**
+**Schema:** $R = (A, B, C, G, H, I)$
+**Dependencies:** $A \rightarrow\rightarrow B$, $B \rightarrow\rightarrow HI$, $CG \rightarrow\rightarrow H$
+*   $R$ is not in 4NF because $A \rightarrow\rightarrow B$ and $A$ is not a superkey.
+*   **Decomposition:**
+    1.  $R_1 = (A, B)$ (In 4NF).
+    2.  $R_2 = (A, C, G, H, I)$ (Not in 4NF due to $CG \rightarrow\rightarrow H$).
+    3.  Decompose $R_2$ into $R_3 = (C, G, H)$ and $R_4 = (A, C, G, I)$.
+    4.  $R_4$ is not in 4NF because $A \rightarrow\rightarrow I$ (derived via transitivity).
+    5.  Decompose $R_4$ into $R_5 = (A, I)$ and $R_6 = (A, C, G)$.
+*   **Final 4NF result:** $(A, B), (C, G, H), (A, I), (A, C, G)$.
+<img width="1094" height="556" alt="image" src="https://github.com/user-attachments/assets/34c7a350-cd95-4c5e-9fed-730b3ab6d55d" />
+
+---
+
+## **3. Case Study: LIS Example for 4NF**
+Consider a version of `book_catalogue` where a `book_title` is associated with multiple authors and multiple editions.
+*   **Relation:** `book_catalogue(book_title, author_fname, author_lname, edition)`.
+*   **MVDs:**
+    1.  `book_title` $\rightarrow\rightarrow$ `{author_fname, author_lname}`
+    2.  `book_title` $\rightarrow\rightarrow$ `edition`
+*   **Condition:** Relation has no functional dependencies, so it is in BCNF but violates 4NF.
+*   **Decomposition:**
+    *   `book_author(book_title, author_fname, author_lname)`
+    *   `book_edition(book_title, edition)`
+*   Both are now in 4NF.
+
+
+
+
+
+---
+
+
+
+
