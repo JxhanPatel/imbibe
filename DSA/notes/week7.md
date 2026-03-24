@@ -138,3 +138,104 @@ Computing height recursively at each step is $O(n)$, which would make rebalancin
 *   **Height balanced trees** (AVL trees) maintain a height of **$O(\log n)$** through local rotations.
 *   The `find()`, `insert()`, and `delete()` operations all walk a single path and thus take **$O(\log n)$** time.
 *   Over a sequence of $n$ operations, the total work is **$O(n \log n)$**.
+
+
+
+
+---
+
+
+
+
+
+# 7.2: Greedy Algorithms - Interval Scheduling
+
+## 7.2.1: Defining Greedy Algorithms
+A greedy algorithm needs to make a sequence of choices to achieve a global optimum. At each stage, it makes the next choice based on some local criterion. The algorithm never goes back and revises an earlier decision. This approach drastically reduces the space to search for solutions, making the algorithms very efficient. However, one must prove that these local choices actually achieve the global optimum.
+
+### Examples of Greedy Algorithms
+*   **Dijkstra's Algorithm**: Locally freezes the distance to the nearest unvisited vertex to achieve the global optimum of shortest distances from a source.
+*   **Prim's Algorithm**: Locally adds the nearest non-tree vertex to the spanning tree to achieve a global minimum cost spanning tree.
+*   **Kruskal's Algorithm**: Locally adds the smallest edge that does not form a cycle to achieve a global minimum cost spanning tree.
+
+## 7.2.2: The Interval Scheduling Problem
+IIT Madras has a special video classroom for delivering online lectures, and different teachers want to book the classroom. A slot for instructor $i$ starts at $s(i)$ and finishes at $f(i)$. Because slots may overlap, not all bookings can be honored. The goal is to choose a subset of bookings to maximize the number of teachers who get to use the room. 
+
+> [!NOTE]
+> The global optimum here is to choose a subset of compatible bookings of the largest size. Compatible means no two bookings in the set overlap in time.
+
+## 7.2.3: Natural Greedy Strategies and Counterexamples
+There are many "natural" greedy strategies for interval scheduling, but most of them are wrong.
+
+### Strategy 1: Earliest Starting Time
+Choose the booking whose starting time is earliest.
+*   **Counterexample**: A single very long booking might start earliest but overlap with multiple shorter, non-overlapping bookings that could have been scheduled instead.
+
+<img width="518" height="197" alt="image" src="https://github.com/user-attachments/assets/e9446d49-941c-4926-8ae0-10f2ff9d391a" />
+
+### Strategy 2: Shortest Interval
+Choose the booking spanning the shortest interval.
+*   **Counterexample**: A very short interval might overlap with two non-overlapping long intervals. Choosing the shortest interval would allow only one booking, whereas choosing the two long ones would allow two.
+
+<img width="549" height="184" alt="image" src="https://github.com/user-attachments/assets/e22f0baf-133e-4d68-9290-c0af5e421872" />
+
+### Strategy 3: Minimum Overlaps
+Choose the booking that overlaps with the minimum number of other bookings.
+*   **Counterexample**: A specific configuration where a booking with the fewest overlaps rules out multiple other bookings that could have been part of a larger compatible set.
+
+<img width="557" height="239" alt="image" src="https://github.com/user-attachments/assets/eff4fa98-838a-40e6-ba74-79e73e0920b7" />
+
+## 7.2.4: The Correct Greedy Strategy
+**Strategy 4**: Choose the booking whose finish time is the earliest.
+
+### The Greedy Algorithm for Interval Scheduling
+Let $B$ be the set of bookings and $A$ be the set of accepted bookings.
+1.  Initially, $A$ is empty.
+2.  While $B$ is not empty:
+    *   Pick $b \in B$ with the earliest finishing time.
+    *   Add $b$ to $A$.
+    *   Remove from $B$ all bookings that overlap with $b$.
+
+<img width="537" height="359" alt="image" src="https://github.com/user-attachments/assets/1a6eb878-b00f-40f9-9d3f-c007f9ab8599" />
+<img width="554" height="356" alt="image" src="https://github.com/user-attachments/assets/2d87aae3-770a-43da-9203-96d92bb93a36" />
+
+
+## 7.2.5: Proof of Correctness
+To prove optimality, we compare the greedy solution $A$ to an arbitrary optimal set of accepted bookings $O$. $A$ and $O$ need not be identical, as multiple allocations of the same size may exist. We must show that $|A| = |O|$.
+
+### Setup
+Let $A = \{i_{1}, i_{2}, \dots, i_{k}\}$ and $O = \{j_{1}, j_{2}, \dots, j_{m}\}$. 
+Assume both are sorted by finish time:
+*   For $A$: $f(i_{1}) \le s(i_{2}), f(i_{2}) \le s(i_{3}), \dots$.
+*   For $O$: $f(j_{1}) \le s(j_{2}), f(j_{2}) \le s(j_{3}), \dots$.
+Our goal is to show $k = m$.
+
+### Claim: Greedy Algorithm "Stays Ahead"
+For each $l \le k$, the finish time of the $l$-th greedy job is no later than the finish time of the $l$-th optimal job: $f(i_{l}) \le f(j_{l})$.
+
+**Proof by Induction on $l$**:
+*   **Base Case ($l=1$)**: By the greedy strategy, $i_{1}$ has the earliest overall finish time in the global set, so it cannot finish later than $j_{1}$.
+*   **Induction Step**: Assume $f(i_{l-1}) \le f(j_{l-1})$. 
+    *   Since the optimal set is compatible, $f(j_{l-1}) \le s(j_{l})$.
+    *   By the inductive hypothesis, $f(i_{l-1}) \le f(j_{l-1}) \le s(j_{l})$.
+    *   This shows that $j_{l}$ is compatible with the greedy set chosen so far ($i_{1}, \dots, i_{l-1}$).
+    *   If $f(j_{l}) < f(i_{l})$, the greedy strategy would have picked $j_{l}$ because it finishes earlier.
+    *   Therefore, we must have $f(i_{l}) \le f(j_{l})$.
+
+### Proving $|A| = |O|$ (Optimality)
+Suppose $m > k$.
+1.  From the "stays ahead" claim, we know $f(i_{k}) \le f(j_{k})$.
+2.  Consider the request $j_{k+1}$ from the optimal set.
+3.  Since $f(i_{k}) \le f(j_{k}) \le s(j_{k+1})$, this request $j_{k+1}$ is compatible with the greedy set $A$.
+4.  Therefore, $j_{k+1}$ must still be in $B$ when the greedy algorithm stops.
+5.  But the greedy strategy stops only when $B$ is empty.
+6.  This is a contradiction; hence, $m$ cannot be greater than $k$.
+
+## 7.2.6: Implementation and Complexity
+1.  **Sort** $n$ bookings by finish time: $O(n \log n)$.
+2.  **Renumber** bookings to reflect this sorted order.
+3.  **Record** start times $S[i]$ and finish times $F[i]$ in an array or dictionary.
+4.  **Selection**: Add the first booking to $A$. In general, after adding booking $j$, scan the renumbered list to find the smallest index $r$ such that $S[r] \ge F[j]$.
+
+> [!TIP]
+> This selection process is a single scan, taking $O(n)$ time overall. The overall complexity is dominated by the sort: **$O(n \log n)$**.
