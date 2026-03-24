@@ -603,3 +603,135 @@ Consider a version of `book_catalogue` where a `book_title` is associated with m
 
 
 
+# 6.5: Relational Database Design/10: Design Summary and Temporal Data
+
+
+
+## **Objectives**
+*   To summarize the database design process.
+*   To explore the issues with temporal data.
+
+
+## **1. Database Design Process**
+
+### **1.1. Design Goals**
+Goal for a relational database design is:
+*   BCNF / 4NF.
+*   Lossless join.
+*   Dependency preservation.
+
+If we cannot achieve this, we accept one of:
+*   Lack of dependency preservation.
+*   Redundancy due to use of 3NF.
+
+**SQL Limitations:**
+*   Interestingly, SQL does not provide a direct way of specifying functional dependencies other than superkeys.
+*   Can specify FDs using assertions, but they are expensive to test, (and currently not supported by any of the widely used databases!).
+*   Even if we had a dependency preserving decomposition, using SQL we would not be able to efficiently test a functional dependency whose left hand side is not a key.
+
+<img width="1091" height="526" alt="image" src="https://github.com/user-attachments/assets/7e77a6b2-1cf2-4471-bb7e-870d7e4951cc" />
+
+### **1.2. Further Normal Forms**
+*   Elementary Key Normal Form (EKNF).
+*   Essential Tuple Normal Form (ETNF).
+*   Join Dependencies and Fifth Normal Form (5NF).
+    *   Join dependencies generalize multivalued dependencies.
+    *   Lead to project-join normal form (PJNF).
+*   Sixth Normal Form (6NF).
+*   Domain/Key Normal Form (DKNF).
+    *   A class of even more general constraints, leads to a normal form called domain-key normal form.
+*   These are rarely used in practice.
+
+### **1.3. Overall Database Design Process**
+We have assumed schema R is given.
+*   R could have been generated when converting E-R diagram to a set of tables.
+*   R could have been a single relation containing all attributes that are of interest (universal relation).
+*   Normalization breaks R into smaller relations.
+*   R could have been the result of some ad hoc design of relations, which we then test/convert to normal form.
+
+### **1.4. ER Model and Normalization**
+*   When an E-R diagram is carefully designed, identifying all entities correctly, the tables generated from the E-R diagram should not need further normalization.
+*   However, in a real (imperfect) design, there can be functional dependencies from non-key attributes of an entity to other attributes of the entity.
+*   **Example:** An employee entity with attributes `department_name` and `building`, and a functional dependency $department\_name \rightarrow building$. Good design would have made department an entity.
+*   Functional dependencies from non-key attributes of a relationship set are possible but rare, as most relationships are binary.
+
+### **1.5. Denormalization for Performance**
+*   May want to use non-normalized schema for performance.
+*   **Example:** Displaying prereqs along with `course_id` and `title` requires join of `course` with `prereq`.
+*   **Alternative 1:** Use denormalized relation containing attributes of `course` as well as `prereq`.
+    *   Pros: Faster lookup.
+    *   Cons: Extra space, extra execution time for updates, extra coding work, and possibility of errors.
+*   **Alternative 2:** Use a materialized view defined as `Course ⋈ Prerequisite`.
+    *   Pros: No extra coding work and avoids errors; kept up to date by the database system.
+
+### **1.6. Other Design Issues (Bad Designs to Avoid)**
+*   Instead of `earnings (company_id, year, amount)`, using separate tables like `earnings_2004`, `earnings_2005` for each year.
+    *   These are in BCNF but make querying across years difficult and require new tables each year.
+*   Using `company_year (company_id, earnings_2004, earnings_2005, ...)`.
+    *   Also in BCNF but requires a new attribute each year.
+*   **Crosstabs:** Where values for one attribute become column names (common in spreadsheets).
+
+<img width="1103" height="510" alt="image" src="https://github.com/user-attachments/assets/5a40c089-de75-489a-8a9f-15e72f10fc5e" />
+
+### **1.7. LIS Example for 4NF**
+Consider a version of `book_catalogue` with attributes `{book_title, author_fname, author_lname, edition}`.
+*   Nontrivial MVDs:
+    *   $book\_title \rightarrow\rightarrow \{author\_fname, author\_lname\}$
+    *   $book\_title \rightarrow\rightarrow edition$
+*   Decomposition into 4NF:
+    *   `book_author(book_title, author_fname, author_lname)`
+    *   `book_edition(book_title, edition)`
+
+---
+
+## **2. Temporal Databases**
+
+### **2.1. Definition and Motivation**
+*   Some data are inherently historical and include time-dependent/time-varying data (e.g., Medical Records, Share prices, Exchange rates).
+*   Temporal databases provide a uniform and systematic way of dealing with historical data.
+*   **Temporal data** have an associated time interval during which the data are valid.
+*   **Snapshot:** The value of the data at a particular point in time.
+
+
+### **2.2. Modeling Temporal Data**
+In practice, designers may add `start` and `end` time attributes.
+*   `course(course_id, course_title)` becomes `course(course_id, course_title, start, end)`.
+*   **Constraint:** No two tuples can have overlapping valid times (hard to enforce efficiently).
+*   **Foreign keys:** References may be to the current version or data at a specific point in time (e.g., a transcript referring to course info at the time it was taken).
+
+### **2.3. Temporal Database Theory**
+*   **Temporal Domain Model:** Single-dimensional linearly ordered. Can be discrete or dense, bounded or unbounded, linear or non-linear.
+*   **Timestamp Model.**
+*   **Temporal ER Model:** Adding valid time to attributes (address history), entities (student duration), and relationships (course attendance).
+*   **Temporal Query Languages:** TQuel , TSQL2 , SQL/Temporal , SQL/TP .
+
+### **2.4. Aspects of Time: Uni-Temporal vs. Bi-Temporal**
+*   **Valid Time:** Time period during which a fact is true in the real world (provided to the system).
+*   **Transaction Time:** Time period during which a fact is stored in the database (automatically generated by the system).
+*   **Uni-Temporal Relations:** Has one axis of time (Valid or Transaction).
+*   **Bi-Temporal Relations:** Has both axes (Valid Start/End and Transaction Start/End).
+
+### **2.5. Modeling Temporal Data: Example (John)**
+*   **Scenario:** John born April 3, 1992 (Chennai). Birth registered April 6. Job in Mumbai June 21, 2015. Address change registered Jan 10, 2016.
+*   **Non-Temporal Database:** Only the latest address (Mumbai) is visible; history is lost.
+*   **Uni-Temporal (Valid Time):**
+    | Name | City | Valid From | Valid Till |
+    | :--- | :--- | :--- | :--- |
+    | John | Chennai | April 3, 1992 | June 20, 2015 |
+    | John | Mumbai | June 21, 2015 | $\infty$ |
+*   **Bi-Temporal:**
+    | Name | City | Valid From | Valid Till | Entered | Superseded |
+    | :--- | :--- | :--- | :--- | :--- | :--- |
+    | John | Chennai | April 3, 1992 | June 20, 2015 | April 6, 1992 | Jan 10, 2016 |
+    | John | Mumbai | June 21, 2015 | $\infty$ | Jan 10, 2016 | $\infty$ |
+
+<img width="1137" height="483" alt="image" src="https://github.com/user-attachments/assets/12112731-6d98-499a-a258-7c475a2b2260" />
+
+### **2.6. Summary of Temporal Data**
+*   **Advantages:**
+    *   Provides historical information (Valid Time).
+    *   Provides rollback information (Transaction Time).
+*   **Disadvantages:**
+    *   More storage.
+    *   Complex query processing.
+    *   Complex maintenance (backup and recovery).
