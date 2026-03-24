@@ -207,3 +207,130 @@ To identify and remove the maximum:
 
 
 
+
+---
+
+
+
+
+# 6.3: Heaps
+
+## 6.3.1: Binary Trees
+Values are stored as nodes in a rooted tree.
+*   Each node has up to two children: **Left child** and **right child**.
+*   Order is important.
+*   Other than the root, each node has a unique parent.
+*   **Leaf node**: A node with no children.
+*   **Size**: Total number of nodes in the tree.
+*   **Height**: Number of levels (level 0 is the root).
+
+<img width="1015" height="523" alt="image" src="https://github.com/user-attachments/assets/dc861500-5c1d-44e8-91db-035ee3778232" />
+
+
+## 6.3.2: Heap Definition and Properties
+A heap is a binary tree implementation of priority queues with two additional constraints:
+
+1.  **Structural Constraint**: The binary tree is filled level by level, from top to bottom and left to right.
+2.  **Value Constraint (max-heap)**: The value at each node is at least as big as the values of its children.
+
+> [!IMPORTANT]
+> **The Root Property**: Because of the max-heap property, the root always has the largest value in the tree. By induction, as you go down any level $j$, you can only go down in the value chain.
+
+## 6.3.3: Non-examples of Heaps
+A binary tree is not a heap if it violates either the structural or value properties:
+*   **Structural violations**: No "holes" are allowed. You cannot leave a level incomplete or leave a gap in the middle of a level.
+*   **Value violations**: If a node has a value smaller than one of its children (in a max-heap), the heap property is violated.
+
+<img width="1142" height="523" alt="image" src="https://github.com/user-attachments/assets/7081bf57-56bd-4875-b13a-34163cf283db" /> <img width="641" height="526" alt="image" src="https://github.com/user-attachments/assets/53937fb3-71a4-4760-90f4-edff59c7b76e" />
+
+
+## 6.3.4: The Insert Operation
+To insert an arbitrary item into a heap while maintaining its properties:
+1.  **Structural Growth**: Add a new node at the only position dictated by the heap structure (the leftmost available spot in the bottom-most level).
+2.  **Restore Value Property**: If the new value is bigger than its parent, swap it with the parent. Continue this process along the path walking upwards until the value is correctly placed with respect to its children and parent.
+
+> [!NOTE]
+> When moving a value up, you do not need to check the other child of the parent. If $77 > 74$ and $74 > 27$, then $77$ is automatically bigger than $27$.
+
+
+<img width="1151" height="506" alt="image" src="https://github.com/user-attachments/assets/5066c33d-fc75-4ed1-ad82-490c25cbcbe8" />
+<img width="1142" height="465" alt="image" src="https://github.com/user-attachments/assets/23665e0b-ebea-4d63-94e1-792585038468" />
+<img width="1101" height="431" alt="image" src="https://github.com/user-attachments/assets/9fd1f55a-0c23-4101-9bc9-dda6f22377b2" />
+
+
+
+## 6.3.5: Complexity of Insert
+*   In the worst case, the new element must walk up from the leaf to the root.
+*   The number of levels in a tree with $N$ nodes is at most $1 + \log N$.
+*   Number of nodes at level $j$ is $2^j$.
+*   Filling $k$ levels results in $2^0 + 2^1 + \dots + 2^{k-1} = 2^k - 1$ nodes.
+*   **Complexity**: `insert()` is $O(\log N)$.
+
+## 6.3.6: The Delete_max Operation
+1.  **Identify Max**: The maximum value is always at the root.
+2.  **Shrink Tree**: The node to delete must be the rightmost node at the lowest level to maintain the structural property.
+3.  **Move Homeless Value**: Move the value from the deleted leaf node to the empty root.
+4.  **Restore Property Downwards**: Compare the new root with its two children. To restore the heap, swap the root with the **bigger** of the two children. Continue this single path down the tree until the heap property is restored.
+
+
+<img width="1155" height="506" alt="image" src="https://github.com/user-attachments/assets/ae84131d-dfb4-4c9d-82d5-dcc0aef365e2" />
+<img width="1116" height="458" alt="image" src="https://github.com/user-attachments/assets/6940c916-361c-439a-8dc8-ae4ca9c50189" />
+<img width="1110" height="559" alt="image" src="https://github.com/user-attachments/assets/7a8b24c2-8bd2-4b9d-88a4-6b7ebb4b8f0c" />
+
+
+
+## 6.3.7: Complexity of Delete_max
+*   The operation follows a single path from the root down to the leaves.
+*   The height of the tree is logarithmic in the size.
+*   **Complexity**: `delete_max()` is $O(\log N)$.
+
+
+
+
+
+## 6.3.8: Implementation (Array/List Representation)
+A heap does not require a complex graph structure with pointers. Due to its rigid level-by-level growth, it can be stored as a list $H = [h_0, h_1, h_2, \dots]$.
+
+**Index Arithmetic**:
+*   Number the nodes top to bottom, left to right.
+*   **Children of $H[i]$**: Located at $H[2i + 1]$ and $H[2i + 2]$.
+*   **Parent of $H[i]$**: Located at $H[(i - 1) // 2]$ for $i > 0$.
+
+<img width="1129" height="457" alt="image" src="https://github.com/user-attachments/assets/cf5be30e-f644-4c65-a595-6e4439dae1bc" />
+
+
+
+
+
+## 6.3.9: Building a Heap (heapify)
+Converting an unordered list $[v_0, v_1, \dots, v_N]$ into a heap.
+
+### Strategy 1: Naive Strategy
+*   Start with an empty heap and repeatedly apply `insert(v_j)` for each element.
+*   **Complexity**: $O(N \log N)$.
+
+### Strategy 2: Better heapify()
+*   Treat the list as a tree structure.
+*   **Leaves**: The slice $L[mid:]$ where $mid = len(L) // 2$ contains only leaf nodes, which already satisfy the heap condition.
+*   **Process**: Work backwards from the right of the list to the left (bottom-up in the tree). Fix the heap property downwards for the second-last level, then the third-last, up to the root.
+*   **Cost Analysis**:
+    *   Number of nodes at each level halves as you move up, while the max work per node (swaps) increases by 1.
+    *   Total cost $\approx \frac{n}{4} \times 1 + \frac{n}{8} \times 2 + \frac{n}{16} \times 3 + \dots$
+*   **Complexity**: `heapify()` is $O(N)$.
+
+## 6.3.10: Min-heaps
+The heap condition can be inverted:
+*   **Property**: Each node is smaller than its children.
+*   **Root**: Contains the smallest value.
+*   **Operation**: Supports `delete_min()` rather than `delete_max()`.
+*   **Application**: Used in Dijkstra's and Prim's algorithms to pick the smallest distance or cost.
+
+
+
+
+
+
+---
+
+
+
