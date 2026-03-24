@@ -161,3 +161,143 @@ When decomposing an original schema into 1NF, 2NF, or 3NF, two properties are cr
 
 
 
+
+
+
+# 6.2: Relational Database Design/7: Normal Forms
+
+
+
+## **Objectives**
+*   To Learn the Decomposition Algorithm for a Relation to 3NF.
+*   To Learn the Decomposition Algorithm for a Relation to BCNF.
+
+
+
+
+## **1. Decomposition to 3NF**
+
+### **1.1. Motivation for 3NF Decomposition**
+*   There are some situations where BCNF is not dependency preserving.
+*   Efficient checking for FD violation on updates is important.
+*   **Solution:** Define a weaker normal form, called Third Normal Form (3NF).
+    *   Allows some redundancy (with resultant problems).
+    *   But functional dependencies can be checked on individual relations without computing a join.
+    *   There is always a lossless-join, dependency-preserving decomposition into 3NF.
+
+### **1.2. 3NF Definition**
+A relational schema $R$ is in 3NF if for every functional dependency $X \rightarrow A$ associated with $R$, at least one of the following holds:
+1.  $A \subseteq X$ (that is, the FD is trivial).
+2.  $X$ is a superkey of $R$.
+3.  $A$ is part of some candidate key (not just superkey!).
+
+*Note:* A relation in 3NF is naturally in 2NF.
+
+### **1.3. Testing for 3NF**
+*   **Optimization:** Need to check only FDs in $F$, need not check all FDs in $F^+$.
+*   Use attribute closure to check for each dependency $\alpha \rightarrow \beta$, if $\alpha$ is a superkey.
+*   If $\alpha$ is not a superkey, we have to verify if each attribute in $\beta$ is contained in a candidate key of $R$.
+*   This test is rather more expensive, since it involves finding candidate keys.
+*   Decomposition into 3NF can be done in polynomial time.
+
+### **1.4. 3NF Decomposition Algorithm**
+
+<img width="659" height="512" alt="image" src="https://github.com/user-attachments/assets/70642ead-1210-474d-983d-6f9f3187f9f1" />
+
+**Algorithm Steps:**
+1.  Let $F_c$ be a canonical cover for $F$.
+2.  $i := 0$.
+3.  For each functional dependency $\alpha \rightarrow \beta$ in $F_c$ do:
+    *   If none of the schemas $R_j, 1 \le j \le i$ contains $\alpha\beta$, then:
+        *   $i := i + 1$
+        *   $R_i := \alpha\beta$.
+4.  If none of the schemas $R_j, 1 \le j \le i$ contains a candidate key for $R$, then:
+    *   $i := i + 1$
+    *   $R_i := \text{any candidate key for } R$.
+5.  **Optionally, remove redundant relations:**
+    *   Repeat:
+        *   If any schema $R_j$ is contained in another schema $R_k$:
+            *   Delete $R_j$
+            *   $R_j = R_i$
+            *   $i = i - 1$
+    *   Until no more $R_j$s can be deleted.
+6.  Return $(R_1, R_2, \dots, R_i)$.
+
+**Properties upon decomposition:**
+*   Each relation schema $R_j$ is in 3NF.
+*   Decomposition is **Dependency Preserving** and **Lossless Join**.
+
+### **1.5. 3NF Decomposition Example**
+*   **Relation schema:** `cust_banker_branch = (customer_id, employee_id, branch_name, type)`.
+*   **Functional Dependencies:**
+    1.  `customer_id, employee_id → branch_name, type`
+    2.  `employee_id → branch_name`
+    3.  `customer_id, branch_name → employee_id`.
+*   **Canonical Cover ($F_c$):**
+    *   `branch_name` is extraneous in the RHS of the 1st dependency.
+    *   $F_c = \{$`customer_id, employee_id → type`, `employee_id → branch_name`, `customer_id, branch_name → employee_id` $\}$.
+*   **Generated Schemas:**
+    1.  `(customer_id, employee_id, type)`
+    2.  `(employee_id, branch_name)`
+    3.  `(customer_id, branch_name, employee_id)`.
+*   **Resultant simplified 3NF schema:**
+    *   `(customer_id, employee_id, type)` (Contains a candidate key of the original schema).
+    *   `(customer_id, branch_name, employee_id)`.
+
+---
+
+## **2. Decomposition to BCNF**
+
+### **2.1. BCNF Definition**
+A relation schema $R$ is in BCNF with respect to a set $F$ of FDs if for all FDs in $F^+$ of the form $\alpha \rightarrow \beta$, where $\alpha \subseteq R$ and $\beta \subseteq R$, at least one of the following holds:
+*   $\alpha \rightarrow \beta$ is trivial (that is, $\beta \subseteq \alpha$).
+*   $\alpha$ is a superkey for $R$.
+
+### **2.2. BCNF Decomposition Algorithm**
+
+<img width="707" height="501" alt="image" src="https://github.com/user-attachments/assets/6021a186-2c34-45b7-9943-c729f856ed0d" />
+
+**Algorithm Steps:**
+1.  `result := {R}`.
+2.  `done := false`.
+3.  Compute $F^+$.
+4.  While (`not done`) do:
+    *   If (there is a schema $R_i$ in result that is not in BCNF), then:
+        *   Let $\alpha \rightarrow \beta$ be a nontrivial functional dependency that holds on $R_i$ such that $\alpha \rightarrow \beta$ is not in $F^+$, and $\alpha \cap \beta = \emptyset$.
+        *   `result := (result - Ri) ∪ (Ri - β) ∪ (α, β)`.
+    *   Else `done := true`.
+*Note:* Each $R_i$ is in BCNF, and the decomposition is lossless-join.
+
+### **2.3. BCNF Decomposition Example**
+*   $R = (A, B, C)$
+*   $F = \{A \rightarrow B, B \rightarrow C\}$
+*   $Key = \{A\}$.
+*   $R$ is not in BCNF ($B \rightarrow C$ but $B$ is not a superkey).
+*   **Decomposition:** $R_1 = (B, C)$ and $R_2 = (A, B)$.
+
+### **2.4. Dependency Preservation in BCNF**
+*   It is not always possible to get a BCNF decomposition that is dependency preserving.
+*   **Example:** $R = (J, K, L)$, $F = \{JK \rightarrow L, L \rightarrow K\}$.
+*   Two candidate keys: $JK$ and $JL$.
+*   $R$ is not in BCNF.
+*   Any decomposition of $R$ will fail to preserve $JK \rightarrow L$. Testing for $JK \rightarrow L$ would then require a join.
+
+---
+
+## **3. Comparison of BCNF and 3NF**
+
+### **3.1. Capability Summary**
+*   It is **always** possible to decompose a relation into a set of relations that are in 3NF such that:
+    *   The decomposition is lossless.
+    *   The dependencies are preserved.
+*   It is **always** possible to decompose a relation into a set of relations that are in BCNF such that:
+    *   The decomposition is lossless.
+    *   It **may not** be possible to preserve dependencies.
+
+### **3.2. Comparison Table**
+| S# | 3NF | BCNF |
+| :--- | :--- | :--- |
+| 1. | It concentrates on Primary Key | It concentrates on Candidate Key |
+| 2. | Redundancy is high as compared to BCNF | 0% redundancy (w.r.t functional dependencies) |
+| 3. | It preserves all the dependencies | It may not preserve the dependencies |
+| 4. | A dependency $X \rightarrow Y$ is allowed in 3NF if $X$ is a super key or $Y$ is a part of some key | A dependency $X \rightarrow Y$ is allowed if $X$ is a super key |
