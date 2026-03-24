@@ -239,3 +239,105 @@ Suppose $m > k$.
 
 > [!TIP]
 > This selection process is a single scan, taking $O(n)$ time overall. The overall complexity is dominated by the sort: **$O(n \log n)$**.
+
+
+
+
+---
+
+
+
+
+
+
+# 7.3: Greedy Algorithms - Minimizing Lateness
+
+## 7.3.1: Defining Greedy Algorithms
+A greedy algorithm makes a sequence of local choices to achieve a global optimum. It never goes back and revises an earlier decision. This drastically reduces the space to search for solutions, but it is necessary to prove that these local choices actually achieve the global optimum.
+
+There are two common strategies to prove a greedy algorithm's correctness:
+*   **Strategy 1**: Incrementally show that the greedy solution is at least as good as an optimal one. The greedy algorithm "stays ahead" of the optimal.
+*   **Strategy 2**: Transform an arbitrary optimal solution to match the greedy one step-by-step, preserving optimality. This is often called an **exchange argument**.
+
+## 7.3.2: The Minimizing Lateness Problem
+IIT Madras has a single 3D printer that a number of users need to access.
+*   Each user $i$ has an item that takes time $T(i)$ to print.
+*   Each user $i$ has a deadline $D(i)$ by which they want their item ready.
+*   Each user will get access to the printer, but they may not finish before their deadline.
+*   User $i$ starts at time $S(i)$ and finishes at time $F(i) = S(i) + T(i)$.
+*   If $F(i) > D(i)$, user $i$ is late by $L(i) = F(i) - D(i)$.
+*   If the user finishes before the deadline, lateness $L(i)$ is considered 0.
+*   **Maximum Lateness**: $\max_{i} L(i)$.
+
+**Goal**: Minimize the maximum lateness.
+
+## 7.3.3: Natural Greedy Strategies and Counterexamples
+Several heuristics might seem plausible but can be shown to be incorrect using counterexamples.
+
+### Strategy 1: Shortest Processing Time
+Schedule requests in increasing order of length $T(i)$.
+*   **Counterexample**: 
+    *   Job 1: $T(1)=1, D(1)=100$
+    *   Job 2: $T(2)=10, D(2)=10$
+    *   If Job 1 goes first, it finishes at time 1. Job 2 then finishes at time 11. Job 2 is late by 1 ($11 - 10$).
+    *   If Job 2 goes first, it finishes at time 10 (on time). Job 1 finishes at time 11 (on time). The maximum lateness is 0.
+
+### Strategy 2: Smallest Slack Time
+Give priority to requests with smaller slack time $D(i) - T(i)$.
+*   **Counterexample**:
+    *   Job 1: $T(1)=1, D(1)=2$ (Slack = 1)
+    *   Job 2: $T(2)=10, D(2)=10$ (Slack = 0)
+    *   Smaller slack first (Job 2): Job 2 finishes at 10 (on time). Job 1 finishes at 11. Job 1 is late by 9 ($11 - 2$).
+    *   Doing Job 1 first: Job 1 finishes at 1 (on time). Job 2 finishes at 11. Job 2 is late by only 1 ($11 - 10$). Maximum lateness is reduced to 1.
+
+## 7.3.4: The Correct Greedy Strategy
+**Strategy 3**: Schedule requests in increasing order of deadlines $D(i)$.
+
+### The Greedy Algorithm for Minimizing Lateness
+1.  **Sort** the $n$ requests by deadline $D(i)$.
+2.  **Renumber** the jobs such that $D(1) \le D(2) \le \dots \le D(n)$.
+3.  **Schedule** the jobs continuously in this order:
+    *   Job 1 starts at $S(1) = 0$, ends at $F(1) = T(1)$.
+    *   Job 2 starts at $S(2) = F(1)$, ends at $F(2) = S(2) + T(2)$.
+    *   In general, Job $i$ starts at $S(i) = F(i-1)$ and ends at $F(i) = S(i) + T(i)$.
+
+## 7.3.5: Correctness - The Exchange Argument
+To prove optimality, we compare the greedy schedule to an arbitrary optimal schedule $O$.
+
+### Step 1: No Idle Time
+Our greedy schedule has no gaps; the printer is in continuous use from $S(1)=0$ to $F(n)$. There is always an optimal schedule with no idle time, because any idle time can be eliminated by shifting jobs earlier, which can only reduce lateness.
+
+### Step 2: Inversions
+A schedule $O$ has an **inversion** if job $i$ appears before job $j$ but $D(j) < D(i)$.
+*   The greedy schedule has no inversions by construction.
+*   **Claim**: Any two schedules with no inversions and no idle time have the same maximum lateness. 
+    *   If they have no inversions and no idle time, the only difference can be the order of requests with the same deadline. 
+    *   Reordering jobs with the same deadline produces the same lateness.
+
+<img width="533" height="175" alt="image" src="https://github.com/user-attachments/assets/a20a8549-10d5-4555-a3fc-dbff474066aa" />
+
+### Step 3: Removing Inversions
+**Claim**: There is an optimal schedule with no inversions and no idle time.
+1.  Let $O$ be an optimal schedule with no idle time.
+2.  If $O$ has an inversion, there must be at least one pair of adjacent jobs $i, j$ such that $j$ is scheduled immediately after $i$ and $D(j) < D(i)$.
+3.  **Swap** $i$ and $j$ to get a schedule with one less inversion.
+4.  **Optimality Preservation**: Swapping $i$ and $j$ does not increase the maximum lateness of $O$.
+    *   Jobs before $i$ and after $j$ are unaffected.
+    *   Job $j$ finishes earlier, so its lateness decreases.
+    *   Job $i$ finishes later, but its new finish time is the old finish time of $j$. Since $D(j) < D(i)$, the lateness of $i$ in the new schedule is less than the lateness of $j$ in the original schedule.
+
+<img width="512" height="272" alt="image" src="https://github.com/user-attachments/assets/aff50cf7-a8a4-4f54-9a0c-35976cde2332" />
+
+### Conclusion of Proof
+There are at most $n(n-1)/2$ inversions in $O$ to start with. We can repeatedly remove adjacent inversions without increasing lateness until no inversions remain. The resulting schedule is identical to the greedy schedule (up to reordering jobs with the same deadline) and remains optimal.
+
+## 7.3.6: Implementation and Complexity
+1.  **Sort** the requests by $D(i)$: $O(n \log n)$.
+2.  **Read off** the schedule in sorted order: $O(n)$.
+**Overall complexity**: **$O(n \log n)$**.
+
+## 7.3.7: Summary
+The simple greedy algorithm sorts requests by deadline and processes them in that order to minimize maximum lateness. Correctness is established through an exchange argument, transforming any optimal solution into the greedy solution without sacrificing optimality.
+
+
+
