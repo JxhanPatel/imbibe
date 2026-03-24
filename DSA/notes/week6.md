@@ -334,3 +334,76 @@ The heap condition can be inverted:
 
 
 
+# 6.4: Using Heaps in Algorithms
+
+## 6.4.1: Priority Queues and Heaps Recap
+Priority queues support two basic operations: `insert()` and `delete_max()` (or `delete_min()`). In a priority queue, each element has a priority; when removing an element, you must remove the one with the highest priority rather than the one inserted earliest. This differs from a normal queue, which is first-in, first-out (FIFO).
+
+Heaps are a tree-based implementation of priority queues where `insert()` and `delete_max()` are both $O(\log n)$. A heap can be represented as a list or array using simple index arithmetic to find the parent and children of a node:
+*   **Children of $H[i]$**: Located at $H[2i + 1]$ and $H[2i + 2]$.
+*   **Parent of $H[i]$**: Located at $H[(i - 1) // 2]$ for $i > 0$.
+
+Additionally, `heapify()` can build a heap from a list or array in $O(n)$ time.
+
+## 6.4.2: Dijkstra's Algorithm and the Bottleneck
+Dijkstra's algorithm maintains two dictionaries with vertices as keys: `visited` (initially `False`) and `distance` (initially infinity, with `distance[s] = 0`). The algorithm repeats the following until all reachable vertices are visited:
+1.  Find an unvisited vertex `nextv` with the minimum distance.
+2.  Set `visited[nextv]` to `True`.
+3.  Recompute `distance[v]` for every neighbour `v` of `nextv`.
+
+<img width="620" height="547" alt="image" src="https://github.com/user-attachments/assets/71a0a1fe-ce95-43d2-8e42-db546129e4f4" />
+
+
+### The Bottleneck
+The primary bottleneck is finding the unvisited vertex $j$ with the minimum distance. A naive implementation requires an $O(n)$ scan across all vertices to check which ones are not visited and find the minimum distance. Over $n$ iterations, this results in an $O(n^2)$ worst-case complexity.
+
+> [!IMPORTANT]
+> **Optimization Strategy**: By maintaining unvisited vertices in a **min-heap**, identifying and removing the minimum distance vertex (`delete_min()`) takes only $O(\log n)$ time.
+
+## 6.4.3: Updating Values in a Min-Heap
+While a min-heap optimizes finding the minimum, Dijkstra's algorithm also requires updating the distances of neighbours. These unvisited neighbours' distances are already inside the min-heap. However, updating a value in the middle of a heap is not a basic heap operation.
+
+### Mechanism for Updating Arbitrary Values
+To update an arbitrary value in a min-heap, two types of violations must be handled:
+1.  **Reducing a value**: If a distance is reduced (e.g., changing 54 to 35), it may create a violation with its parent if the new value is now smaller. To restore the heap property, **swap upwards** (bubble up), similar to the `insert()` operation.
+2.  **Increasing a value**: If a value is increased (e.g., changing 29 to 71), it may create a violation with its children. To restore the heap property, **swap downwards** (bubble down), similar to the `delete_min()` operation.
+
+Both update operations take $O(\log n)$ time.
+
+<img width="1125" height="498" alt="image" src="https://github.com/user-attachments/assets/6bf32bd9-fef0-447e-89f1-b79c6d7add38" />
+<img width="1085" height="488" alt="image" src="https://github.com/user-attachments/assets/20dc54b5-2d53-44b4-bd08-8e1187c8ae64" />
+<img width="1114" height="498" alt="image" src="https://github.com/user-attachments/assets/e14440cb-6baa-4fdf-90c7-878f80774b29" />
+
+
+### Locating the Node to Update
+A challenge exists in locating a specific vertex within the heap structure, as elements move around based on heap operations. Finding a vertex by value would require an exhaustive $O(n)$ search. To avoid this, two additional dictionaries are maintained:
+*   **VtoH**: Maps vertices $\{0, 1, \dots, n-1\}$ to their current **heap positions**.
+*   **HtoV**: Maps current **heap positions** $\{0, 1, \dots, n-1\}$ back to the **vertices** stored there.
+
+> [!NOTE]
+> These dictionaries must be updated every time values are swapped within the heap during any heap operation to ensure the mapping remains consistent.
+
+<img width="1118" height="547" alt="image" src="https://github.com/user-attachments/assets/60e462c0-c129-4998-b030-5cdbf6de0577" />
+
+## 6.4.4: Complexity Analysis
+With the extended heap (supporting updates), the complexity of graph algorithms improves:
+
+### Dijkstra's Algorithm Complexity
+*   **Identifying the next vertex**: $n$ iterations of `delete_min()` take $O(n \log n)$.
+*   **Updating distances**: Each edge $(u, v)$ is processed once; updating a distance in the heap takes $O(\log n)$. For $m$ edges, this takes $O(m \log n)$.
+*   **Overall Time**: $O((m + n) \log n)$.
+
+
+
+
+### Prim's Algorithm Complexity
+Prim's algorithm for Minimum Cost Spanning Tree has the same structure as Dijkstra's, differing only in the distance update calculation (using edge cost instead of cumulative distance). Using the min-heap optimization, Prim's algorithm also achieves $O((m + n) \log n)$.
+
+## 6.4.5: Heap Sort
+Heaps can also be used to sort a list of $n$ elements.
+1.  **Build a Heap**: Use `heapify()` to convert an unordered list into a max-heap in $O(n)$ time.
+2.  **Extract Elements**: Call `delete_max()` $n$ times to extract elements in descending order. Each `delete_max()` takes $O(\log n)$, totaling $O(n \log n)$.
+3.  **In-place Storage**: After each `delete_max()`, the heap shrinks by one. The vacated position at the end of the current heap (index $n-1, n-2, \dots$) can be used to store the deleted maximum value.
+
+This results in an **in-place $O(n \log n)$ sort**. This is an improvement over Merge Sort, which also takes $O(n \log n)$ but requires extra space for merging.
+
