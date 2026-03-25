@@ -86,3 +86,102 @@ Most presentation layers follow the **Model-View-Controller (MVC)** architecture
 | **Web Mail** | Login, Inbox view, Mail composer, Filters | User authentication, Connection to Mail Server (SMTP, etc.), Encryption/Decryption | Mail Users, Address Book, Mail Items |
 | **Net Banking** | Login, Account View, Fund Transfer interface | Beneficiary authentication, Transaction validation, Bank/Gateway connection | Account Holders, Beneficiaries, Transactions |
 | **Timetable** | Login, Add/Delete Courses, Assignments view | Assignment logic, Teacher-Course allocation logic | Courses, Teachers, Rooms, Slots |
+
+
+
+
+
+---
+
+
+
+# **7.2: Application Design and Development/2: Web Applications**
+
+
+
+## **1. Objectives**
+*   To familiarize with the fundamental notions and technologies of the Web.
+*   To learn about the role and types of scripting in web applications.
+*   To learn about Java Servlets and their implementation.
+
+---
+
+## **2. Web Fundamentals**
+
+### **2.1. The World Wide Web (WWW)**
+*   **Definition**: A distributed information system based on **hypertext**.
+*   **HTML**: Most web documents are formatted via HyperText Markup Language. They contain text, formatting instructions, hypertext links, and forms for data entry.
+
+### **2.2. Uniform Resource Locators (URLs)**
+*   **Function**: Provide the functionality of pointers on the web.
+*   **Structure**: 
+    *   **Protocol**: (e.g., `http` or `https`) indicates how the document is accessed.
+    *   **Machine Name**: Identifies the unique machine on the Internet.
+    *   **Path/Identifier**: Locates the document or program within that specific machine.
+*   **Examples**:
+    *   `http://www.google.com/search?q=silberschatz`: An identifier of a program plus arguments.
+    *   `file:///C:/WINDOWS/...`: Accesses a local file.
+
+### **2.3. Identifiers: URI, URL, and URN**
+*   **URI (Uniform Resource Identifier)**: The broad classification.
+*   **URL (Uniform Resource Locator)**: Resembles a person's street address; provides a method for finding an item.
+*   **URN (Uniform Resource Name)**: Functions like a person's name; defines an item's identity regardless of location.
+
+<img width="1277" height="644" alt="image" src="https://github.com/user-attachments/assets/00e342ae-ee56-48ff-89b2-a9421759d572" />
+
+### **2.4. HTML and HTTP**
+*   **HTML**: Provides formatting, images, tables, and input features (menus, radio buttons, text boxes).
+*   **HTTP**: The protocol used for communication with web servers. It is **connectionless**—the server closes the connection and "forgets" the request after replying.
+
+### **2.5. Sessions and Cookies**
+*   **Motivation**: Because HTTP is connectionless, information services need a way to track session-specific data (e.g., user authentication).
+*   **Cookies**: A small piece of text containing identifying information.
+    *   Sent by the server to the browser on first interaction to identify a session.
+    *   Stored by the browser and sent back to the server on subsequent interactions.
+
+### **2.6. Web Infrastructure**
+*   **Web Browser**: Application software that fetches content and displays it via a **rendering engine**. It transforms HTML and resources into a visual representation.
+*   **Web Server**: Software/hardware that accepts HTTP/HTTPS requests. It can execute programs identified in a URL and deliver the results as HTML.
+*   **CGI (Common Gateway Interface)**: A standard interface between a web server and an application server.
+*   **Web Services**: Remote procedure call mechanisms (e.g., **REST** returning JSON/XML).
+
+---
+
+## **3. Scripting for Web Applications**
+
+### **3.1. Definition**
+*   **Script**: A list of text commands embedded in a web page or server, interpreted and executed by a scripting engine.
+
+### **3.2. Types of Scripting**
+1.  **Client-Side Scripting**: 
+    *   Responsible for interaction within the web page.
+    *   Downloaded to the client and executed by the browser (e.g., **JavaScript**).
+2.  **Server-Side Scripting**: 
+    *   Responsible for tasks at the server end (e.g., database access).
+    *   Executes on the server, generates HTML, and sends only the result to the client.
+
+### **3.3. Client-Side Scripting and JavaScript**
+*   **Benefits**: Permits flexible user interaction, animations, and correctness checks (input validation) without round trips to the server.
+*   **Security**: Runs in "safe mode"—scripts generally cannot write to the client disk or make direct system calls outside the browser.
+*   **JavaScript**: The basis for **Web 2.0** and **Ajax**. It can modify the **DOM (Document Object Model)** tree to change the page without refreshing.
+
+### **3.4. Server-Side Scripting**
+*   **Languages**: JSP, PHP, VBScript, Perl, Python.
+*   **Function**: Simplifies connecting databases to the web by allowing SQL queries to be embedded directly in HTML documents.
+
+---
+
+## **4. Servlets and Java Server Pages (JSP)**
+
+### **4.1. Java Servlets**
+*   **Definition**: An API for communication between the web/application server and an application program running in the server.
+*   **Mechanism**: The servlet is loaded into the server; each user request spawns a new **thread** in the server, which is closed once serviced.
+*   **Sessions**: The Servlet API supports session handling by setting cookies and allowing the storage of attribute value pairs (e.g., `session.setAttribute("userid", userid)`).
+
+### **4.2. Java Server Pages (JSP)**
+*   **Concept**: HTML pages with embedded Java code.
+*   **JSP vs. Pure Servlets**: JSP is more convenient for designing HTML than using millions of `println` statements in a servlet.
+*   **JSP vs. JavaScript**: JavaScript is "Client-Side" (executed after server response); JSP is "Server-Side" (executed before server response and can access resources like databases).
+
+### **4.3. PHP**
+*   **Function**: Widely used for web server scripting with extensive libraries for database access via **ODBC**.
