@@ -270,11 +270,13 @@ try (Connection con = DriverManager.getConnection(connectionUrl);
     }
 }
 ```
-**
+<img width="1352" height="525" alt="image" src="https://github.com/user-attachments/assets/ecf86726-45a2-452b-bde8-3f626db4c341" />
+
 
 ### **3.3. Bridge Configurations**
 *   **Definition**: A special driver that translates source function-calls into target function-calls (e.g., **ODBC-to-JDBC bridge**).
 *   Used when a programmer lacks a direct driver for a database but has access to a different target driver.
+<img width="1122" height="558" alt="image" src="https://github.com/user-attachments/assets/e32686a9-ee88-47de-83d5-ecd15643ccde" />
 
 ---
 
