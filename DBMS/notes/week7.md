@@ -309,7 +309,7 @@ FROM ONE.SAILOR
 WHERE sid = :sid;
 printf("Sailor %s's age is %d.", sname, sage);
 ```
-**
+
 
 **Java Language (SQLJ):**
 *   Uses `#sql` syntax and iterators.
@@ -609,15 +609,15 @@ def viewAll():
 
 # **7.5: Application Design and Development/5: Application Development and Mobile**
 
----
 
-## **1. Module Objectives**
+
+## **1. Objectives**
 *   To explore the **Rapid Application Development (RAD)** process.
 *   To understand the issues in **Application Performance and Security**.
 *   To understand the similarities and differences between **Mobile Apps and Web Applications**.
 
 
----
+
 
 ## **2. Rapid Application Development (RAD)**
 
