@@ -598,3 +598,102 @@ def viewAll():
 {% endfor %}
 ```
 
+
+
+
+---
+
+
+
+
+
+# **7.5: Application Design and Development/5: Application Development and Mobile**
+
+---
+
+## **1. Module Objectives**
+*   To explore the **Rapid Application Development (RAD)** process.
+*   To understand the issues in **Application Performance and Security**.
+*   To understand the similarities and differences between **Mobile Apps and Web Applications**.
+
+
+---
+
+## **2. Rapid Application Development (RAD)**
+
+### **2.1 Definition and Approach**
+*   A lot of effort is required to develop Web application interfaces, especially the rich interaction functionality associated with Web 2.0 applications.
+*   **RAD Software** is an agile model that focuses on fast prototyping and quick feedback in app development to ensure speedier delivery and an efficient result.
+*   With RAD, the time between prototypes and iterations is short, and integration occurs since inception.
+*   It is often called a **"customer-in-the-loop"** kind of development.
+
+### **2.2 App Development Phases**
+Application development typically consists of 4 phases:
+1.  **Business Modeling:** Defining requirements and what the business needs to satisfy.
+2.  **Data Modeling:** Modeling items (books, appliances, etc.) to be stored.
+3.  **Process Modeling:** Modeling workflows and sequence of steps.
+4.  **Testing & Turnover:** Prototyping, receiving feedback, and finalizing the software.
+
+### **2.3 Approaches to Speed up Development**
+*   **Function libraries** to generate user-interface elements.
+*   **Drag-and-drop features** in an IDE (e.g., Visual Studio) to create UI elements.
+*   **Automatic code generation** for user interfaces from declarative specifications.
+
+### **2.4 RAD Frameworks and Platforms**
+*   **Java Server Faces (JSF):** A set of APIs for representing UI components, managing their state, handling events, input validation, and supporting internationalization and accessibility.
+*   **Ruby on Rails:** Allows easy creation of simple CRUD (create, read, update, and delete) interfaces by code generation from a database schema or object model.
+*   **ASP.NET and Visual Studio:** Provides a variety of controls interpreted at the server to generate HTML; supports drag-and-drop development and a **DataGrid** for displaying SQL results.
+*   **RAD Platforms:** G Suite, Google App Engine, Microsoft Azure, Amazon Elastic Compute Cloud (EC2), and AWS Elastic Beanstalk.
+
+---
+
+## **3. Application Performance and Security**
+
+### **3.1 Application Performance**
+*   Performance is a major issue for popular Web sites that may be accessed by millions of users with thousands of requests per second at peak time.
+*   **Caching techniques** are used to reduce the cost of serving pages by exploiting similarities between requests:
+    *   **Connection Pooling:** Caching of JDBC connections between servlet requests.
+    *   **Query Result Caching:** Caching results of database queries (must be updated if underlying data changes).
+    *   **HTML Caching:** Caching of generated HTML pages.
+
+### **3.2 Application Security: SQL Injection**
+*   Occurs when a query is constructed using string concatenation, such as:
+    `"select * from instructor where name = '" + name + "'"`.
+*   If a user enters `X' or 'Y'='Y`, the statement becomes:
+    `"select * from instructor where name = 'X' or 'Y'='Y'"`.
+*   Because `'Y'='Y'` is always true, the query returns all instructors, bypassing intended filters.
+
+### **3.3 Additional Security Threats**
+1.  **Password Leakage:** Never store database passwords in clear text in scripts. Editor backup files (e.g., `file.jsp~`) may accidentally be served by web servers.
+2.  **Authentication:** Password-based systems are weak due to reuse across sites and spyware. **Two-factor authentication (2FA)** adds security via one-time password (OTP) devices or SMS.
+3.  **Application-Level Authorization:**
+    *   SQL standards are often too coarse (table/column level) for fine-grained needs (e.g., "students see only their own grades").
+    *   **Workaround:** Use views with `syscontext.user_id()` to identify the end user.
+    *   **Oracle Virtual Private Database (VPD):** Transparently adds predicates (e.g., `WHERE ID = sys_context.user_id()`) to all queries to enforce row-level authorization.
+4.  **Audit Trails:** Applications must log actions to detect security breaches, repair damage, and trace perpetrators. Trails are needed at both the database and application levels.
+
+---
+
+## **4. Mobile Applications**
+
+### **4.1 Definition and Characteristics**
+*   A type of application software designed specifically for small, wireless computing devices like smartphones and tablets.
+*   **Device Constraints:** Limited memory, limited computing power, limited battery power, and limited bandwidth.
+*   **Specialized Capabilities:** Mobiles provide sensors like **accelerometers** (to track speed), gravitational sensors (for screen rotation), and touchscreens for **gesture-based navigation**.
+
+### **4.2 Mobile Website vs. Mobile App**
+*   **Mobile Website:** Consists of browser-based HTML pages designed for small handheld displays and touchscreens; accessed over WiFi/3G/4G.
+*   **Mobile App:** Actual applications downloaded and installed via device-specific portals (App Store, Google Play). Apps can download content for offline access.
+
+### **4.3 Types of Mobile Apps**
+*   **Native Apps:** Written in the platform's native language (iOS: Objective-C; Android: Java or C/C++). They are platform-specific and OS-dependent.
+*   **Web Apps:** Run completely inside a Web browser using HTML, CSS, and languages like JavaScript or Ruby on Rails. They are portable across devices.
+*   **Hybrid Apps:** Combine attributes of both native and web apps, attempting to use common redundant code while tailoring specific attributes to the native system.
+
+### **4.4 Architecture of Mobile Apps**
+*   Typically follows a **3-tier architecture**: Presentation, Business, and Data.
+*   The **Data Layer** is often split between:
+    *   **Local Data:** Small, cached database for quick turnaround and offline use.
+    *   **Remote Data:** Bulk data stored on remote services, which is more expensive to access.
+
+<img width="1062" height="501" alt="image" src="https://github.com/user-attachments/assets/612b86f4-f620-4efd-91a0-b418db2b1912" />
