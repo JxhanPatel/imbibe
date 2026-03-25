@@ -327,3 +327,274 @@ printf("Sailor %s's age is %d.", sname, sage);
 | **Variable Access** | Via API getter/setter methods | Direct use with colon prefix (`:var`) |
 | **Iterators** | `ResultSet` object | Cursors or Language Iterators |
 
+
+
+
+---
+
+
+
+
+
+
+
+# **7.4: Application Design and Development/4: Python and PostgreSQL**
+
+
+### **1. Objectives**
+*   To understand how to access a PostgreSQL database from Python.
+*   To understand how to build a Python Web Application with PostgreSQL.
+
+
+## **2. Python and PostgreSQL Integration**
+
+### **2.1. Python Modules for PostgreSQL**
+The following Python modules can be used to work with a PostgreSQL database server:
+*   **psycopg2**
+*   pg8000
+*   py-postgresql
+*   PyGreSQL
+*   ocpgdb
+*   bpgsql
+*   SQLAlchemy (requires one of the above to be installed separately)
+
+### **2.2. The `psycopg2` Package**
+**Advantages of `psycopg2`:**
+*   It is the most popular and stable module for working with PostgreSQL.
+*   It is used in most Python and Postgres frameworks.
+*   It is an actively maintained package supporting Python 2.x and 3.x.
+*   It is thread-safe and designed for heavily multi-threaded applications.
+
+**Installation:**
+*   General: `pip install psycopg2`
+*   Specific version: `pip install psycopg2==2.8.6`
+
+---
+
+## **3. Steps to Access PostgreSQL from Python**
+
+The process follows a standard workflow where the Python program interacts with the database through the `psycopg2` module and Python Database APIs.
+
+<img width="1097" height="352" alt="image" src="https://github.com/user-attachments/assets/7524e304-1f58-4382-998a-15c5e50659f7" />
+
+### **3.1. Standard Workflow**
+1.  **Create connection**: Use `psycopg2.connect()` with required arguments (database name, user, password, host, port).
+2.  **Create cursor**: Create a cursor object using the `cursor()` method of the connection object to act as an iterator for result sets.
+3.  **Execute the query**: The `execute()` method runs SQL commands.
+4.  **Commit/rollback**: Use `commit()` to make changes persistent or `rollback()` to revert changes since the last commit.
+5.  **Close the cursor**: Release the cursor resource.
+6.  **Close the connection**: Close the database connection.
+
+### **3.2. Core `psycopg2` APIs**
+
+| Method / Attribute | Description |
+| :--- | :--- |
+| `psycopg2.connect(...)` | Opens a connection to the database. Returns a connection object. |
+| `connection.cursor()` | Creates a cursor used throughout the program. |
+| `cursor.execute(sql [, parameters])` | Executes an SQL statement. Supports placeholders like `%s` (e.g., `cursor.execute("insert into people values (%s, %s)", (who, age))`). |
+| `cursor.rowcount` | A read-only attribute returning the number of rows modified, inserted, or deleted by the last `execute()`. |
+| `cursor.fetchone()` | Fetches the next row of a query result set. |
+| `cursor.fetchall()` | Fetches all remaining rows of a query result set. |
+| `connection.commit()` | Commits the current transaction, making changes visible to other connections. |
+| `connection.rollback()` | Rolls back any changes since the last `commit()`. |
+
+---
+
+## **4. CRUD Examples in Python**
+
+The following examples assume the database "mydb", user "myuser", password "mypass", host "127.0.0.1", and port "5432".
+
+### **4.1. Creating a Table**
+```python
+import psycopg2
+def createTable():
+    try:
+        conn = psycopg2.connect(database="mydb", user="myuser", password="mypass", host="127.0.0.1", port="5432")
+        cur = conn.cursor()
+        cur.execute('''CREATE TABLE EMPLOYEE 
+                      (emp_num INT PRIMARY KEY NOT NULL, 
+                       emp_name VARCHAR(40) NOT NULL, 
+                       department VARCHAR(40) NOT NULL)''')
+        conn.commit()
+        print("Table created successfully")
+    except Exception as error:
+        print(error)
+```
+
+### **4.2. Inserting and Updating Records**
+*   **Insert**: `cur.execute("INSERT INTO EMPLOYEE (emp_num, emp_name, department) VALUES (%s, %s, %s)", (num, name, dept))`
+*   **Update**: `cur.execute("UPDATE EMPLOYEE SET department = %s WHERE emp_num = %s", (dept, num))`
+
+### **4.3. Selecting Records**
+```python
+cur.execute("SELECT emp_num, emp_name, department FROM EMPLOYEE")
+rows = cur.fetchall()
+for row in rows:
+    print("ID =", row, "Name =", row, "Dept =", row)
+```
+
+
+
+### **4.4. Delete Example**
+The `DELETE` operation removes specific rows from a table based on a condition. In this example, an employee record is deleted based on their employee number (`emp_num`).
+
+```python
+import psycopg2
+
+def deleteRecord(num):
+    conn = None
+    try:
+        # 1. Create connection to the PostgreSQL database
+        conn = psycopg2.connect(
+            database="mydb", 
+            user="myuser", 
+            password="mypass", 
+            host="127.0.0.1", 
+            port="5432"
+        )
+        
+        # 2. Create a cursor object
+        cur = conn.cursor()
+
+        # 3. Execute the DELETE statement using %s as a placeholder for parameters
+        # Note: The parameter must be passed as a tuple (num,)
+        cur.execute("DELETE FROM EMPLOYEE WHERE emp_num = %s", (num,))
+
+        # 4. Commit the changes to make them persistent in the database
+        conn.commit()
+
+        # 5. Use rowcount to verify the number of rows deleted
+        print("Total number of rows deleted:", cur.rowcount)
+        
+        # 6. Close the cursor
+        cur.close()
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        if conn is not None:
+            conn.rollback() # Revert changes if an error occurs
+    finally:
+        # 7. Close the connection
+        if conn is not None:
+            conn.close()
+
+# Function call to delete employee with ID 110
+deleteRecord(110)
+```
+
+### **4.5. Update Example**
+The `UPDATE` operation modifies existing data. This example updates the department field for a specific employee identified by their employee number.
+
+```python
+import psycopg2
+
+def updateRecord(num, dept):
+    conn = None
+    try:
+        # 1. Create connection
+        conn = psycopg2.connect(
+            database="mydb", 
+            user="myuser", 
+            password="mypass", 
+            host="127.0.0.1", 
+            port="5432"
+        )
+        
+        # 2. Create a cursor
+        cur = conn.cursor()
+
+        # 3. Execute the UPDATE statement with multiple placeholders
+        cur.execute("UPDATE EMPLOYEE set department = %s where emp_num = %s", (dept, num))
+
+        # 4. Commit the changes
+        conn.commit()
+
+        # 5. Report the number of rows modified
+        print("Total number of rows updated:", cur.rowcount)
+        
+        cur.close()
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        if conn is not None:
+            conn.rollback()
+    finally:
+        if conn is not None:
+            conn.close()
+
+# Function call to update employee 110's department to "Finance"
+updateRecord(110, "Finance")
+```
+
+
+
+---
+
+## **5. Python Web Frameworks for PostgreSQL**
+
+Python offers various frameworks for web and internet development:
+*   **Micro-frameworks**: Flask, Bottle.
+*   **Full-stack Frameworks**: Django, Pyramid.
+*   **Advanced CMS**: Plone, django CMS.
+
+### **5.1. Flask Micro-framework**
+*   **Definition**: A lightweight WSGI (Web Server Gateway Interface) web application framework.
+*   **Key components**:
+    *   `Flask` class: The WSGI application object.
+    *   `route()` function: A decorator that tells the application which URL should call the associated function.
+    *   `run()` method: Runs the application on the local development server.
+
+---
+
+## **6. Case Study: Integrated Web Application with Flask**
+
+This example demonstrates a "Candidate Email Database" application with a `Candidate` table.
+
+### **6.1. Navigation and Rendering**
+The `index.html` template provides links to add and view emails. Flask uses `render_template` to serve these pages:
+```python
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/add")
+def add():
+    return render_template("add.html")
+```
+
+<img width="402" height="295" alt="image" src="https://github.com/user-attachments/assets/01931e62-f2fc-4def-b91a-2dc3c90d2b1e" />
+
+### **6.2. Adding Data (`add.html` and `saveDetails`)**
+The HTML form uses `method="post"` and targets the `/savedetails` route. The Python function extracts form data via `request.form` and executes an `INSERT` statement:
+```python
+@app.route("/savedetails", methods = ["POST"])
+def saveDetails():
+    cno = request.form["cno"]
+    name = request.form["name"]
+    email = request.form["email"]
+    # ... connection and cursor setup ...
+    cur.execute("INSERT INTO Candidate (cno, name, email) VALUES (%s, %s, %s)", (cno, name, email))
+    conn.commit()
+    return render_template("success.html")
+```
+
+### **6.3. Viewing Data (`viewAll` and `viewall.html`)**
+The application retrieves all rows and passes them to a Jinja2 template for rendering in a table:
+```python
+@app.route("/viewall")
+def viewAll():
+    # ... connection and cursor setup ...
+    cur.execute("SELECT cno, name, email FROM Candidate")
+    results = cur.fetchall()
+    return render_template("viewall.html", rows=results)
+```
+
+**Template Snippet (`viewall.html`):**
+```html
+{% for row in rows %}
+<tr>
+    <td>{{row}}</td> <td>{{row}}</td> <td>{{row}}</td>
+</tr>
+{% endfor %}
+```
+
