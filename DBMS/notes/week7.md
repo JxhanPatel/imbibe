@@ -185,3 +185,143 @@ Most presentation layers follow the **Model-View-Controller (MVC)** architecture
 
 ### **4.3. PHP**
 *   **Function**: Widely used for web server scripting with extensive libraries for database access via **ODBC**.
+
+
+
+
+
+---
+
+
+
+
+# **7.3: Application Design and Development/3: SQL and Native Language**
+
+
+
+## **1. Objectives**
+*   To understand the "missing piece" in application development: how to connect high-level programming logic (Middle Tier) to backend SQL data (Data Access Layer).
+*   To learn the implementation of SQL within a programming language using two dominant frameworks: **Connectionist** and **Embedding**.
+
+---
+
+## **2. The Interaction Challenge**
+
+### **2.1. The Paradigm Mismatch**
+*   Middle-tier logic is typically written in an **Object-Oriented** language (Java, C++, Python) where data is modeled as objects and methods.
+*   Backend data is **Relational**, accessible only via SQL.
+*   **Challenge**: From the middle tier, one must execute SQL commands and retrieve results (tables/relations) back into the high-level program variables.
+
+<img width="1275" height="433" alt="image" src="https://github.com/user-attachments/assets/984503af-cb3d-4beb-be06-87712c380210" />
+<img width="1309" height="613" alt="image" src="https://github.com/user-attachments/assets/323d110f-86ec-4374-922f-6d36d0a7681b" />
+
+
+
+### **2.2. Two Dominant Frameworks**
+1.  **Connectionist (API-based)**: The application uses an Application Program Interface (API) to send SQL as character strings to the database server and fetch results one-by-one.
+2.  **Embedding**: SQL commands are placed directly inside the source code of the native language, identified by specific markers (e.g., `EXEC SQL`).
+
+---
+
+## **3. Connectionist Frameworks**
+
+### **3.1. ODBC (Open Database Connectivity)**
+*   **Definition**: A standard API for accessing a DBMS, aimed at being independent of specific database systems and operating systems.
+*   **Portability**: Applications can be ported across platforms with minimal changes to data access code.
+*   **Process**: Open connection $\rightarrow$ Send queries/updates $\rightarrow$ Fetch results.
+
+**Python ODBC Example (`pyodbc`):**
+```python
+import pyodbc
+# Connection string using a Data Source Name (DSN)
+conn = pyodbc.connect('DSN=SQLS; UID=test01; PWD=test01')
+cursor = conn.cursor()
+# Executing SQL commands
+cursor.execute("create table rvtest (col1 int, col3 varchar(10))")
+cursor.execute("insert into rvtest values (1, 'ABC')")
+cursor.execute("select * from rvtest")
+# Fetching data using the cursor as an iterator
+while True:
+    row = cursor.fetchone()
+    if not row: break
+    print(row)
+```
+
+### **3.2. JDBC (Java Database Connectivity)**
+*   **Definition**: A Java-specific API defining how a client accesses a database. It is part of the Java Standard Edition platform.
+*   **Communication Model**:
+    1.  **Open a Connection**: Uses a connection URL (server, port, database name, credentials).
+    2.  **Create a Statement Object**: Serves as a handle between Java and the database.
+    3.  **Execute Queries**: Send SQL and fetch results into a `ResultSet` object.
+    4.  **Exception Handling**: Uses a try-catch mechanism to manage errors (e.g., wrong password).
+
+**Java JDBC Snippet:**
+```java
+// Connection setup
+String connectionUrl = "jdbc:sqlserver://<server>:<port>;databaseName=AdventureWorks";
+try (Connection con = DriverManager.getConnection(connectionUrl);
+     Statement stmt = con.createStatement();) {
+    // Execute query
+    String SQL = "SELECT * FROM Production.Product;";
+    ResultSet rs = stmt.executeQuery(SQL);
+    // Iterate through ResultSet
+    while (rs.next()) {
+        System.out.println(rs.getString("ProductID") + ":" + rs.getString("Name"));
+    }
+}
+```
+**
+
+### **3.3. Bridge Configurations**
+*   **Definition**: A special driver that translates source function-calls into target function-calls (e.g., **ODBC-to-JDBC bridge**).
+*   Used when a programmer lacks a direct driver for a database but has access to a different target driver.
+
+---
+
+## **4. Embedded SQL**
+
+### **4.1. Concept and Host Languages**
+*   SQL standards define embedding for languages like C, C++, Java, and Fortran.
+*   **Host Language**: The native language where SQL is embedded.
+*   **Markers**: Request to pre-processors are usually identified by `EXEC SQL` (C/C++) or `#sql` (Java).
+
+### **4.2. Host Variables and Cursors**
+*   **Host Variables**: Native language variables used within SQL statements, preceded by a colon (e.g., `:credit_amount`) to distinguish them from SQL attributes.
+*   **Cursors**: Declared to handle queries that return multiple tuples. The program iterates through the cursor to place tuple values into host variables.
+*   **Operations**:
+    *   **DECLARE**: Identifies the query.
+    *   **OPEN**: Executes the query and saves results in a temporary relation.
+    *   **FETCH**: Retrieves successive tuples into host variables.
+    *   **CLOSE**: Deletes the temporary relation.
+
+### **4.3. Examples of Embedded SQL**
+
+**C Language (DB2 Style):**
+```c
+EXEC SQL BEGIN DECLARE SECTION;
+    short sage, sid; char sname;
+EXEC SQL END DECLARE SECTION;
+// ... connection logic ...
+EXEC SQL SELECT SNAME, AGE into :sname, :sage
+FROM ONE.SAILOR
+WHERE sid = :sid;
+printf("Sailor %s's age is %d.", sname, sage);
+```
+**
+
+**Java Language (SQLJ):**
+*   Uses `#sql` syntax and iterators.
+*   **Named Binding**: Returns values based on column names.
+*   **Positional Binding**: Returns values by column position.
+
+---
+
+## **5. Summary Table: Comparison**
+
+| Feature | Connectionist (ODBC/JDBC) | Embedded SQL |
+| :--- | :--- | :--- |
+| **Mechanism** | API calls (Functions/Methods) | Marker tags for Pre-processor |
+| **SQL Handling** | Constructed as character strings at runtime | Hard-coded into source or pre-compiled |
+| **Variable Access** | Via API getter/setter methods | Direct use with colon prefix (`:var`) |
+| **Iterators** | `ResultSet` object | Cursors or Language Iterators |
+
