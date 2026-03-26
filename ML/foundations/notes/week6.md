@@ -390,3 +390,121 @@ $$
 
 <img width="1600" height="1400" alt="image" src="https://github.com/user-attachments/assets/a098a56e-b255-4bcf-9422-10b5a623cce1" />
 <img width="1400" height="1645" alt="image" src="https://github.com/user-attachments/assets/69cecbf5-8daf-48fe-b4ee-72e3ff3d4318" />
+
+
+
+
+---
+
+
+
+
+
+
+# 6.4 Positive Definite Matrices
+
+Positive definiteness brings together the most basic ideas of linear algebra—pivots, determinants, and eigenvalues—to solve the highly important problem of recognizing a minimum point for functions of several variables.
+
+## 6.4.1 Definition and Basic Properties
+
+A real symmetric matrix $A$ is **positive definite** if it satisfies the following fundamental condition:
+
+* **Quadratic Form Test**: $x^T Ax > 0$ for all nonzero real vectors $x$.
+
+> [!NOTE]
+> For a matrix to be positive definite, it must be symmetric. While eigenvalues and pivots exist for unsymmetric matrices, the study of minima and maxima typically centers on the symmetric case where $a_{ij} = a_{ji}$.
+
+### The 2 by 2 Case
+
+For a symmetric 2 by 2 matrix $A = \begin{bmatrix} a & b \ b & c \end{bmatrix}$, the quadratic form is $f(x,y) = ax^2 + 2bxy + cy^2$. This function has a minimum at $(0,0)$ if and only if:
+
+1. $a > 0$
+2. $ac - b^2 > 0$.
+
+These conditions ensure that the surface $z = f(x,y)$ is shaped like a bowl resting on the origin.
+
+
+## 6.4.2 The Four Tests for Positive Definiteness
+
+Each of the following is a necessary and sufficient condition for a real symmetric matrix $A$ to be positive definite:
+
+1. **Eigenvalue Test**: All eigenvalues of $A$ are positive ($\lambda_i > 0$).
+2. **Determinant Test**: All $n$ "upper left" submatrices $A_k$ have positive determinants ($det A_k > 0$).
+3. **Pivot Test**: All the pivots $d_k$ (without row exchanges) are positive.
+4. **Quadratic Form Test**: $x^T Ax > 0$ for all $x \ne 0$.
+
+## 6.4.3 Positive Definiteness and Quadratic Functions
+
+The quadratic form $x^T Ax$ can be expressed as a sum of squares, which explicitly illustrates why the function stays positive.
+
+### Connection to Pivots (Completing the Square)
+
+Elimination on a symmetric matrix is identical to the algebraic process of completing the square. If $A = LDL^T$, the quadratic form becomes:
+
+$$
+x^T Ax =
+(L^T x)^T D (L^T x) =
+d_1(\text{square 1}) + d_2(\text{square 2}) + \dots + d_n(\text{square n})
+$$
+
+**Example**:
+For $A =
+
+$$
+\begin{bmatrix}
+2 & -1 & 0 \\\
+-1 & 2 & -1 \\\
+0 & -1 & 2
+\end{bmatrix}
+$$
+
+the pivots are $2, \frac{3}{2}, \frac{4}{3}$. The quadratic form is:
+
+$$
+x^T Ax =
+2(u - \frac{1}{2}v)^2 + \frac{3}{2}(v - \frac{2}{3}w)^2 + \frac{4}{3}w^2
+$$
+
+Because the pivots (the coefficients outside the squares) are all positive, the sum is always positive unless $u=v=w=0$.
+
+## 6.4.4 Relation to Eigenvalues and the Spectral Theorem
+
+The eigenvalue test ($\lambda_i > 0$) is often the most useful for theoretical purposes.
+
+### The Spectral Theorem
+
+Every real symmetric matrix can be factored into $A = Q \Lambda Q^T$, where $Q$ is an orthogonal matrix of orthonormal eigenvectors and $\Lambda$ is the diagonal matrix of real eigenvalues.
+This allows $A$ to be expressed as a combination of one-dimensional projections:
+
+$$
+A =
+\lambda_1 x_1 x_1^T + \lambda_2 x_2 x_2^T + \dots + \lambda_n x_n x_n^T
+$$
+
+### Eigenvalues vs. Pivots (Law of Inertia)
+
+Though the values of the pivots and eigenvalues are usually different, their **signs** always match for symmetric matrices.
+**Theorem 6G**: The number of positive eigenvalues of a symmetric matrix $A$ equals the number of positive pivots.
+
+## 6.4.5 Geometric Interpretation: Ellipsoids
+
+The equation $x^T Ax = 1$ defines an ellipsoid in $n$ dimensions if $A$ is positive definite.
+
+* **Principal Axes**: The axes of the ellipsoid point in the directions of the eigenvectors of $A$.
+* **Axis Lengths**: The distances from the center to the ellipsoid along these axes are $1/\sqrt{\lambda_1}, \dots, 1/\sqrt{\lambda_n}$.
+* **Alignment**: The change of variables $y = Q^T x$ (rotating the axes) aligns the ellipsoid with the coordinate axes, resulting in:
+
+$$
+\lambda_1 y_1^2 + \dots + \lambda_n y_n^2 = 1
+$$
+
+<img width="494" height="357" alt="image" src="https://github.com/user-attachments/assets/c7253fb1-f02f-4991-958b-74d421c0af7c" />
+
+## 6.4.6 Positive Semidefinite Matrices
+
+If the requirement $x^T Ax > 0$ is relaxed to $x^T Ax \ge 0$, the matrix is **positive semidefinite**.
+
+* **Eigenvalues**: $\lambda_i \ge 0$ (at least one $\lambda$ is zero).
+* **Pivots**: $d_i \ge 0$ (at least one pivot is missing).
+* **Geometry**: The surface $z = x^T Ax$ degenerates from a bowl into a valley.
+* **Singularity**: Positive semidefinite matrices are singular ($det A = 0$).
