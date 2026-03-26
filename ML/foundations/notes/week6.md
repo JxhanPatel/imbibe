@@ -267,3 +267,126 @@ $$
 > The SVD chooses orthonormal bases for all four fundamental subspaces. The first $r$ columns of $U$ span the column space $C(A)$, the last $m-r$ span the left nullspace $N(A^T)$, the first $r$ columns of $V$ span the row space $C(A^T)$, and the last $n-r$ span the nullspace $N(A)$.
 
 
+
+
+---
+
+
+
+# 6.3 Positive Definiteness
+
+Positive definiteness brings the whole course together, linking pivots, determinants, and eigenvalues to the study of minima, maxima, and saddle points.
+
+## 6.3.1 Stationary Points, Minima, Maxima, and Saddle Points
+
+The mathematical problem is to move the second derivative test $F'' > 0$ into $n$ dimensions.
+
+### Stationary Points
+
+A stationary point occurs where the first derivatives of a function vanish. For a function $F(x,y)$, the linear terms in a Taylor series give a necessary condition: to have any chance of a minimum, the first derivatives must vanish at the point.
+
+* **Condition**: $\frac{\partial F}{\partial x} = 0$ and $\frac{\partial F}{\partial y} = 0$.
+* **Geometry**: At a stationary point, the surface $z = F(x,y)$ is tangent to a horizontal plane.
+
+### Minima, Maxima, and Saddle Points
+
+* **Local Minimum**: A point $x^\star$ is a local minimizer if there is a neighborhood $N$ of $x^\star$ such that $f(x^\star) \le f(x)$ for all $x$ in $N$.
+* **Local Maximum**: If $-f$ has a local minimum, then $f$ has a local maximum.
+* **Saddle Point**: A stationary point that is neither a maximum nor a minimum. In two dimensions, this occurs when one direction gives a minimum while another direction gives a maximum (e.g., $f = x^2 - y^2$).
+
+
+<img width="778" height="531" alt="image" src="https://github.com/user-attachments/assets/7a0132e1-0cb5-41ba-ba66-306f36a3243e" />
+
+
+
+## 6.3.2 First and Second Derivative Tests for Quadratic Functions
+
+Every quadratic form $f = ax^2 + 2bxy + cy^2$ has a stationary point at the origin. The second derivatives at the stationary point are decisive.
+
+### The Second Derivative Matrix
+
+The second derivatives fit into a symmetric 2 by 2 matrix $A$. The terms $ax^2$ and $cy^2$ appear on the diagonal, while the cross derivative $2bxy$ is split between the off-diagonal entries.
+
+$$
+f(x,y) =
+\begin{bmatrix}
+x & y
+\end{bmatrix}
+\begin{bmatrix}
+a & b \\
+b & c
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+$$
+
+### The 2 by 2 Test for a Minimum
+
+For a function of two variables, the quadratic $ax^2 + 2bxy + cy^2$ is positive definite (a minimum) if and only if:
+
+1. $a > 0$
+2. $ac > b^2$
+
+> [!IMPORTANT]
+> These conditions guarantee $c > 0$. The sign of $b$ is of no importance to the existence of a minimum.
+
+### Summary of 2 by 2 Quadratic Form Behaviors
+
+| Type                      | Conditions                 | Geometry                        |
+| :------------------------ | :------------------------- | :------------------------------ |
+| **Positive Definite**     | $a > 0$ and $ac - b^2 > 0$ | Bowl opening upward (Minimum)   |
+| **Negative Definite**     | $a < 0$ and $ac - b^2 > 0$ | Bowl opening downward (Maximum) |
+| **Indefinite**            | $ac - b^2 < 0$             | Saddle point                    |
+| **Positive Semidefinite** | $a > 0$ and $ac - b^2 = 0$ | Valley                          |
+
+## 6.3.3 Positive Definiteness and Linear Algebra Connection
+
+A symmetric matrix $A$ is positive definite if $x^T Ax > 0$ for all nonzero real vectors $x$. This definition generalizes to $n$ dimensions.
+
+### The Four Tests for Positive Definiteness
+
+Each of the following is a necessary and sufficient condition for a real symmetric matrix $A$ to be positive definite:
+
+1. **Eigenvalue Test**: All eigenvalues $\lambda_i > 0$.
+2. **Determinant Test**: All the upper left submatrices $A_k$ have positive determinants ($det A_k > 0$).
+3. **Pivot Test**: All the pivots (without row exchanges) are positive ($d_k > 0$).
+4. **Quadratic Form Test**: $x^T Ax > 0$ for all nonzero vectors $x$.
+
+### Connection to Pivots (Completing the Square)
+
+Elimination and completing the square are the same. The pivots are the coefficients outside the squares.
+
+$$
+ax^2 + 2bxy + cy^2 =
+a\left(x + \frac{b}{a}y\right)^2 + \frac{ac - b^2}{a}y^2
+$$
+
+In $n$ dimensions, if $A = LDL^T$, then:
+
+$$
+x^T Ax =
+(L^T x)^T D (L^T x) =
+\sum d_i ( \text{squared terms} )
+$$
+
+### The Law of Inertia
+
+For any symmetric matrix $A$, the signs of the pivots agree with the signs of the eigenvalues. The eigenvalue matrix $\Lambda$ and the pivot matrix $D$ have the same number of positive, negative, and zero entries.
+
+### Geometric Connection: Ellipsoids
+
+The equation $x^T Ax = 1$ defines an ellipsoid in $n$ dimensions if $A$ is positive definite.
+
+* **Rotation**: Rotating axes via $y = Q^T x$ (where $Q$ is the matrix of orthonormal eigenvectors) simplifies the equation to:
+
+$$
+\lambda_1 y_1^2 + \lambda_2 y_2^2 + \dots + \lambda_n y_n^2 = 1
+$$
+
+* **Axis Lengths**: The axes of the ellipsoid have lengths $1/\sqrt{\lambda_1}, \dots, 1/\sqrt{\lambda_n}$ from the center.
+* **Direction**: The axes point along the eigenvectors of $A$.
+
+<img width="1600" height="1400" alt="image" src="https://github.com/user-attachments/assets/a098a56e-b255-4bcf-9422-10b5a623cce1" />
+<img width="1400" height="1645" alt="image" src="https://github.com/user-attachments/assets/69cecbf5-8daf-48fe-b4ee-72e3ff3d4318" />
