@@ -337,3 +337,82 @@ $$\lambda_1 y_1^2 + \lambda_2 y_2^2 = 1 \cdot y_1^2 + 9 \cdot y_2^2 = 1$$.
 | **Axis Length** | $1/\sqrt{\lambda_i}$ from the center of the ellipsoid. |
 | **Dimension Reduction** | Keeping only $k$ significant singular values $\sigma_i$ |
 
+
+
+---
+
+
+
+
+
+
+# 7.4: Principal Component Analysis in Higher Dimensions
+
+Principal Component Analysis (PCA) provides a way to extract the "essential information" from large data sets, such as image processing where a matrix may contain 1,000 by 1,000 "pixels" ★ a million little squares, each with a definite color.
+
+## 7.4.1 Reformulating Eigenvector Problems in Higher Dimensions
+
+The Singular Value Decomposition (SVD) factors any $m$ by $n$ matrix $A$ into $U\Sigma V^T$. For rectangular matrices in higher dimensions, the key is almost always to consider the symmetric matrices $A^T A$ and $AA^T$.
+
+### 1. The Relationship between $AA^T$ and $A^T A$
+The $r$ singular values on the diagonal of $\Sigma$ ( $m$ by $n$) are the square roots of the nonzero eigenvalues of both $AA^T$ and $A^T A$.
+*   **$U$ Matrix**: The columns of $U$ ($m$ by $m$) are eigenvectors of $AA^T$.
+*   **$V$ Matrix**: The columns of $V$ ($n$ by $n$) are eigenvectors of $A^T A$.
+
+### 2. Efficiency in High Dimensions
+In many applications, the dimensions $m$ and $n$ are significantly different (e.g., $m \ll n$ or $n \ll m$).
+*   If $A$ is 3 by 1, $A^T A$ is a 1 by 1 matrix, whereas $AA^T$ is 3 by 3.
+*   They both share the same nonzero eigenvalues.
+*   **Derivation of $u_j$ from $v_j$**: To avoid solving two large eigenvalue problems, one can use the relation $Av_j = \sigma_j u_j$.
+    *   Start with $A^T A v_j = \sigma_j^2 v_j$.
+    *   Multiply by $A$: $(AA^T)Av_j = \sigma_j^2 Av_j$.
+    *   This demonstrates that $Av_j$ is an eigenvector of $AA^T$.
+    *   The unit eigenvector is $u_j = Av_j / \sigma_j$.
+
+> [!NOTE]
+> The SVD is terrific for numerically stable computations because $U$ and $V$ are orthogonal matrices and never change the length of a vector: $||Ux||^2 = x^T U^T U x = ||x||^2$.
+
+<img width="1920" height="1738" alt="image" src="https://github.com/user-attachments/assets/28a49fa4-44ae-4eb9-8163-738d41d7d07a" />
+
+## 7.4.2 PCA and Dimension Reduction
+
+PCA aims to find the essential information inside a large matrix and send or store only that.
+
+### 1. Matrix Approximation
+Any matrix is the sum of $r$ matrices of rank 1:
+$$A = U\Sigma V^T = u_1\sigma_1v_1^T + u_2\sigma_2v_2^T + \cdot\cdot\cdot + u_r\sigma_r v_r^T$$
+
+In image processing, if we keep only the first $k$ significant singular values and their corresponding columns of $U$ and $V$, we achieve significant compression. For example, keeping 20 terms for a 1,000,000 pixel image results in a 25 to 1 compression.
+
+### 2. The Effective Rank
+In higher dimensions and real arithmetic, counting pivots can be misleading due to roundoff errors.
+*   **Method**: Use $A^T A$ or $AA^T$ and their eigenvalues (singular values squared).
+*   **Tolerance**: Based on the accuracy of data, a tolerance (e.g., $10^{-6}$) is chosen.
+*   **Condition**: Only singular values above this tolerance are counted to determine the **effective rank**.
+
+### 3. Principal Axis Theorem
+The orthogonal eigenvectors $q_i$ (or $v_i$) give the principal axes.
+*   In geometry, these are the right choice of axes for an ellipsoid.
+*   The change of variables $y = Q^T x$ rotates the axes of the space to match the axes of the ellipsoid.
+*   The lengths of the axes are $1/\sqrt{\lambda_1}, \dots, 1/\sqrt{\lambda_n}$ from the center.
+
+<img width="778" height="608" alt="image" src="https://github.com/user-attachments/assets/2772f2a9-3004-4ea2-969b-4c2581caee14" />
+<img width="966" height="473" alt="image" src="https://github.com/user-attachments/assets/54678831-0c90-4c15-aae0-f3c6e6ebb65b" />
+
+## 7.4.3 Computational Techniques for Large Matrices
+
+For large sparse matrices, calculating the full SVD or eigenvalue decomposition is expensive.
+
+| Method | Application |
+| :--- | :--- |
+| **Arnoldi / Lanczos** | Orthogonalizes the Krylov sequence $x, Ax, A^2x, \dots$ to find eigenvalues of large sparse matrices. | 
+| **Power Method** | Operates on the principle $u_{k+1} = Au_k$. Converges to the eigenvector $x_n$ of the largest eigenvalue. | 
+| **Shifted Inverse Power** | Solves $(A - \alpha I)w_{k+1} = w_k$ to enormously accelerate convergence toward specific eigenvalues. | 
+
+### Summary of SVD Bases for Fundamental Subspaces
+In higher dimensions, the SVD identifies orthonormal bases for the four fundamental subspaces in a special way:
+
+*   **Column Space $C(A)$**: First $r$ columns of $U$.
+*   **Left Nullspace $N(A^T)$**: Last $m-r$ columns of $U$.
+*   **Row Space $C(A^T)$**: First $r$ columns of $V$.
+*   **Nullspace $N(A)$**: Last $n-r$ columns of $V$.
