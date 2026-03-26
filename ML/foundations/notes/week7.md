@@ -251,3 +251,89 @@ $$
 2. **Idempotency**: The square of the projection matrix is itself ($P^2 = P$). Projecting twice gives the same result as projecting once.
 3. **Trace**: The trace of a rank-1 projection matrix $aa^T/a^T a$ always equals 1.
 4. **Eigenvalues**: The eigenvalues of a projection matrix are 1 or 0.
+
+
+
+---
+
+
+
+
+# 7.3: PCA as Maximizing Variance
+
+Principal Component Analysis (PCA) is a technique used to find the "best basis" for representing a matrix and extracting essential information from large data sets. It provides a way to identify the directions in which data varies the most.
+
+## 7.3.1 Using PCA for Maximizing Variance of the Projected Data
+
+The magnitude of the singular values $\sigma_i$ relates directly to the variance and the "amplifying power" of the matrix. To find the direction of maximum variance, we look for the vector that the matrix $A$ amplifies the most.
+
+### 1. The Rayleigh Quotient
+The mathematical tool used to find the direction of maximum variance is the Rayleigh quotient. For a symmetric matrix $A^T A$, the Rayleigh quotient is defined as:
+$$R(x) = \frac{||Ax||^2}{||x||^2} = \frac{x^T A^T Ax}{x^T x}$$ 
+
+### 2. Rayleigh's Principle
+Rayleigh's Principle states that the minimum value of the Rayleigh quotient is the smallest eigenvalue $\lambda_1$. Its maximum value is the largest eigenvalue $\lambda_n$. 
+*   **Minimum Value**: $R(x)$ reaches its minimum at the first eigenvector $x_1$ of $A$.
+*   **Maximum Value**: $R(x)$ reaches its maximum at the last eigenvector $x_n$ of $A$.
+
+### 3. Connection to Matrix Norms
+The norm of $A$ measures the largest amount by which any vector is amplified. $||A||^2$ is the square root of the largest eigenvalue of $A^T A$:
+$$||A||^2 = \max \frac{x^T A^T Ax}{x^T x} = \lambda_{\max}(A^T A)$$.
+This maximum value equals the square of the largest singular value, $\sigma_1^2$ 
+
+<img width="456" height="447" alt="image" src="https://github.com/user-attachments/assets/49b37080-9e0d-4d2c-97ca-fec4857e91ff" />
+
+## 7.3.2 Principal Directions and Principal Components
+
+PCA uses the spectral theorem and singular value decomposition to identify the principal axes of a data set 
+
+### 1. Principal Directions
+The principal directions are the orthogonal eigenvectors of the matrix
+*   In mathematics, the formula $A = Q\Lambda Q^T$ is known as the spectral theorem.
+*   The orthogonal eigenvectors $q_i$ give the principal axes
+*   In geometry or mechanics, these are the right choice of axes for an ellipse or ellipsoid.
+
+### 2. Principal Components
+The first principal component is the eigenvector corresponding to $\sigma_{\max}$ [7.1.5]. This vector represents the direction of maximum amplification or maximum variance
+
+> [!NOTE]
+> The axes of an ellipsoid $x^T Ax = 1$ point along the eigenvectors of $A$. The major axis corresponds to the smallest eigenvalue, while the direction of greatest amplification corresponds to the largest singular value
+
+## 7.3.3 Example Problem: Principal Axes of an Ellipse
+
+Consider the symmetric matrix 
+
+$$
+A = \begin{bmatrix} 5 & 4 \\\ 4 & 5 \end{bmatrix}
+$$
+
+ and the quadratic form $x^T Ax = 5u^2 + 8uv + 5v^2 = 1$. Find the principal directions (axes) and the lengths of those axes.
+
+### Step 1: Find the Eigenvalues
+The characteristic equation is solved to find $\lambda_1 = 1$ and $\lambda_2 = 9$.
+
+### Step 2: Find the Unit Eigenvectors (Principal Directions)
+The unit eigenvectors are:
+*   $x_1 = (1, -1) / \sqrt{2}$.
+*   $x_2 = (1, 1) / \sqrt{2}$.
+These eigenvectors are at $45^\circ$ angles with the $u$-$v$ axes and are lined up with the axes of the ellipse.
+
+### Step 3: Determine Axis Lengths
+The equation $x^T Ax = 1$ can be rewritten using a change of variables $y = Q^T x$ to produce a sum of squares:
+$$\lambda_1 y_1^2 + \lambda_2 y_2^2 = 1 \cdot y_1^2 + 9 \cdot y_2^2 = 1$$.
+*   The axes have lengths $1/\sqrt{\lambda_1}$ and $1/\sqrt{\lambda_2}$.
+*   **Major Axis Length**: $1/\sqrt{1} = 1$.
+*   **Minor Axis Length**: $1/\sqrt{9} = 1/3$.
+
+<img width="376" height="584" alt="image" src="https://github.com/user-attachments/assets/f0829dcb-60a8-43bf-b640-6733f0312438" />
+
+### Summary Table: Variance and Principal Components
+
+| Concept | Linear Algebra Equivalent |
+| :--- | :--- |
+| **Total Matrix** | Sum of $r$ rank-1 matrices: $A = \sum \sigma_i u_i v_i^T$. |
+| **Maximum Variance** | Largest singular value $\sigma_1$ or $\lambda_{\max}(A^T A)$ |
+| **Principal Axis** | Eigenvector $q_i$ or $v_i$ |
+| **Axis Length** | $1/\sqrt{\lambda_i}$ from the center of the ellipsoid. |
+| **Dimension Reduction** | Keeping only $k$ significant singular values $\sigma_i$ |
+
