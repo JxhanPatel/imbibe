@@ -77,7 +77,25 @@ The unit eigenvector is $u_j = A v_j / \sigma_j$, which confirms the relationshi
 
 <img width="846" height="546" alt="image" src="https://github.com/user-attachments/assets/50c58c3a-07a6-4d63-9a48-363f86cbe1cb" />
 
-## 6.1.4 Example 1: Rank-1 Matrix
+
+## 6.1.4 Summary of SVD Properties
+
+| Feature             | Description                                                      |
+| :------------------ | :--------------------------------------------------------------- |
+| **Rank**            | $rank(A) = rank(\Sigma) = r$ (number of nonzero singular values) |
+| **Matrix $U$**      | Columns are "left singular vectors" (eigenvectors of $AA^T$)     |
+| **Matrix $V$**      | Columns are "right singular vectors" (eigenvectors of $A^T A$)   |
+| **Singular Values** | $\sigma_i > 0$ are the diagonal entries of $\Sigma$              |
+| **Relation**        | $A v_i = \sigma_i u_i$ for $i \le r$; $A v_i = 0$ for $i > r$    |
+
+
+
+
+
+
+# 6.2: Example of SVD
+
+## 6.2.1: Example 1: Rank-1 Matrix
 
 Consider a matrix $A$ with only one column:
 
@@ -110,7 +128,7 @@ $$
 
 The columns of $U$ are the unit eigenvectors of $AA^T$.
 
-## 6.1.5 Example 2: Rank-2 Matrix
+## 6.2.2 Example 2: Rank-2 Matrix
 
 Consider the matrix:
 
@@ -153,19 +171,99 @@ A =
 \end{bmatrix}^T
 $$
 
-## 6.1.6 Summary of SVD Properties
-
-| Feature             | Description                                                      |
-| :------------------ | :--------------------------------------------------------------- |
-| **Rank**            | $rank(A) = rank(\Sigma) = r$ (number of nonzero singular values) |
-| **Matrix $U$**      | Columns are "left singular vectors" (eigenvectors of $AA^T$)     |
-| **Matrix $V$**      | Columns are "right singular vectors" (eigenvectors of $A^T A$)   |
-| **Singular Values** | $\sigma_i > 0$ are the diagonal entries of $\Sigma$              |
-| **Relation**        | $A v_i = \sigma_i u_i$ for $i \le r$; $A v_i = 0$ for $i > r$    |
 
 
 
----
+## 6.2.3 Example: Orthonormal Basis Construction
 
+Starting from 
+
+$$
+A = \begin{bmatrix} 1 & 1 & 0 \\\ 0 & 1 & 1 \end{bmatrix}
+$$
+
+1. **Find $U$**:
+
+$$
+AA^T =
+\begin{bmatrix}
+2 & 1 \\
+1 & 2
+\end{bmatrix}
+$$
+
+has $\sigma_1^2 = 3$ and $\sigma_2^2 = 1$.
+
+Unit eigenvectors:
+
+$$
+u_1 =
+\begin{bmatrix}
+1/\sqrt{2} \\
+1/\sqrt{2}
+\end{bmatrix}
+$$
+
+$$
+u_2 =
+\begin{bmatrix}
+1/\sqrt{2} \\
+-1/\sqrt{2}
+\end{bmatrix}
+$$
+
+2. **Find $V$**:
+
+$$
+A^T A =
+\begin{bmatrix}
+1 & 1 & 0 \\
+1 & 2 & 1 \\
+0 & 1 & 1
+\end{bmatrix}
+$$
+
+has $\sigma_1^2 = 3$ with
+
+$$
+v_1 =
+\begin{bmatrix}
+1/\sqrt{6} \\
+2/\sqrt{6} \\
+1/\sqrt{6}
+\end{bmatrix}
+$$
+
+$\sigma_2^2 = 1$ with
+
+$$
+v_2 =
+\begin{bmatrix}
+1/\sqrt{2} \\
+0 \\
+-1/\sqrt{2}
+\end{bmatrix}
+$$
+
+and nullvector
+
+$$
+v_3 =
+\begin{bmatrix}
+1/\sqrt{3} \\
+-1/\sqrt{3} \\
+1/\sqrt{3}
+\end{bmatrix}
+$$
+
+3. **Bases for Fundamental Subspaces**:
+
+   * $C(A)$: Orthonormal basis is $u_1, u_2$.
+   * $N(A)$: Orthonormal basis is $v_3$.
+   * $C(A^T)$: Orthonormal basis is $v_1, v_2$.
+   * $N(A^T)$: Orthonormal basis is empty (since $AA^T$ is invertible).
+
+> [!NOTE]
+> The SVD chooses orthonormal bases for all four fundamental subspaces. The first $r$ columns of $U$ span the column space $C(A)$, the last $m-r$ span the left nullspace $N(A^T)$, the first $r$ columns of $V$ span the row space $C(A^T)$, and the last $n-r$ span the nullspace $N(A)$.
 
 
