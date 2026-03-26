@@ -416,7 +416,13 @@ A real symmetric matrix $A$ is **positive definite** if it satisfies the followi
 
 ### The 2 by 2 Case
 
-For a symmetric 2 by 2 matrix $A = \begin{bmatrix} a & b \ b & c \end{bmatrix}$, the quadratic form is $f(x,y) = ax^2 + 2bxy + cy^2$. This function has a minimum at $(0,0)$ if and only if:
+For a symmetric 2 by 2 matrix 
+
+$$
+A = \begin{bmatrix} a & b \\\ b & c \end{bmatrix}
+$$
+
+, the quadratic form is $f(x,y) = ax^2 + 2bxy + cy^2$. This function has a minimum at $(0,0)$ if and only if:
 
 1. $a > 0$
 2. $ac - b^2 > 0$.
