@@ -312,3 +312,90 @@ Since $\log_2 3 \approx 1.59$:
 *   **Seminar (1960)**: Kolmogorov mentioned this conjecture at Moscow University.
 *   **The Breakthrough**: Anatolii Karatsuba, a 23-year-old student, returned two weeks later with this divide and conquer algorithm.
 *   **Refinements**: Karatsuba's original proposal used $(x_{1} + x_{0})(y_{1} + y_{0})$, which led to $n+1$ bits and a messier analysis. Donald Knuth introduced the simplification using $(x_{1} - x_{0})(y_{1} - y_{0})$ to make the analysis go more smoothly.
+
+
+
+
+
+---
+
+
+
+
+# 8.4: Divide and Conquer - Recursion Trees
+
+## 8.4.1: Solving Recurrences
+Divide and conquer involves breaking up a problem into disjoint subproblems and combining the solutions efficiently. In this strategy, subproblems do not refer to each other and are solved separately. The complexity $T(n)$ of such an algorithm is expressed as a recurrence because it depends on the complexity of smaller subproblems plus the extra cost of splitting and combining. 
+
+Simple recurrences can be solved by repeated substitution:
+*   **Binary Search**: $T(n) = T(n/2) + 1$, resulting in $O(\log n)$.
+*   **Merge Sort**: $T(n) = 2T(n/2) + n$, resulting in $O(n \log n)$.
+
+More complicated recurrences arise in integer multiplication:
+*   **Naive Divide and Conquer**: $T(n) = 4T(n/2) + n$, resulting in $O(n^{2})$.
+*   **Karatsuba's Algorithm**: $T(n) = 3T(n/2) + n$, resulting in $O(n^{\log 3})$.
+
+There is a uniform way to compute the asymptotic expression for $T(n)$ using recursion trees.
+
+## 8.4.2: Recursion Tree Definition
+A recursion tree is a rooted tree where each node represents one recursive subproblem. 
+*   The **value** of each node is the time spent on that specific subproblem, excluding the recursive calls made from that node. 
+*   Recursive calls are added up in the nodes below as children of the node that created them.
+
+### Parameters of a Recursion Tree
+On an input of size $n$:
+*   $f(n)$ represents the time spent on **non-recursive work** (splitting the problem and combining answers).
+*   $r$ is the **number of recursive calls**.
+*   Each recursive call works on a subproblem of size $n/c$, where $c$ is a constant fraction of the input.
+
+> [!IMPORTANT]
+> The parameters $r$ (number of subproblems) and $c$ (size reduction factor) are independent. For example, in Karatsuba's algorithm, $r=3$ and $c=2$ because three subproblems of half the size are solved.
+
+The resulting general recurrence is $T(n) = rT(n/c) + f(n)$.
+
+<img width="975" height="478" alt="image" src="https://github.com/user-attachments/assets/54526351-5815-48a5-9f27-4f6e12c98348" />
+
+## 8.4.3: Analyzing the Tree Structure
+1.  **Root**: The root of the recursion tree for $T(n)$ has the value $f(n)$.
+2.  **Children**: The root has $r$ children, each representing the root of a tree for $T(n/c)$.
+3.  **Levels**: Each node at level $d$ has the value $f(n/c^{d})$. 
+4.  **Level Population**: Level $i$ contains $r^{i}$ nodes.
+5.  **Tree Depth**: The tree has $L$ levels, where $L = \log_{c} n$ (assuming $n$ is a power of $c$).
+6.  **Base Case**: Leaves correspond to the base case $T(1)$, which is assumed to be $1$ for asymptotic analysis.
+7.  **Leaf Level Cost**: There are $r^{L}$ leaves. The cost of the last level is $r^{\log_{c} n} \cdot f(1) = n^{\log_{c} r}$ (utilizing the property $a^{\log_{b} c} = c^{\log_{b} a}$).
+
+The total cost $T(n)$ is the sum of costs level by level: $T(n) = \sum_{i=0}^{L} r^{i} \cdot f(n/c^{i})$.
+
+## 8.4.4: Three Common Complexity Cases
+The total cost can be interpreted as a series where $T(n) = \text{cost of level } 0 + \text{level } 1 + \dots + \text{level } L$.
+
+| Case | Description | Resulting Complexity |
+| :--- | :--- | :--- |
+| **Decreasing** | Each term is a constant factor smaller than the previous term. | **Root dominates**: $T(n) = O(f(n))$. |
+| **Equal** | All terms in the series across all levels are equal. | **Balanced**: $T(n) = O(f(n) \cdot L) = O(f(n) \log n)$. |
+| **Increasing** | Series grows exponentially; each term is a constant factor larger than the previous. | **Leaves dominate**: $T(n) = O(n^{\log_{c} r})$. |
+
+## 8.4.5: Examples of Recursion Tree Analysis
+### Merge Sort
+*   **Recurrence**: $T(n) = 2T(n/2) + n$.
+*   **Analysis**: At level $0$, cost is $n$; at level $1$, cost is $2(n/2) = n$; at level $2$, cost is $4(n/4) = n$.
+*   **Classification**: Equal series.
+*   **Result**: $T(n) = O(n \log n)$.
+
+### Quicksort (Clever Pivot)
+*   Assume a pivot always stays in the middle third $[n/3, 2n/3]$, resulting in unequal partitions.
+*   **Recurrence**: $T(n) = T(n/3) + T(2n/3) + n$.
+*   **Analysis**: The tree will have "holes" because the left side shrinks faster than the right, but the longest path is $L = \log_{3/2} n = O(\log n)$. 
+*   **Classification**: Every level still adds up to $n$, making it an equal series.
+*   **Result**: $T(n) = O(n \log n)$.
+
+### Integer Multiplication
+*   **Naive Approach**: $T(n) = 4T(n/2) + n$.
+    *   **Classification**: Increasing (exponential); leaves dominate.
+    *   **Result**: $T(n) = n^{\log_{2} 4} = O(n^{2})$.
+*   **Karatsuba's Algorithm**: $T(n) = 3T(n/2) + n$.
+    *   **Classification**: Increasing (exponential); leaves dominate.
+    *   **Result**: $T(n) = n^{\log_{2} 3} \approx O(n^{1.59})$.
+
+## 8.4.6: Summary and Master Theorem
+These recursion tree calculations are sometimes referred to as the **Master Theorem** for recursion. By determining if a recurrence is increasing, decreasing, or stable, one can directly read off the asymptotic complexity without manual expansion. This provides a uniform way to analyze divide and conquer algorithms.
