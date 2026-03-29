@@ -106,3 +106,104 @@ def sortAndCount(A):
 
 
 
+# 8.2: Closest Pair of Points
+
+## 8.2.1: Context - Video Game Objects
+In a video game with several objects on the screen, a basic step is to find the closest pair of objects. With $n$ objects, a naive brute force algorithm takes $O(n^{2})$ time by computing the distance for every pair and reporting the minimum. There is a clever divide and conquer algorithm that reduces this time to $O(n \log n)$.
+
+## 8.2.2: Problem Statement
+Points $p$ in 2D are represented as $(x, y)$. The Euclidean distance between $p_{1}=(x_{1}, y_{1})$ and $p_{2}=(x_{2}, y_{2})$ is defined as:
+$$d(p_{1}, p_{2}) = \sqrt{(y_{2}-y_{1})^{2} + (x_{2}-x_{1})^{2}}$$.
+Given $n$ points $\{p_{1}, p_{2}, \dots, p_{n}\}$, the goal is to find the closest pair.
+
+> [!NOTE]
+> **Assumption**: Assume no two points have the same $x$ or $y$ coordinate. Points can always be rotated slightly to ensure this without changing their relative distances.
+
+<img width="530" height="424" alt="image" src="https://github.com/user-attachments/assets/9d1297cd-be09-4d33-87bf-58a6b32984b8" />
+
+## 8.2.3: Closest Pair in 1 Dimension
+In 1D, points are just $x$-coordinates, and distance is $d(p_{i}, p_{j}) = |x_{j} - x_{i}|$.
+1.  **Sort** the points: $O(n \log n)$.
+2.  **Scan**: In sorted order, the nearest points to $p$ are its immediate neighbors.
+3.  Perform an $O(n)$ scan to find the minimum separation between adjacent points.
+**Total Time**: $O(n \log n)$.
+
+## 8.2.4: Divide and Conquer in 2 Dimensions
+The strategy involves splitting the points into two halves using a vertical line.
+1.  **Divide**: Split points into equal size sets $Q$ (left) and $R$ (right).
+2.  **Recursion**: Compute the closest pair in each half recursively.
+3.  **Combine**: Compare the shortest distance found in each half to the shortest distance across the dividing line.
+
+<img width="1006" height="473" alt="image" src="https://github.com/user-attachments/assets/50438ea6-24db-4597-a77b-2034f17e1c04" />
+
+## 8.2.5: Efficiently Dividing and Sorting
+To avoid repeated sorting, the algorithm maintains two lists: $P_{x}$ (points sorted by $x$) and $P_{y}$ (points sorted by $y$).
+*   **Splitting $P_{x}$**: $Q_{x}$ is the first half of $P_{x}$, and $R_{x}$ is the second half.
+*   **Splitting $P_{y}$**: Let $x_{R}$ be the smallest $x$-coordinate in $R$. Scan $P_{y}$ once; if a point's $x$-coordinate is $< x_{R}$, move it to $Q_{y}$, otherwise to $R_{y}$.
+*   This ensures $Q_{y}$ and $R_{y}$ are constructed in sorted $y$-order in $O(n)$ time.
+
+## 8.2.6: Combining Solutions - The Band Strategy
+Let $d_{Q}$ and $d_{R}$ be the closest distances in $Q$ and $R$ respectively.
+1.  Set $\delta = \min(d_{Q}, d_{R})$.
+2.  Only consider points within a vertical band of distance $\delta$ on either side of the separator.
+3.  No pair of points outside this $2\delta$-wide band can be closer than $\delta$.
+
+<img width="981" height="468" alt="image" src="https://github.com/user-attachments/assets/e594eec9-b5c5-4963-8887-dd003f6a9a27" />
+
+## 8.2.7: The Box Argument for Linear Scan
+Divide the $\delta$-band into boxes with sides of $\delta/2$.
+*   **Property**: Each box can contain at most one point because the diagonal is $\delta/\sqrt{2} < \delta$, and any two points in the same box (on the same side of the line) would have to be at least $\delta$ apart.
+*   **Neighborhood**: Any point within distance $\delta$ of a point $p$ must lie within a $4 \times 4$ neighborhood of boxes.
+*   **Linear Scan**: Extract $S_{y}$ (points in the band sorted by $y$) from $Q_{y}$ and $R_{y}$. Scan $S_{y}$ from bottom to top, comparing each point $p$ with only the next **15 points** in the list.
+
+<img width="962" height="488" alt="image" src="https://github.com/user-attachments/assets/f7cdc0e2-f303-4429-b149-767d3110b7f3" />
+
+## 8.2.8: Algorithm Pseudocode
+```python
+def ClosestPair(Px, Py):
+    if len(Px) <= 3:
+        compute pairwise distances
+        return closest pair and distance
+    
+    # Divide
+    Construct (Qx, Qy), (Rx, Ry)
+    
+    # Conquer
+    (q1, q2, dQ) = ClosestPair(Qx, Qy)
+    (r1, r2, dR) = ClosestPair(Rx, Ry)
+    
+    # Combine
+    delta = min(dQ, dR)
+    Construct Sy from Qy, Ry
+    Scan Sy, find cross-boundary closest pair (s1, s2, dS)
+    
+    return the pair with the overall minimum distance (dQ, dR, or dS)
+```
+
+## 8.2.9: Complexity Analysis
+*   **Initial Sort**: $O(n \log n)$ to get $P_{x}$ and $P_{y}$.
+*   **Recursive Work**:
+    *   Constructing $(Q_{x}, Q_{y}), (R_{x}, R_{y})$: $O(n)$.
+    *   Constructing $S_{y}$: $O(n)$.
+    *   Scanning $S_{y}$: $O(n)$.
+*   **Recurrence**: $T(n) = 2T(n/2) + O(n)$, which is identical to Merge Sort.
+*   **Overall Time**: $O(n \log n)$.
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
