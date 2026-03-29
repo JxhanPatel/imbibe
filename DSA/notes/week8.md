@@ -207,3 +207,108 @@ def ClosestPair(Px, Py):
 
 
 
+# 8.3: Integer Multiplication
+
+## 8.3.1: Standard Multiplication (Naive Approach)
+The problem is how to multiply two integers $x$ and $y$. The method learned in school involves forming partial products by multiplying each digit of $y$ separately by $x$. 
+
+**Process**:
+1. Form partial products by taking each digit of $y$ and multiplying it by all of $x$.
+2. Add up all the partial products.
+3. This works the same in any base, such as binary.
+
+**Complexity Analysis**:
+To multiply two $n$-bit numbers:
+*   There are $n$ partial products.
+*   Adding each partial product to the cumulative sum is $O(n)$.
+*   **Overall time**: $O(n^{2})$.
+
+> [!NOTE]
+> It appears that every row (partial product) is necessary, especially if every bit in the multiplier is 1, suggesting $n^{2}$ operations are unavoidable in this approach.
+
+<img width="335" height="292" alt="image" src="https://github.com/user-attachments/assets/043f0095-fd35-4ee6-88df-39c364b44b93" />
+
+## 8.3.2: Naive Divide and Conquer
+The logical way to apply divide and conquer is to split the $n$ bits of each number into two groups of $n/2$.
+
+*   Let $x = x_{1} \cdot 2^{n/2} + x_{0}$, where $x_{1}$ is the upper half and $x_{0}$ is the lower half of the bits.
+*   Similarly, $y = y_{1} \cdot 2^{n/2} + y_{0}$.
+
+**Rewriting the product $xy$**:
+$xy = (x_{1} \cdot 2^{n/2} + x_{0})(y_{1} \cdot 2^{n/2} + y_{0})$
+**Regrouping the terms**:
+$xy = x_{1}y_{1} \cdot 2^{n} + (x_{1}y_{0} + x_{0}y_{1}) \cdot 2^{n/2} + x_{0}y_{0}$
+
+This decomposition requires **four** $n/2$-bit multiplications:
+1. $x_{1}y_{1}$
+2. $x_{1}y_{0}$
+3. $x_{0}y_{1}$
+4. $x_{0}y_{0}$
+
+**Recurrence and Result**:
+*   $T(1) = 1$
+*   $T(n) = 4T(n/2) + n$
+*   Combining the products requires adding $O(n)$ bit numbers.
+*   Solving this recurrence results in $T(n) = O(n^{2})$.
+*   **Conclusion**: This naive divide and conquer approach does not help as it yields the same complexity as the standard method.
+
+## 8.3.3: Karatsuba's Algorithm
+Anatolii Karatsuba discovered that four multiplications can be replaced by three by cleverly rearranging terms.
+
+**The Observation**:
+Consider the product: $(x_{1} - x_{0})(y_{1} - y_{0}) = x_{1}y_{1} - (x_{1}y_{0} + x_{0}y_{1}) + x_{0}y_{0}$.
+The middle term we need, $(x_{1}y_{0} + x_{0}y_{1})$, can be extracted using three products:
+1. $p = x_{1}y_{1}$
+2. $q = x_{0}y_{0}$
+3. $r = (x_{1} - x_{0})(y_{1} - y_{0})$
+
+**Formula**:
+$(x_{1}y_{0} + x_{0}y_{1}) = p + q - r$.
+
+### The Algorithm Pseudocode
+```python
+Fast-Multiply(x, y, n):
+    if n == 1:
+        return x * y
+    else:
+        m = n // 2
+        # Extract halves using bit shifting (division and remainder)
+        (x1, x0) = (x // 2**m, x % 2**m)
+        (y1, y0) = (y // 2**m, y % 2**m)
+        
+        (a, b) = (x1 - x0, y1 - y0)
+        
+        p = Fast-Multiply(x1, y1, m)
+        q = Fast-Multiply(x0, y0, m)
+        r = Fast-Multiply(a, b, m)
+        
+        return p * 2**n + (p + q - r) * 2**(n//2) + q
+```
+
+
+## 8.3.4: Complexity Analysis of Karatsuba
+The recurrence for Karatsuba's algorithm is:
+$T(1) = 1$
+$T(n) = 3T(n/2) + n$
+
+**Expansion**:
+$T(n) = 3T(n/2) + n$
+$T(n) = 3^{2}T(n/2^{2}) + (3/2 + 1)n$
+$T(n) = 3^{3}T(n/2^{3}) + ((3/2)^{2} + (3/2)^{1} + 1)n$
+
+After $\log n$ steps:
+$T(n) = 3^{\log n}T(1) + \text{Geometric Series Contribution}$
+
+**Key Term**:
+$3^{\log n} = n^{\log 3}$
+Since $\log_2 3 \approx 1.59$:
+**Overall Complexity**: $O(n^{1.59})$
+
+> [!IMPORTANT]
+> Karatsuba's algorithm reduces the complexity of integer multiplication from $O(n^{2})$ to a subquadratic $O(n^{1.59})$.
+
+## 8.3.5: Historical Notes
+*   **Andrei Kolmogorov**: In the 1950s, he publicly conjectured that multiplication could not be done in subquadratic time ($O(n^{2})$).
+*   **Seminar (1960)**: Kolmogorov mentioned this conjecture at Moscow University.
+*   **The Breakthrough**: Anatolii Karatsuba, a 23-year-old student, returned two weeks later with this divide and conquer algorithm.
+*   **Refinements**: Karatsuba's original proposal used $(x_{1} + x_{0})(y_{1} + y_{0})$, which led to $n+1$ bits and a messier analysis. Donald Knuth introduced the simplification using $(x_{1} - x_{0})(y_{1} - y_{0})$ to make the analysis go more smoothly.
