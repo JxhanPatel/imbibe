@@ -399,3 +399,144 @@ The total cost can be interpreted as a series where $T(n) = \text{cost of level 
 
 ## 8.4.6: Summary and Master Theorem
 These recursion tree calculations are sometimes referred to as the **Master Theorem** for recursion. By determining if a recurrence is increasing, decreasing, or stable, one can directly read off the asymptotic complexity without manual expansion. This provides a uniform way to analyze divide and conquer algorithms.
+
+
+
+
+---
+
+
+
+
+# 8.5: Divide and Conquer - Quick Select
+
+## 8.5.1: Selection
+Selection is the problem of finding a specific position in a list. In particular, we want to find the $k^{th}$ largest value in a sequence of length $n$.
+
+*   **Sort and Look Strategy**: Sort the list in descending order and look at position $k$. Complexity: $O(n \log n)$.
+*   **Special Cases**:
+    *   $k = 1$: Maximum value, $O(n)$.
+    *   $k = n$: Minimum value, $O(n)$.
+    *   **Fixed $k$**: $k$ passes, $O(kn)$.
+    *   **Median**: $k = n/2$. Finding the median in $O(n)$ makes quicksort $O(n \log n)$.
+
+## 8.5.2: Divide and Conquer Strategy
+Recall the partitioning strategy for quicksort. A pivot partitions a sequence into a **lower** segment (values $\le$ pivot) and an **upper** segment (values $>$ pivot).
+
+Let $m = len(lower)$. There are 3 cases for finding the $k^{th}$ largest element:
+1.  **$k \le m$**: The answer lies in the **lower** segment.
+2.  **$k == m + 1$**: The answer is the **pivot**.
+3.  **$k > m + 1$**: The answer lies in the **upper** segment.
+
+### Recursive Strategy
+*   **Case 1**: `select(lower, k)`.
+*   **Case 2**: `return(pivot)`.
+*   **Case 3**: `select(upper, k - (m + 1))`.
+
+<img width="1206" height="421" alt="image" src="https://github.com/user-attachments/assets/c01647a8-befd-495c-9bad-8ea3e0fe83bf" />
+
+## 8.5.3: Quickselect Implementation
+```python
+def quickselect(L, l, r, k): # k-th largest in L[l:r]
+    if (k < 1) or (k > r - l):
+        return (None)
+    
+    (pivot, lower, upper) = (L[l], l + 1, l + 1)
+    
+    for i in range(l + 1, r):
+        if L[i] > pivot: # Extend upper segment
+            upper = upper + 1
+        else: # Exchange L[i] with start of upper segment
+            (L[i], L[lower]) = (L[lower], L[i])
+            (lower, upper) = (lower + 1, upper + 1)
+            
+    (L[l], L[lower - 1]) = (L[lower - 1], L[l]) # Move pivot
+    lower = lower - 1
+    
+    # Recursive calls
+    lowerlen = lower - l
+    if k <= lowerlen:
+        return(quickselect(L, l, lower, k))
+    elif k == (lowerlen + 1):
+        return (L[lower])
+    else:
+        return(quickselect(L, lower + 1, r, k - (lowerlen + 1)))
+```
+
+
+## 8.5.4: Analysis of Quickselect
+The recurrence is similar to quicksort:
+*   $T(1) = 1$
+*   $T(n) = \max(T(m), T(n - (m + 1))) + n$, where $m = len(lower)$.
+
+> [!WARNING]
+> **Worst Case Performance**:
+> If the pivot is always an extreme value (e.g., $m$ is always 0 or $n-1$), the recurrence becomes $T(n) = T(n - 1) + n$. In this case, $T(n)$ is **$O(n^{2})$**.
+
+## 8.5.5: Median of Medians (MoM)
+To ensure $O(n)$ performance, we must pick a "good" pivot that knocks off a fixed fraction of the list. The **Median of Medians** algorithm achieves this.
+
+### The MoM Algorithm
+1.  **Divide** $L$ into blocks of 5.
+2.  **Find** the median of each block (using brute force/sorting).
+3.  **Collect** block medians into a list $M$.
+4.  **Recursively** apply the process to $M$ to find the median of medians.
+
+```python
+def MoM(L): # Median of medians
+    if len(L) <= 5:
+        L.sort()
+        return(L[len(L) // 2])
+    
+    # Construct list of block medians
+    M = []
+    for i in range(0, len(L), 5):
+        X = L[i : i + 5]
+        X.sort()
+        M.append(X[len(X) // 2])
+        
+    return(MoM(M))
+```
+
+
+## 8.5.6: Visualization and Pivot Quality
+If each block of 5 is arranged in ascending order top to bottom, and the blocks are ordered by their medians, we can visualize the distribution.
+
+*   The median of medians (MoM) is guaranteed to lie between $3n/10$ and $7n/10$.
+*   At least $3/10$ of the elements are smaller than the MoM, and at least $3/10$ are larger.
+
+<img width="920" height="466" alt="image" src="https://github.com/user-attachments/assets/a3657837-21b6-47b0-8a9f-68816337eb82" />
+<img width="879" height="476" alt="image" src="https://github.com/user-attachments/assets/72740016-d8df-4808-b239-7b2f3cf14de4" />
+
+
+## 8.5.7: Fastselect Algorithm
+`fastselect` is Quickselect using the Median of Medians to locate the pivot.
+
+```python
+def fastselect(L, l, r, k): # k-th largest in L[l:r]
+    if (k < 1) or (k > r - l):
+        return (None)
+    
+    # Find MoM pivot and move to L[l]
+    pivot = MoM(L[l:r])
+    pivotpos = min([i for i in range(l, r) if L[i] == pivot])
+    (L[l], L[pivotpos]) = (L[pivotpos], L[l])
+    
+    # Partition and Recursive calls (Same as quickselect)
+    ...
+```
+
+
+### Complexity of Fastselect
+*   `MoM` is $O(n)$.
+*   Recurrence for `fastselect`: $T(n) = \max(T(3n/10), T(7n/10)) + n$, which is **$O(n)$**.
+
+## 8.5.8: Summary and Historical Notes
+*   **Pivot Selection**: Median of block medians helps find a good pivot in $O(n)$.
+*   **Performance**: Selection becomes $O(n)$; Quicksort can be made $O(n \log n)$ in the worst case using this strategy.
+*   **Exact Median**: `fastselect` with $k = len(L)/2$ finds the real median in $O(n)$.
+
+> [!NOTE]
+> **History**:
+> *   C.A.R. Hoare described Quickselect in 1962, the same paper introducing Quicksort.
+> *   The Median of Medians algorithm was introduced in 1973 by Manuel Blum, Robert Floyd, Vaughn Pratt, Ron Rivest, and Robert Tarjan.
