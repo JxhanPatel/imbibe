@@ -476,7 +476,10 @@ The gradient is a **vector of partial derivatives**.
 * **Notation:** The gradient uses the symbol $\nabla$ (nabla), denoted as $\nabla f$.
 
 For a two-dimensional function at a point $(a, b)$, the gradient is:
-$$\nabla f(a, b) = \begin{bmatrix} \frac{\partial f}{\partial x_1} \Big|_{x_1=a} \\ \frac{\partial f}{\partial x_2} \Big|_{x_2=b} \end{bmatrix}$$
+
+$$
+\nabla f(a, b) = \begin{bmatrix} \frac{\partial f}{\partial x_1} \Big|_{x_1=a} \\ \frac{\partial f}{\partial x_2} \Big|_{x_2=b} \end{bmatrix}
+$$
 
 <img width="300" height="278" alt="image" src="https://github.com/user-attachments/assets/53ba271d-f18c-42ec-ba37-d63f7c49fe1b" />
 
@@ -488,7 +491,14 @@ Given $f(x_1, x_2) = x_1^2 + 4x_2 + 8x_2^2$, find the gradient at point $(1, 3)$
 2.  **Evaluate at $(1, 3)$:**
     * $x_1 = 1 \implies 2(1) = 2$
     * $x_2 = 3 \implies 4 + 16(3) = 52$
-3.  **Result:** $\nabla f(1, 3) = \begin{bmatrix} 2 \\ 52 \end{bmatrix}$
+    * 
+3.  **Result:**
+
+$$
+\nabla f(1, 3) = \begin{bmatrix} 2 \\\ 52 \end{bmatrix}
+$$
+
+
 
 The gradient is a vector, meaning it has both **direction and magnitude**. Moving in the direction of the negative gradient means moving in the direction given by this vector.
 
@@ -497,14 +507,41 @@ Consider a distance function $d(x_1, x_2)$ representing the squared distance fro
 $$d(x_1, x_2) = (x_1 - 40)^2 + (x_2 - 40)^2$$
 
 ### Scenario 1: Point $(5, 2)$
-* **Gradient:** $\nabla d = \begin{bmatrix} 2(x_1 - 40) \\ 2(x_2 - 40) \end{bmatrix}$
-* **Evaluation at $(5, 2)$:** $\nabla d(5, 2) = \begin{bmatrix} -70 \\ -76 \end{bmatrix}$
-* **Negative Gradient:** $-\nabla d(5, 2) = \begin{bmatrix} 70 \\ 76 \end{bmatrix}$
+* **Gradient:**
+
+$$
+\nabla d = \begin{bmatrix} 2(x_1 - 40) \\\ 2(x_2 - 40) \end{bmatrix}
+$$
+
+* **Evaluation at $(5, 2)$:** 
+
+$$
+\nabla d(5, 2) = \begin{bmatrix} -70 \\\ -76 \end{bmatrix}
+$$
+
+* **Negative Gradient:**
+
+$$
+-\nabla d(5, 2) = \begin{bmatrix} 70 \\\ 76 \end{bmatrix}
+$$
+
 * **Intuition:** Since both coordinates are positive, moving in this direction adds a positive multiple to $x_1$ and $x_2$, moving the cow closer to $(40, 40)$.
 
+
+
 ### Scenario 2: Point $(30, 50)$
-* **Evaluation at $(30, 50)$:** $\nabla d(30, 50) = \begin{bmatrix} 2(30-40) \\ 2(50-40) \end{bmatrix} = \begin{bmatrix} -20 \\ 20 \end{bmatrix}$
-* **Negative Gradient:** $-\nabla d(30, 50) = \begin{bmatrix} 20 \\ -20 \end{bmatrix}$
+* **Evaluation at $(30, 50)$:**
+
+$$
+\nabla d(30, 50) = \begin{bmatrix} 2(30-40) \\\ 2(50-40) \end{bmatrix} = \begin{bmatrix} -20 \\\ 20 \end{bmatrix}
+$$
+
+* **Negative Gradient:**
+
+$$
+-\nabla d(30, 50) = \begin{bmatrix} 20 \\\ -20 \end{bmatrix}
+$$
+
 * **Intuition:** Moving in the positive $x$ direction and negative $y$ direction (toward the third quadrant relative to the point) moves the cow closer to the grass at $(40, 40)$.
 
 <img width="387" height="340" alt="image" src="https://github.com/user-attachments/assets/a43e7e54-942c-407c-b2d9-2d9a31adcde9" />
@@ -512,7 +549,9 @@ $$d(x_1, x_2) = (x_1 - 40)^2 + (x_2 - 40)^2$$
 ## Multivariate Gradient Descent Algorithm
 The formal update rule for higher dimensions is:
 
-$$\mathbf{x}_{t+1} = \mathbf{x}_t + \eta \cdot (-\nabla f(\mathbf{x}_t))$$
+$$
+\mathbf{x}_{t+1} = \mathbf{x}_t + \eta \cdot (-\nabla f(\mathbf{x}_t))
+$$
 
 **Variable Types:**
 * $\mathbf{x}_{t+1}, \mathbf{x}_t$: Vectors (depending on the number of variables).
@@ -522,3 +561,73 @@ $$\mathbf{x}_{t+1} = \mathbf{x}_t + \eta \cdot (-\nabla f(\mathbf{x}_t))$$
 ### Key Properties
 * **Direction of Decrease:** The negative gradient always points toward the direction of decrease.
 * **Local Minimum:** This algorithm is guaranteed to converge to a **local minimum** for any unconstrained optimization problem where the gradient can be computed.
+
+
+
+
+
+
+
+
+
+# 8.8: Taylor Series in Higher Dimensions
+
+## Taylor Series Analog for Higher Dimensions
+The Taylor series justification for selecting the negative derivative as the descent direction in one dimension can be generalized to higher dimensions.
+
+### The Higher-Order Taylor Series Equation
+In multiple variables, evaluating the function at a new point $\mathbf{x} + \eta \mathbf{d}$ (where both $\mathbf{x}$ and $\mathbf{d}$ are vectors) is approximated as:
+$$f(\mathbf{x} + \eta \mathbf{d}) \approx f(\mathbf{x}) + \eta \mathbf{d}^T \nabla f(\mathbf{x})$$
+
+**Components:**
+* **$f(\mathbf{x})$**: A scalar representing the function evaluation at vector $\mathbf{x}$.
+* **$\eta$**: A positive scalar (step size).
+* **$\nabla f(\mathbf{x})$**: The gradient vector (the generalization of $f'(x)$).
+* **$\mathbf{d}^T \nabla f(\mathbf{x})$**: The directional derivative along vector $\mathbf{d}$. This is a scalar value calculated via a **dot product**.
+
+#### Dot Product Reminder
+If $\mathbf{a} = [a_1, \dots, a_d]^T$ and $\mathbf{b} = [b_1, \dots, b_d]^T$, then:
+$$\mathbf{a}^T \mathbf{b} = a_1b_1 + a_2b_2 + \dots + a_db_d$$
+
+<img width="500" height="384" alt="image" src="https://github.com/user-attachments/assets/3d31245c-70e3-4244-b5e9-c7e56e3808b2" />
+<img width="1663" height="1164" alt="image" src="https://github.com/user-attachments/assets/e58b9c4d-5b9d-422d-944a-9825837d80d7" />
+
+## The Descent Direction
+To ensure the function value decreases ($f(\mathbf{x} + \eta \mathbf{d}) - f(\mathbf{x}) < 0$), we require:
+$$\eta \mathbf{d}^T \nabla f(\mathbf{x}) < 0 \implies \mathbf{d}^T \nabla f(\mathbf{x}) < 0$$
+
+### Case: $\mathbf{d} = -\nabla f(\mathbf{x})$
+If we choose the direction used in gradient descent ($\mathbf{d} = -\nabla f(\mathbf{x})$):
+$$\mathbf{d}^T \nabla f(\mathbf{x}) = (-\nabla f(\mathbf{x}))^T \nabla f(\mathbf{x}) = -\|\nabla f(\mathbf{x})\|^2$$
+The squared norm $\|\mathbf{a}\|^2 = \sum a_i^2$ is always positive. Therefore, $-\|\nabla f(\mathbf{x})\|^2$ is always less than zero, guaranteeing descent for a small enough step.
+
+
+## Infinite Descent Directions
+While the negative gradient is a valid descent direction, it is not the *only* one. Any direction $\mathbf{d}$ that makes a negative dot product with the gradient is a descent direction.
+
+### Partitioning the Space
+A vector $\mathbf{w}$ (like the gradient) partitions the 2D space into three regions based on the direction $\mathbf{d}$:
+1.  **$\mathbf{d}^T \mathbf{w} = 0$**: The set of points perpendicular to $\mathbf{w}$ (a line in 2D).
+2.  **$\mathbf{d}^T \mathbf{w} > 0$**: The half-space where the dot product is positive.
+3.  **$\mathbf{d}^T \mathbf{w} < 0$**: The half-space where the dot product is negative (the **descent region**).
+
+In optimization, any direction $\mathbf{d}$ chosen from the region where $\mathbf{d}^T \nabla f(\mathbf{x}) < 0$ will result in a decrease in the function value.
+
+<img width="680" height="182" alt="image" src="https://github.com/user-attachments/assets/de3be336-c0d9-47e7-b4e5-43d4738e0aa9" />
+
+## Steepest Descent
+The negative gradient direction ($\mathbf{d} = -\nabla f(\mathbf{x})$) is special because it provides the **steepest descent**.
+* If restricted to moving a unit length in any direction, the negative gradient direction yields the **maximum possible decrease** in the function value.
+* Consequently, gradient descent is also known as the **steepest descent algorithm**.
+
+## Transition to Constrained Optimization
+In unconstrained optimization ($\min f(\mathbf{x})$), the negative gradient is the ideal direction. However, problems change when **constraints** are introduced.
+
+### Constrained Problem Format
+$$\min f(\mathbf{x}) \text{ s.t. } g(\mathbf{x}) \le 0$$
+
+**Example:** A cow tied to a rope where the rope limits movement to a specific radius:
+$$g(\mathbf{x}) = x_1^2 + x_2^2 - 10 \le 0$$
+
+**The Challenge:** Moving in the negative gradient direction might lead to a point that violates the constraint ($g(\mathbf{x}) > 0$). In constrained optimization, other descent directions may become necessary to stay within the feasible region while still minimizing the function.
+
