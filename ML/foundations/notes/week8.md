@@ -372,10 +372,88 @@ For many functions used in machine learning, every local minimum is also a globa
 
 * **Example:** $f(x) = (x - 5)^2$ is a convex function. It has only one local minimum ($x = 5$), which is also its global minimum.
 * For convex functions, gradient descent is guaranteed to find the optimal answer (the global minimum).
+<img width="911" height="464" alt="image" src="https://github.com/user-attachments/assets/ef3421ce-e39d-4da4-b4ab-a139686dd7c7" />
 
 
 ## Summary
 Gradient descent is a powerful tool for solving unconstrained optimization problems. It uses the direction of the negative derivative ($-f'(x)$) to iteratively move toward a local minimum. In the next lectures, we will explore why $-f'(x)$ is a good direction and how to handle constraints.
+
+
+
+
+---
+
+
+
+
+
+# 8.6: Gradient Descent & Taylor Series
+
+## Overview of Gradient Descent
+Gradient descent is a fundamental iterative algorithm for unconstrained optimization problems where the goal is to minimize a function $f(x)$ without any constraints on $x$.
+
+### The Update Rule
+At any point $x_t$, the current point is updated to $x_{t+1}$ using the following key equation:
+
+$$x_{t+1} = x_t + \eta_t \cdot (-f'(x_t))$$
+
+**Components of the rule:**
+* **Derivative Step:** Taking a step in the negative direction of the derivative ($-f'(x_t)$).
+* **Step Size ($\eta_t$):** A scaling factor for the step, rather than taking a full unit step.
+
+## The Taylor Series Expansion
+To justify why moving in the direction of the negative derivative is effective, we use the **Taylor series**. This equation allows us to compute a function's value at a point $x + \eta d$ by expanding it around the point $x$.
+
+### The General Equation
+$$f(x + \eta d) = f(x) + \eta d f'(x) + \frac{\eta^2 d^2}{2} f''(x) + \dots$$
+
+### Fundamental Importance
+* **Local to Global Information:** The function's value at a new point ($x + \eta d$) can be determined using information strictly from the current point $x$.
+* **Evaluation Points:** Notice that $f(x)$, $f'(x)$, and $f''(x)$ are all evaluated at the current point $x$.
+* **Complete Description:** If you know the function's value, slope (first derivative), and curvature (second derivative) locally at $x$, you can compute the function's value at any other point by scaling $\eta$ and $d$ accordingly.
+
+## Applying Taylor Series to Optimization
+In the context of optimization, we analyze the function value after taking a small step $\eta$ in a direction $d$.
+
+### Neglecting Higher-Order Terms
+When $\eta$ is a small positive step size (e.g., $0.1$ or $0.01$):
+* $\eta^2$ becomes even smaller.
+* $\eta^3$ and higher powers become much smaller.
+
+For a small enough $\eta$, we can neglect these **higher-order terms** and approximate the function:
+$$f(x + \eta d) \approx f(x) + \eta d f'(x)$$
+
+### The Descent Condition
+We want to move from a current point $x$ to a new point $x + \eta d$ such that the function value decreases:
+$$f(x + \eta d) - f(x) < 0$$
+
+Using the Taylor approximation, this implies:
+$$\eta \cdot d \cdot f'(x) < 0$$
+
+Since $\eta$ is a positive constant, it does not change the sign. Therefore, we want a direction $d$ such that:
+$$d \cdot f'(x) < 0$$
+
+<img width="2499" height="1638" alt="image" src="https://github.com/user-attachments/assets/9324780d-70f5-40f2-96f4-11abd92c7cf8" />
+
+## Justification for the Choice of $d$
+The derivative $f'(x)$ (the slope) can be positive or negative depending on the point $x$. Therefore, the choice of $d$ must depend on $x$.
+
+### Why Choose $d = -f'(x)$?
+If we select the direction $d$ to be the negative derivative:
+1.  Substitute $d = -f'(x)$ into the condition $d \cdot f'(x)$.
+2.  The expression becomes: $(-f'(x)) \cdot f'(x) = -(f'(x))^2$.
+3.  Since any squared real number is non-negative, $-(f'(x))^2$ is guaranteed to be **less than zero** (unless $f'(x) = 0$, in which case the algorithm stops).
+
+### Conclusion
+Taylor series confirms that as long as the step size $\eta$ is small, choosing $d = -f'(x)$ ensures the function value is expected to reduce. This is the rationale for the gradient descent update rule.
+
+
+
+
+
+
+---
+
 
 
 
