@@ -319,3 +319,63 @@ Because the cumulative sum grows to infinity, the algorithm can eventually reach
 | **Geometric** | $\eta_t = \frac{1}{2^t}$ | Finite (Converges to 2) | **Bad:** May not reach the minimum. |
 | **Harmonic** | $\eta_t = \frac{1}{t+1}$ | Infinite (Diverges) | **Good:** Typically works for convergence. |
 
+
+
+
+
+---
+
+
+
+
+# 8.5: Basic Algorithm for Unconstrained Optimization: Gradient Descent
+
+## The Gradient Descent Algorithm
+
+We now have a complete recipe for making a computer solve an unconstrained minimization problem: $\min_{x \in \mathbb{R}} f(x)$. This algorithm is one of the simplest in optimization and is known as a **first-order algorithm** because it uses first-order information (the derivative).
+
+### The Algorithm Steps
+1.  **Initialize:** $x_0 \in \mathbb{R}$ (can be any arbitrary value).
+2.  **Iterate:** For $t = 0, 1, 2, \dots$
+    $$x_{t+1} = x_t - \eta_t f'(x_t)$$
+    Where $\eta_t$ is the step size. A common sequence to use is $\eta_t = \frac{1}{t+1}$.
+
+
+### Generalization to Higher Dimensions
+While we have focused on one-dimensional problems ($x \in \mathbb{R}$), this algorithm generalizes to $d$-dimensional vectors ($x \in \mathbb{R}^d$). In higher dimensions, the derivative is replaced by the **gradient**, which is why the algorithm is called **Gradient Descent**.
+
+---
+
+## Properties and Convergence
+
+### 1. Convergence
+If the step size sequence is chosen correctly (e.g., $\eta_t = \frac{1}{t+1}$), the algorithm is guaranteed to converge, meaning it will stop oscillating and settle at a specific value.
+
+### 2. Local vs. Global Minimum
+The gradient descent algorithm converges to a **local minimum**.
+
+* **Global Minimum ($x^★$):** A point where the function value is the smallest possible over the entire domain.
+    $$f(x^★) \leq f(x) \text{ for all } x$$
+* **Local Minimum ($\hat{x}$):** A point where the function value is the smallest within a specific neighborhood or interval.
+    **Formal Definition:** There exists an $\epsilon > 0$ such that $f(\hat{x}) \leq f(x)$ for all $x \in (\hat{x} - \epsilon, \hat{x} + \epsilon)$.
+
+<img width="884" height="511" alt="image" src="https://github.com/user-attachments/assets/bf1af137-0de8-4648-b1c1-23ab3117c137" />
+
+### The "Hill-Sliding" Intuition
+Imagine you are at a point on a hill and you slide down into a valley. If the terrain goes back up, you are stuck in that valley—this is a local minimum. Gradient descent "descends" the hill and stops at the bottom of whichever valley it starts in.
+
+---
+
+## Special Case: Convex Functions
+
+For many functions used in machine learning, every local minimum is also a global minimum. These are called **convex functions**.
+
+* **Example:** $f(x) = (x - 5)^2$ is a convex function. It has only one local minimum ($x = 5$), which is also its global minimum.
+* For convex functions, gradient descent is guaranteed to find the optimal answer (the global minimum).
+
+
+## Summary
+Gradient descent is a powerful tool for solving unconstrained optimization problems. It uses the direction of the negative derivative ($-f'(x)$) to iteratively move toward a local minimum. In the next lectures, we will explore why $-f'(x)$ is a good direction and how to handle constraints.
+
+
+
