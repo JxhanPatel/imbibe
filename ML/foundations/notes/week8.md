@@ -171,3 +171,83 @@ Where $x \in \mathbb{R}^d$ (a $d$-dimensional real space).
 2.  **Maximization vs. Minimization:** Is it possible to convert a maximization problem (like maximizing reward) into an equivalent minimization problem? If so, how? 
 
 
+
+
+
+---
+
+
+
+
+
+# 8.3: Solving an Unconstrained Optimization Problem | Part 1
+
+## Introduction to Unconstrained Optimization
+
+The general form of an optimization problem includes an objective and a bunch of constraints. To understand how to solve these, it makes sense to start with an **unconstrained optimization problem**, where constraints ($g_i(x)$ and $h_j(x)$) are absent. 
+### A Simple Example
+Consider minimizing a real number $x$:
+$$\min_{x \in \mathbb{R}} (x - 5)^2$$
+
+* **Logical Solution:** By observation, $x = 5$ is the solution because the squared function is non-negative and $(5-5)^2 = 0$. No other point can achieve a lower value. 
+* **Traditional School Method:**
+    1.  Let $f(x) = (x - 5)^2$.
+    2.  Compute the first derivative: $f'(x) = 2(x - 5)$.
+    3.  Set $f'(x) = 0 \implies 2(x - 5) = 0 \implies x^★ = 5$. 
+
+### Limitations of the Derivative Method
+The traditional method of setting the derivative to zero does not generalize to all problems. For example:
+$$\min_{x \in \mathbb{R}} 3x^6 + 2x^5 + 3x^3 + 5x^2 + 2$$
+Taking the derivative results in a degree-5 equation: $18x^5 + 10x^4 + 9x^2 + 10x = 0$. There is no easy way to solve this, and it is not even clear if the resulting $x$ is the minimum. 
+
+
+---
+
+## Developing a Systematic Iterative Procedure
+
+To enable a computer to solve optimization problems, we need a systematic, iterative procedure. 
+
+### The General Iterative Approach
+1.  **Start with an arbitrary initial guess** $x_0 \in \mathbb{R}$ (e.g., $x_0 = 10$).
+2.  **Update the guess** over $T$ rounds (e.g., $T = 1000$):
+    $$x_{t+1} = x_t + d$$
+    Where $d$ is a **direction** that hopefully moves the current point closer to the minimum.
+
+### Determining a Good Direction
+In the case of $f(x) = (x - 5)^2$:
+* If $x > 5$: We want to move left (add a negative value, $d < 0$).
+* If $x < 5$: We want to move right (add a positive value, $d > 0$). 
+
+<img width="1323" height="766" alt="image" src="https://github.com/user-attachments/assets/70159964-7efe-4ff5-b715-bfff1336f82a" />
+
+### The Choice of Direction ($d$)
+The direction $d$ must be a function of $x$. A specific choice that satisfies the requirements above is the **negative derivative**:
+$$d = -f'(x)$$
+
+**Verification for $f(x) = (x - 5)^2$:**
+* $f'(x) = 2(x - 5)$
+* If $x > 5 \implies f'(x) > 0 \implies d = -f'(x) < 0$ (Correct: Move left).
+* If $x < 5 \implies f'(x) < 0 \implies d = -f'(x) > 0$ (Correct: Move right). 
+
+---
+
+## Analyzing the Update Rule: The Oscillation Problem
+
+Using the update rule $x_{t+1} = x_t - f'(x_t)$ on $f(x) = (x - 5)^2$ starting at $x_0 = 10$: 
+
+1.  **Iteration 0:**
+    * $x_0 = 10$
+    * $f'(10) = 2(10 - 5) = 10$
+    * $x_1 = 10 - 10 = 0$
+2.  **Iteration 1:**
+    * $x_1 = 0$
+    * $f'(0) = 2(0 - 5) = -10$
+    * $x_2 = 0 - (-10) = 10$
+3.  **Iteration 2:**
+    * $x_2 = 10 \implies x_3 = 0$
+
+**Observation:** The algorithm oscillates between 10 and 0 and never reaches the minimum at $x = 5$. 
+
+### Diagnosis
+The problem is not the direction of movement. Our `−f′(x)` is indeed giving us a negative value when we need to move left and a positive value when we need to move right. The problem is the **amount** you move in this direction. The amount of movement seems high; you are taking a step in the direction given by your negative derivative, but that step is too large so that it misses the minimum.
+
