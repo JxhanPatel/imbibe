@@ -251,3 +251,71 @@ Using the update rule $x_{t+1} = x_t - f'(x_t)$ on $f(x) = (x - 5)^2$ starting a
 ### Diagnosis
 The problem is not the direction of movement. Our `−f′(x)` is indeed giving us a negative value when we need to move left and a positive value when we need to move right. The problem is the **amount** you move in this direction. The amount of movement seems high; you are taking a step in the direction given by your negative derivative, but that step is too large so that it misses the minimum.
 
+
+
+
+
+---
+
+
+
+
+
+# 8.4: Solving an Unconstrained Optimization Problem (Part 2)
+
+## Addressing the Step Size Issue
+
+The problem identified previously was not the direction of the update, but the **amount** of movement. To fix this, the update rule is modified by introducing a **step size**.
+
+### The Modified Update Rule
+$$x_{t+1} = x_t - \eta_t f'(x_t)$$
+
+* **$\eta_t$ (eta):** A scalar quantity called the **step size**.
+* **Properties:** It must be a positive scalar quantity ($\eta_t > 0$).
+
+If $\eta_t = 1$ for every $t$, the algorithm returns to the previous version that caused oscillation. The core idea is to take smaller steps potentially to ensure the algorithm converges to the minimum.
+
+<img width="471" height="293" alt="image" src="https://github.com/user-attachments/assets/724033eb-fe8f-4d29-8f3b-0d54417c4fcc" />
+
+---
+
+## Choosing a Step Size Sequence
+
+The step size should ideally be a decreasing sequence to prevent oscillation. However, the sequence must be chosen carefully to ensure the algorithm does not stall before reaching the minimum.
+
+### First Attempt: The Geometric Sequence
+$$\eta_t = \frac{1}{2^t}$$
+Sequence: $1, \frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \dots$
+
+**Problem: Limited Reach**
+A computer has no idea how close the initial guess $x_0$ is to the optimal value $x★$. If the step sizes decrease too quickly, the algorithm might stop before reaching the minimum.
+
+**Example Case:**
+* Let $x★ = 5$ and $x_0 = 2$.
+* Assume the direction $d$ is always 1 (pointing toward the minimum).
+* **Iteration 0:** $x_1 = 2 + (1 \times 1) = 3$
+* **Iteration 1:** $x_2 = 3 + (\frac{1}{2} \times 1) = 3.5$
+* **Iteration 2:** $x_3 = 3.5 + (\frac{1}{4} \times 1) = 3.75$
+
+The cumulative movement is the sum of all step sizes:
+$$\sum_{t=0}^{\infty} \eta_t = \sum_{t=0}^{\infty} \frac{1}{2^t} = 1 + \frac{1}{2} + \frac{1}{4} + \dots = 2$$
+
+Even if the algorithm runs for an infinite amount of time, it will never get closer to 5 than the value 4. The steps become too small to cover the remaining distance, which is the opposite problem of oscillation.
+
+---
+
+### Second Attempt: The Harmonic Sequence
+$$\eta_t = \frac{1}{t+1}$$
+Sequence: $1, \frac{1}{2}, \frac{1}{3}, \frac{1}{4}, \frac{1}{5}, \dots$
+
+**Why it works:**
+While the individual values still go toward zero (preventing oscillation), this sequence has the property that its **cumulative sum** is infinite:
+$$\sum_{t=0}^{\infty} \eta_t = \sum_{t=0}^{\infty} \frac{1}{t+1} = 1 + \frac{1}{2} + \frac{1}{3} + \dots = \infty$$
+
+Because the cumulative sum grows to infinity, the algorithm can eventually reach the minimum no matter how far away it is from the starting point.
+
+| Sequence Type | Formula | Cumulative Sum | Effectiveness |
+| :--- | :--- | :--- | :--- |
+| **Geometric** | $\eta_t = \frac{1}{2^t}$ | Finite (Converges to 2) | **Bad:** May not reach the minimum. |
+| **Harmonic** | $\eta_t = \frac{1}{t+1}$ | Infinite (Diverges) | **Good:** Typically works for convergence. |
+
