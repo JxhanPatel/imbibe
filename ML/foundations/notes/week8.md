@@ -457,3 +457,68 @@ Taylor series confirms that as long as the step size $\eta$ is small, choosing $
 
 
 
+
+
+# 8.7: Gradient Descent for Multivariate Functions
+
+## Generalizing to Higher Dimensions
+The concept of moving in the negative derivative's direction is generalized to functions of multiple variables. In higher dimensions, the function depends on several variables instead of just one.
+
+**Example of a multivariate function:**
+$$f(x_1, x_2) = x_1^2 + 4x_2 + 8x_2^2$$
+
+## The Gradient
+In higher dimensions, the equivalent of a derivative is the **gradient**. While a derivative captures the rate of change for a one-dimensional function at a particular point, the gradient captures this for movement in every possible direction (e.g., the direction of $x_1$, $x_2$, etc.).
+
+### Definition
+The gradient is a **vector of partial derivatives**. 
+* **Partial Derivative:** Obtained by fixing all variables except one as constants and seeing how the function behaves with respect to that specific variable.
+* **Notation:** The gradient uses the symbol $\nabla$ (nabla), denoted as $\nabla f$.
+
+For a two-dimensional function at a point $(a, b)$, the gradient is:
+$$\nabla f(a, b) = \begin{bmatrix} \frac{\partial f}{\partial x_1} \Big|_{x_1=a} \\ \frac{\partial f}{\partial x_2} \Big|_{x_2=b} \end{bmatrix}$$
+
+<img width="300" height="278" alt="image" src="https://github.com/user-attachments/assets/53ba271d-f18c-42ec-ba37-d63f7c49fe1b" />
+
+### Example Calculation
+Given $f(x_1, x_2) = x_1^2 + 4x_2 + 8x_2^2$, find the gradient at point $(1, 3)$:
+1.  **Partial derivatives:**
+    * $\frac{\partial f}{\partial x_1} = 2x_1$
+    * $\frac{\partial f}{\partial x_2} = 4 + 16x_2$
+2.  **Evaluate at $(1, 3)$:**
+    * $x_1 = 1 \implies 2(1) = 2$
+    * $x_2 = 3 \implies 4 + 16(3) = 52$
+3.  **Result:** $\nabla f(1, 3) = \begin{bmatrix} 2 \\ 52 \end{bmatrix}$
+
+The gradient is a vector, meaning it has both **direction and magnitude**. Moving in the direction of the negative gradient means moving in the direction given by this vector.
+
+## Intuition: The Cow and Grass Example
+Consider a distance function $d(x_1, x_2)$ representing the squared distance from a cow at $(x_1, x_2)$ to grass at $(40, 40)$:
+$$d(x_1, x_2) = (x_1 - 40)^2 + (x_2 - 40)^2$$
+
+### Scenario 1: Point $(5, 2)$
+* **Gradient:** $\nabla d = \begin{bmatrix} 2(x_1 - 40) \\ 2(x_2 - 40) \end{bmatrix}$
+* **Evaluation at $(5, 2)$:** $\nabla d(5, 2) = \begin{bmatrix} -70 \\ -76 \end{bmatrix}$
+* **Negative Gradient:** $-\nabla d(5, 2) = \begin{bmatrix} 70 \\ 76 \end{bmatrix}$
+* **Intuition:** Since both coordinates are positive, moving in this direction adds a positive multiple to $x_1$ and $x_2$, moving the cow closer to $(40, 40)$.
+
+### Scenario 2: Point $(30, 50)$
+* **Evaluation at $(30, 50)$:** $\nabla d(30, 50) = \begin{bmatrix} 2(30-40) \\ 2(50-40) \end{bmatrix} = \begin{bmatrix} -20 \\ 20 \end{bmatrix}$
+* **Negative Gradient:** $-\nabla d(30, 50) = \begin{bmatrix} 20 \\ -20 \end{bmatrix}$
+* **Intuition:** Moving in the positive $x$ direction and negative $y$ direction (toward the third quadrant relative to the point) moves the cow closer to the grass at $(40, 40)$.
+
+<img width="387" height="340" alt="image" src="https://github.com/user-attachments/assets/a43e7e54-942c-407c-b2d9-2d9a31adcde9" />
+
+## Multivariate Gradient Descent Algorithm
+The formal update rule for higher dimensions is:
+
+$$\mathbf{x}_{t+1} = \mathbf{x}_t + \eta \cdot (-\nabla f(\mathbf{x}_t))$$
+
+**Variable Types:**
+* $\mathbf{x}_{t+1}, \mathbf{x}_t$: Vectors (depending on the number of variables).
+* $\eta$: Scalar (the step size).
+* $-\nabla f(\mathbf{x}_t)$: Vector (the negative gradient).
+
+### Key Properties
+* **Direction of Decrease:** The negative gradient always points toward the direction of decrease.
+* **Local Minimum:** This algorithm is guaranteed to converge to a **local minimum** for any unconstrained optimization problem where the gradient can be computed.
