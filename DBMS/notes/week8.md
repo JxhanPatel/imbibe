@@ -398,3 +398,185 @@ From the study of Linear data structures, we observe:
 | **Examples** | Array, Stack, Queue, Linked List. | Trees, Graphs, Skip List, Hash Map. |
 
 
+
+
+---
+
+
+
+
+
+# **8.4: Storage and File Structure/1: Physical Storage**
+
+
+
+## **Objectives**
+*   Introduce various Physical Storage Media for high volume, fast, reliable and inexpensive options for data storage for databases.
+*   To understand the options of Tertiary Storage for high volume, inexpensive backup options.
+
+---
+
+## **1. Physical Storage Media**
+
+### **1.1. Classification of Physical Storage Media**
+Physical storage media are classified based on the following parameters:
+*   **Speed** with which data can be accessed.
+*   **Cost** per unit of data.
+*   **Reliability**:
+    *   Data loss on power failure or system crash.
+    *   Physical failure of the storage device.
+
+**Storage Differentiation:**
+*   **Volatile storage:** Loses contents when power is switched off.
+*   **Non-volatile storage:** Contents persist even when power is switched off. Includes secondary and tertiary storage, as well as battery-backed up main-memory.
+
+---
+
+### **1.2. Types of Physical Storage Media**
+
+#### **1.2.1. Cache**
+*   Fastest and most costly form of storage.
+*   Volatile.
+*   Managed by the computer system hardware.
+
+#### **1.2.2. Main Memory**
+*   Fast access (10's to 100's of nanoseconds (ns); $1ns = 10^{-9}$ seconds).
+*   Generally too small (or too expensive) to store the entire database.
+*   Capacities of up to a few Gigabytes widely used currently.
+*   Volatile: Contents are usually lost if a power failure or system crash occurs.
+
+#### **1.2.3. Flash Memory**
+*   Data survives power failure.
+*   Data can be written at a location only once, but location can be erased and written to again.
+*   Can support only a limited number (10K – 1M) of write/erase cycles.
+*   Erasing of memory has to be done to an entire bank of memory.
+*   Reads are roughly as fast as main memory.
+*   Writes are slow (few microseconds), erase is slower.
+*   Widely used in embedded devices such as digital cameras, phones, and USB keys.
+
+#### **1.2.4. Magnetic Disk**
+*   Data is stored on spinning disk, and read/written magnetically.
+*   Primary medium for the long-term storage of data; typically stores entire database.
+*   Data must be moved from disk to main memory for access, and written back for storage - much slower access than main memory.
+*   **Direct-access:** Possible to read data on disk in any order, unlike magnetic tape.
+*   Capacities range up to roughly 16–32 TB.
+*   Much larger capacity and much lower cost/byte than main memory/flash memory.
+*   Survives power failures and system crashes; disk failure can destroy data, but is rare.
+
+#### **1.2.5. Optical Storage**
+*   Non-volatile, data is read optically from a spinning disk using a laser.
+*   CD-ROM (640 MB) and DVD (4.7 to 17 GB) are most popular forms.
+*   Blu-ray disks: 27 GB to 54 GB.
+*   **WORM (Write-once, read-many):** Optical disks used for archival storage (CD-R, DVD-R, DVD+R).
+*   Multiple write versions (CD-RW, DVD-RW, DVD+RW, and DVD-RAM).
+*   Reads and writes are slower than with magnetic disk.
+*   Juke-box systems use large numbers of removable disks and automatic mechanisms for loading/unloading large volumes of data.
+
+#### **1.2.6. Tape Storage**
+*   Non-volatile, used primarily for backup (to recover from disk failure) and for archival data.
+*   **Sequential-access:** Much slower than disk.
+*   Very high capacity (40 to 300 TB tapes available).
+*   Tape can be removed from drive; storage costs are much cheaper than disk, but drives are expensive.
+*   Tape jukeboxes available for storing massive amounts of data (hundreds of TB to multiple PB).
+
+---
+
+### **1.3. Storage Hierarchy**
+
+<img width="1130" height="614" alt="image" src="https://github.com/user-attachments/assets/39eb6fdf-e1f4-4460-aa32-42ed1574a350" />
+
+*   **Primary storage:** Volatile, very fast (Cache, Main Memory).
+*   **Secondary storage (on-line storage):** Non-volatile, moderately fast (Flash memory, Magnetic disk).
+*   **Tertiary storage (off-line storage):** Non-volatile, slow (Optical disk, Magnetic tapes).
+
+---
+
+## **2. Magnetic Disk Details**
+
+### **2.1. Mechanism**
+
+<img width="746" height="615" alt="image" src="https://github.com/user-attachments/assets/5aedb5a8-f28c-4208-a22b-9d171bd12970" />
+
+*   **Read-write head:** Positioned very close to the platter surface to read or write magnetically encoded information.
+*   **Tracks:** Surface of platter divided into circular tracks (50K-100K tracks per platter).
+*   **Sectors:** Each track is divided into sectors, the smallest unit of data read or written (typically 512 bytes).
+*   **Head-disk assemblies:** Multiple disk platters (1 to 5) on a single spindle with one head per platter mounted on a common arm.
+*   **Cylinder:** Cylinder $i$ consists of the $i^{th}$ track of all the platters.
+
+<img width="480" height="567" alt="image" src="https://github.com/user-attachments/assets/186bb072-8fc6-457a-8410-8d50a8b84f48" />
+
+### **2.2. Disk Controller and Subsystems**
+*   **Disk Controller:** Interfaces between the computer system and the disk drive hardware.
+    *   Accepts high-level commands to read or write a sector.
+    *   Initiates arm movement to the right track.
+    *   Attaches checksums to verify correct read back.
+*   **Disk Subsystem:** Performs remapping of bad sectors.
+*   **Interface Standards:** ATA, SATA, SCSI, SAS, and variants.
+*   **Network Storage:**
+    *   **Storage Area Networks (SAN):** Connects disks via high-speed network to multiple servers.
+    *   **Network Attached Storage (NAS):** Provides a file system interface using networked file system protocols.
+
+### **2.3. Performance Measures**
+*   **Access Time:** Time from a read/write request issue to start of data transfer.
+    *   **Seek Time:** Time to reposition arm over correct track (4 to 10 ms).
+    *   **Rotational Latency:** Time for sector to appear under the head (4 to 11 ms for 5400 to 15000 rpm).
+*   **Data-transfer Rate:** Rate for data retrieval or storage (typically 25 to 100 MB/s).
+*   **Reliability:** Measured by **Mean Time To Failure (MTTF)**.
+    *   Theoretical MTTF for new disks ranges from 500,000 to 1,200,000 hours.
+
+---
+
+## **3. Cloud Storage**
+
+### **3.1. Definition**
+*   Purchased from a third-party vendor who owns and operates capacity delivered over the Internet in a pay-as-you-go model.
+*   Accessed via traditional storage protocols or directly via an API.
+*   **Options:** Google Drive, Amazon Drive, OneDrive, Evernote, Dropbox.
+
+### **3.2. Cloud vs. Traditional Storage**
+
+| Parameters | Cloud Storage | Traditional Storage |
+| :--- | :--- | :--- |
+| **Cost** | Cheaper per GB than external drives. | High hardware/infrastructure costs; upgrades add costs. |
+| **Reliability** | Highly reliable; less time to get functioning. | Requires high initial effort and is less reliable. |
+| **File Sharing** | Supports dynamic sharing with network access. | Requires physical drives and established networks. |
+| **Accessibility** | Access files from anywhere. | Restricted to local access. |
+| **Backup/Recovery** | Safe from on-site disasters. | Locally stored data/backups susceptible to unexpected events. |
+
+---
+
+## **4. Flash-Based Storage and SSDs**
+
+### **4.1. Flash Storage Types**
+*   **NAND flash:** Predominant for storage; cheaper than NOR flash; requires page-at-a-time reads.
+*   **Wear Leveling:** Remapping logical page addresses to physical page addresses to distribute erase cycles.
+
+### **4.2. Solid-State Drives (SSD) vs. HDD**
+*   SSDs use flash-based memory with no moving parts.
+
+| Parameters | SSD | HDD |
+| :--- | :--- | :--- |
+| **Technology** | Integrated circuit using Flash memory. | Mechanical parts (spinning disks/platters). |
+| **Access Time** | 0.1 ms. | 5.5 - 8.0 ms. |
+| **Avg. Seek Time** | 0.08 - 0.16 ms. | < 10 ms. |
+| **Random I/O** | 6000 io/s. | 400 io/s. |
+| **Reliability** | Failure rate < 0.5%. | Failure rate 2 - 5%. |
+| **Energy** | 2 to 5 watts. | 6 to 15 watts. |
+
+---
+
+## **5. Future of Storage**
+*   **DNA Digital Storage:** Encoding binary data into synthetic strands of DNA using nucleotides (A, T, G, C). Extremely high density (1 exabyte could fit in a palm) and stable, but currently expensive and slow.
+*   **Quantum Memory:** Uses quantum superposition and quantum bits (qubits), providing more flexibility for quantum algorithms than classical storage.
+in terms of DNA and Quantum.
+
+
+
+
+
+---
+
+
+
+
+
