@@ -580,3 +580,134 @@ in terms of DNA and Quantum.
 
 
 
+# 8.5: Storage and File Structure/2: File Structure
+
+
+## **Objectives**
+*   To familiarize with the organization for database files.
+*   To understand how records and relations are organized in files.
+*   To learn how databases keep their own information in Data-Dictionary Storage – the metadata database of a database.
+*   To understand the mechanisms for fast access of a database store.
+
+
+
+
+## **1. File Organization**
+
+### **1.1. Basic Concepts**
+*   A database is a collection of files.
+*   A file is a sequence of records.
+*   A record is a sequence of fields.
+*   **One approach:**
+    *   Assume record size is fixed.
+    *   Each file has records of one particular type only.
+    *   Different files are used for different relations.
+*   A database file is partitioned into fixed-length storage units called **blocks**.
+*   Blocks are units of both storage allocation and data transfer.
+
+### **1.2. Fixed-Length Records**
+*   **Simple approach:** Store record $i$ starting from byte $n*(i-1)$, where $n$ is the size of each record.
+*   **Access:** Simple, but records may cross blocks.
+*   **Modification:** Do not allow records to cross block boundaries.
+
+<img width="531" height="357" alt="image" src="https://github.com/user-attachments/assets/af09d467-63aa-4b2c-922d-6fabf068b938" />
+
+*   **Deletion of record $i$ Alternatives:**
+    1.  Move records $i+1, \dots, n$ to $i, \dots, n-1$ (Compaction).
+    2.  Move record $n$ to $i$.
+    3.  Do not move records, but link all free records on a **free list**.
+
+<img width="1185" height="425" alt="image" src="https://github.com/user-attachments/assets/a88ab841-93b7-4c33-81c4-2b1505d799b8" />
+<img width="1200" height="427" alt="image" src="https://github.com/user-attachments/assets/d2065f3a-f764-4471-8c76-6761238707f2" />
+
+### **1.3. Free Lists**
+*   Store the address of the first deleted record in the file header.
+*   Use this first record to store the address of the second deleted record, and so on.
+*   Addresses act as pointers to the location of a record.
+*   **Space efficiency:** Reuse space for normal attributes of free records to store pointers (no pointers stored in in-use records).
+
+<img width="650" height="407" alt="image" src="https://github.com/user-attachments/assets/2f18f970-4cdd-4a72-8876-2e0822ebda8f" />
+
+### **1.4. Variable-Length Records**
+*   **Arise from:**
+    *   Storage of multiple record types in a file.
+    *   Record types that allow variable lengths for fields like strings (`varchar`).
+    *   Record types that allow repeating fields.
+*   **Representation:**
+    *   Attributes are stored in order.
+    *   Variable length attributes represented by fixed size **(offset, length)**, with actual data stored after all fixed length attributes.
+    *   **Null values:** Represented by a null-value bitmap.
+
+<img width="1054" height="219" alt="image" src="https://github.com/user-attachments/assets/60c56039-ed4e-4e28-993d-f62ce208d699" />
+
+### **1.5. Slotted Page Structure**
+The **Slotted Page header** contains:
+*   Number of record entries.
+*   End of free space in the block.
+*   An array containing the location and size of each record.
+*   Records can be moved around within a page to keep them contiguous; entry in the header must be updated.
+*   Pointers should not point directly to a record; instead, they point to the entry for the record in the header.
+
+<img width="820" height="294" alt="image" src="https://github.com/user-attachments/assets/9bdf5af8-c3bd-42c4-b002-12a610aa48df" />
+
+---
+
+## **2. Organization of Records in Files**
+
+*   **Heap:** A record can be placed anywhere in the file where there is space.
+*   **Sequential:** Store records in sequential order, based on the value of the search key of each record.
+    *   Suitable for applications requiring sequential processing of the entire file.
+    *   Records are ordered by a **search-key**.
+    *   **Deletion:** Use pointer chains.
+    *   **Insertion:** Locate the position; insert in free space or in an **overflow block** if no space exists.
+    *   Need to reorganize the file from time to time to restore sequential order.
+
+<img width="715" height="483" alt="image" src="https://github.com/user-attachments/assets/41ffb2f5-4208-4ad2-8f79-ff4cfbefd222" />
+
+*   **Hashing:** A hash function computed on some attribute of each record; the result specifies in which block of the file the record should be placed.
+*   **Multitable Clustering File Organization:** Records of several different relations are stored in the same file.
+    *   **Motivation:** Store related records on the same block to minimize $I/O$.
+    *   Good for queries involving `department` $\bowtie$ `instructor`.
+    *   Bad for queries involving only `department`.
+    *   Results in variable size records.
+
+<img width="1091" height="611" alt="image" src="https://github.com/user-attachments/assets/c79d7daa-1ef0-45aa-ac15-ee9864d6fafa" />
+
+---
+
+## **3. Data Dictionary Storage**
+
+The **Data Dictionary** (System Catalog) stores **metadata** (data about data) such as:
+*   **Information about relations:** Names, types and lengths of attributes, views, and integrity constraints.
+*   **User and accounting information:** Including passwords.
+*   **Statistical and descriptive data:** Number of tuples in each relation.
+*   **Physical file organization information:** How a relation is stored (sequential/hash/...) and its physical location.
+*   **Information about indices**.
+
+### **3.1. Relational Representation of Metadata**
+
+<img width="728" height="583" alt="image" src="https://github.com/user-attachments/assets/492b8f93-951c-4f17-bea8-c06382951f12" />
+
+
+---
+
+## **4. Storage Access**
+
+*   A database file is partitioned into fixed-length storage units called **blocks**.
+*   Database systems seek to minimize the number of block transfers between the disk and memory.
+*   **Buffer:** Portion of main memory available to store copies of disk blocks.
+*   **Buffer Manager:** Subsystem responsible for allocating buffer space in main memory.
+
+### **4.1. Buffer Manager Tasks**
+*   Programs call the buffer manager when they need a block from disk.
+*   If the block is already in the buffer, return the address in main memory.
+*   If not in the buffer:
+    1.  Allocate space (possibly replacing/throwing out another block).
+    2.  Write back the replaced block **only if it was modified**.
+    3.  Read the block from disk to buffer and return the address.
+
+### **4.2. Buffer Replacement Policies**
+*   **Least Recently Used (LRU strategy):** Replace the block that hasn't been used for the longest period of time. Uses past patterns as a predictor for future references.
+*   **Pinned block:** Memory block that is not allowed to be written back to disk.
+*   **Toss-immediate strategy:** Frees the space occupied by a block as soon as the final tuple of that block has been processed.
+*   **Most recently used (MRU) strategy:** System pins the block currently being processed; unpinned after the final tuple is processed, becoming the most recently used block.
