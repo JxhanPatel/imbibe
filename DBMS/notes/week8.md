@@ -271,3 +271,130 @@ For applications relating to data management, a data structure typically acts as
 
 
 
+# 8.3: Algorithms and Data Structures/3: Data Structures/2
+
+
+## **Objectives**
+*   Introducing Non-linear Data Structures - graph, tree, hash table.
+*   Exploring Binary Search Tree.
+*   Comparing Linear and Non-Linear Data Structures.
+
+
+
+## **2. Non-linear Data Structures**
+
+### **2.1. Motivation: Why Non-linear?**
+From the study of Linear data structures, we observe:
+*   All have space complexity $O(n)$, which is optimal.
+*   Linked lists have a space overhead (approximately 100% in terms of pointers).
+*   Complexity is often identical for Worst as well as Average case.
+*   They offer satisfactory complexity for some operations while being unsatisfactory on others.
+
+**Comparison of Linear Data Structures:**
+| Operation | Array (Unordered) | Array (Ordered) | Linked List (Unordered) | Linked List (Ordered) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Access** | $O(1)$ | $O(1)$ | $O(n)$ | $O(n)$ |
+| **Insert** | $O(n)$ | $O(n)$ | $O(1)$ | $O(1)$ |
+| **Delete** | $O(n)$ | $O(n)$ | $O(1)$ | $O(1)$ |
+| **Search** | $O(n)$ | $O(\log n)$ | $O(n)$ | $O(n)$ |
+
+
+**Conclusion:** Non-Linear data structures can be used to trade-off between these extremes and achieve a balanced good performance for all operations.
+
+<img width="790" height="255" alt="image" src="https://github.com/user-attachments/assets/c62b927f-3840-4cf2-a877-3e4dc4e93f15" />
+
+### **2.2. General Definition**
+*   Data items are **not arranged in a sequence**.
+*   Each element may have **multiple paths** to connect to other elements.
+*   Traversing through the elements is not possible in one run.
+
+### **2.3. Common Non-Linear Structures**
+
+#### **2.3.1. Graph**
+*   A collection of vertices $V$ (storing elements) and connecting edges (links) $E$: $G = <V, E>$ where $E \subseteq V \times V$.
+*   **Variants:** Undirected/Directed, Cyclic/Acyclic, Unweighted/Weighted, Disconnected/Connected.
+*   **Examples:** ER Diagrams, Networks (Electrical/Water), Facebook Friendships, Knowledge Graphs.
+
+#### **2.3.2. Tree**
+*   A **connected acyclic graph** representing hierarchical relationships.
+*   **Variants:** Rooted/Unrooted, Binary/n-ary, Balanced/Unbalanced.
+*   **Examples:** Composite Attributes, Family Genealogy, Search Trees.
+
+#### **2.3.3. Hash Table**
+*   Implements an **associative array** abstract data type.
+*   Uses a **hash function** to compute an index (hash code) into an array of buckets or slots.
+*   **Examples:** Associative arrays, Database indexing, Caches.
+
+---
+
+## **3. Tree Terminology and Properties**
+
+### **3.1. Key Definitions**
+*   **Root:** The node at the top; only one per tree.
+*   **Parent:** The predecessor of any node. Every node except the Root has a unique parent.
+*   **Child:** The descendant of a node.
+*   **Leaf:** A node with no children.
+*   **Internal Node:** A node with at least one child.
+*   **Siblings:** Nodes having the same parent.
+*   **Arity (Degree):** Number of children of a node. The maximum arity of a node defines the arity of the tree.
+*   **Levels:** Root is at Level 0. Level is the distance from the root.
+*   **Height:** The maximum level in a tree.
+
+### **3.2. Binary Tree Facts**
+*   A tree with $n$ nodes has $n-1$ edges.
+*   The maximum number of nodes at level $l$ is $2^l$.
+*   If $h$ is the height of a binary tree of $n$ nodes:
+    *   $h + 1 \le n \le 2^{h+1} - 1$
+    *   $\lceil \log(n+1) \rceil - 1 \le h \le n - 1$
+    *   $O(\log n) \le h \le O(n)$
+*   For a $k$-ary tree, height is $O(\log_k n) \le h \le O(n)$.
+
+---
+
+## **4. Binary Search Tree (BST)**
+
+### **4.1. Concept: Adaptation of Binary Search**
+*   Binary search splits an array; conceptually, the **Middle Element** is the Root, and the left/right sub-arrays are sub-trees.
+*   By progressing recursively, we form a Binary Search Tree.
+
+<img width="1043" height="637" alt="image" src="https://github.com/user-attachments/assets/e04d1805-740b-4a40-9a48-000cc7dd88c4" />
+
+### **4.2. Definition**
+*   **BST Rule:** For any node with value $X$:
+    *   Every node in the **left sub-tree** has a value $< X$.
+    *   Every node in the **right sub-tree** has a value $> X$.
+*   **Node Structure:** Each node consists of an element, a link to the left child (LC), and a link to the right child (RC).
+
+### **4.3. Building a BST**
+**Example Sequence:** E, L, P, H, A, N, T
+1.  Insert **E**: Becomes Root.
+2.  Insert **L**: $L > E$, goes to Right Child.
+3.  Insert **P**: $P > E, P > L$, goes to Right Child of L.
+4.  Insert **H**: $H > E, H < L$, goes to Left Child of L.
+5.  Insert **A**: $A < E$, goes to Left Child of E.
+6.  Insert **N**: $N > E, N > L, N < P$, goes to Left Child of P.
+7.  Insert **T**: $T > E, T > L, T > P$, goes to Right Child of P.
+
+<img width="1104" height="592" alt="image" src="https://github.com/user-attachments/assets/fd75f321-7925-4606-9e97-5f2021e01994" />
+<img width="951" height="366" alt="image" src="https://github.com/user-attachments/assets/84c4ab94-262a-4db7-a240-8ac3c43cfcc3" />
+<img width="1036" height="539" alt="image" src="https://github.com/user-attachments/assets/59b1bf0f-84bd-4c43-b50c-e1947f4f586f" />
+
+### **4.4. Searching a Key**
+*   **Algorithm:** Compare key with root. If equal, return node. If smaller, recurse left; if larger, recurse right.
+*   **Complexity:** $O(h)$ where $h$ is the height.
+*   **Worst Case:** $O(n)$. Occurs if keys are inserted in sorted order, creating a **skewed binary search tree** ($h = n-1$).
+*   **Best Case:** $O(\log n)$. Occurs if the tree is **balanced**.
+
+---
+
+## **5. Comparison of Linear and Non-Linear Data Structures**
+
+| Feature | Linear Data Structure | Non-Linear Data Structure |
+| :--- | :--- | :--- |
+| **Arrangement** | Linear/Sequential order; attached to previous/next. | Hierarchical or networked manner. |
+| **Levels** | Single level involved. | Multiple levels involved. |
+| **Implementation** | Easy. | Complex. |
+| **Traversal** | Single way only. | Multiple ways (Depth-First, Breadth-First, Inorder, etc.). |
+| **Examples** | Array, Stack, Queue, Linked List. | Trees, Graphs, Skip List, Hash Map. |
+
+
