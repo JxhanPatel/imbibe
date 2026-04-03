@@ -8,10 +8,10 @@
 | **Week 3** | Advanced SQL | Joins, Subqueries & Window Functions | 🟢 Done |
 | **Week 4** | Relational Languages & Design | Relational Algebra & ER Diagrams | 🟢 Done |
 | **Week 5** | Normalization I | 1NF, 2NF, 3NF & Redundancy | 🟢 Done |
-| **Week 6** | Normalization II | BCNF, 4NF & Multi-valued Deps | 🟡 In Progress |
-| **Week 7** | Application Development | DB Connectivity (JDBC/ODBC) & Security | ⚪ Planned |
-| **Week 8** | Storage Management | File Org, Buffer Mgmt & RAID | ⚪ Planned |
-| **Week 9** | Indexing & Hashing | B+ Trees & Performance Tuning | ⚪ Planned |
+| **Week 6** | Normalization II | BCNF, 4NF & Multi-valued Deps | 🟢 Done |
+| **Week 7** | Application Development | DB Connectivity (JDBC/ODBC) & Security | 🟢 Done |
+| **Week 8** | Storage Management | File Org, Buffer Mgmt & RAID | 🟢 Done |
+| **Week 9** | Indexing & Hashing | B+ Trees & Performance Tuning | 🟡 In Progress |
 | **Week 10** | Transactions | ACID Properties & Concurrency Control | ⚪ Planned |
 | **Week 11** | Backup & Recovery | Log-based Recovery & Checkpoints | ⚪ Planned |
 | **Week 12** | Query Optimization | Execution Plans & Heuristics | ⚪ Planned |
