@@ -248,3 +248,115 @@ Insert sequence: 10, 30, 60, 20, 50, 40, 70, 80, 15, 90, 100.
 *   **Definition:** A 2-3-4 Tree is essentially a B-Tree where $n=4$.
 
 
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+# 9.3: Indexing and Hashing/3: Indexing/3
+
+
+## **Objectives**
+*   To understand the design of $B^+$ Tree Index Files as a generalization of 2-3-4 Tree.
+*   To understand the fundamentals of B-Tree Index Files.
+
+
+
+## **1. $B^+$ Tree Index Files**
+
+### **1.1 The $B^+$ Tree Concept**
+*   **Definition:** A balanced binary search tree that maintains efficiency despite insertion and deletion of data.
+*   **Form:** A rooted tree where every path from the root to a leaf is of the same length.
+*   **Generalization:** It is a generalization of the 2-3-4 Tree following a multi-level index format.
+*   **Node Occupancy:**
+    *   Each non-leaf node (other than root) has between $\lceil n/2 \rceil$ and $n$ children.
+    *   Each leaf node has between $\lceil (n-1)/2 \rceil$ and $n-1$ values.
+    *   If the root is not a leaf, it has at least 2 children.
+*   **Data Pointers:** Leaf nodes contain the actual data pointers.
+*   **Sequential Access:** Leaf nodes are linked together using a linked list (pointer $P_n$) to support efficient sequential processing.
+
+<img width="704" height="392" alt="image" src="https://github.com/user-attachments/assets/539d80b7-b3bc-417a-8558-50cfbfefda70" />
+
+### **1.2 Node Structure**
+A typical $B^+$ Tree node has the following structure:
+$$P_1, K_1, P_2, K_2, \dots, P_{n-1}, K_{n-1}, P_n$$
+*   **$K_i$:** Search-key values, stored in ordered sequence: $K_1 < K_2 < \dots < K_{n-1}$.
+*   **$P_i$:**
+    *   **In leaf nodes:** $P_1$ to $P_{n-1}$ point to file records with search-key values $K_i$; $P_n$ points to the next leaf node.
+    *   **In non-leaf nodes:** Pointers to children subtrees.
+
+### **1.3 Queries on $B^+$ Trees**
+The procedure for finding a record with search-key value $V$:
+1.  **Set $C = root$ node**.
+2.  **While $C$ is not a leaf node:**
+    *   Let $i = $ smallest number such that $V \le C.K_i$.
+    *   If no such $i$ exists, let $P_m = $ last non-null pointer; set $C = C.P_m$.
+    *   Else if $V = C.K_i$, set $C = C.P_{i+1}$.
+    *   Else set $C = C.P_i$.
+3.  **In leaf node $C$:**
+    *   If there is an $i$ such that $K_i = V$, follow pointer $P_i$ to the record.
+    *   Else, no record exists.
+
+**Height Complexity:** For $K$ search-key values, height is no more than $\lceil \log_{\lceil n/2 \rceil}(K) \rceil$. With $n=100$, 1 million search keys require only 4 node accesses.
+
+### **1.4 Updates on $B^+$ Trees**
+
+#### **1.4.1 Insertion**
+1.  **Find leaf node $L$** for the search-key value.
+2.  If room exists in $L$, insert (key, pointer) in order.
+3.  **If $L$ is full (Splitting):**
+    *   Take $n$ pairs (existing + new), place first $\lceil n/2 \rceil$ in $L$, and the rest in new node $L'$.
+    *   Insert the least key value of $L'$ and a pointer to $L'$ into the parent.
+    *   **Propagation:** If the parent is full, split it recursively up to the root.
+
+<img width="600" height="119" alt="image" src="https://github.com/user-attachments/assets/41d5b8d9-8c2a-480c-819f-127f9f07fec2" />
+
+#### **1.4.2 Deletion**
+1.  **Find leaf node $L$** and remove the entry.
+2.  Shift remaining entries in $L$ left to close gaps.
+3.  **If $L$ is underfull (Coalescing/Merging):**
+    *   If the underfull node and a sibling fit in one node, **merge** them and recursively delete the pointer from the parent.
+    *   Otherwise, **redistribute** pointers between the node and sibling so both satisfy the minimum occupancy requirement.
+
+<img width="775" height="455" alt="image" src="https://github.com/user-attachments/assets/823c1c64-41d0-4cbe-b4d9-c81ab33d0031" />
+
+### **1.5 $B^+$ Tree Extensions**
+
+#### **1.5.1 $B^+$ Tree File Organization**
+*   Leaf nodes store actual data records instead of just pointers to records.
+*   Solves the degradation problem of sequential data files.
+*   Each node is at least half full; records take more space than pointers, reducing fanout at the leaf level.
+
+#### **1.5.2 Indexing Strings**
+*   **Variable length:** Use space utilization as the criterion for splitting instead of the number of pointers.
+*   **Prefix compression:** Internal nodes store only the prefix needed to distinguish subtrees (e.g., "Silb" to separate "Silas" and "Silberschatz").
+
+---
+
+## **2. B-Tree Index Files**
+
+### **2.1 B-Tree vs. $B^+$ Tree**
+*   **Non-redundancy:** Search-key values appear only once in a B-Tree. In $B^+$ Trees, values in non-leaf nodes are repeated in leaf nodes.
+*   **Non-leaf Node Pointers:** Since keys in non-leaf nodes appear nowhere else, non-leaf nodes must include an additional pointer $B_i$ to the record/bucket for that key.
+
+<img width="701" height="258" alt="image" src="https://github.com/user-attachments/assets/2032db22-56e5-4be4-b345-0faa1f238c2b" />
+
+### **2.2 Comparison and Evaluation**
+
+| Advantage of B-Tree | Disadvantage of B-Tree |
+| :--- | :--- |
+| May use fewer tree nodes. | Non-leaf nodes are larger (due to record pointers), reducing fanout and increasing depth. |
+| Possible to find value before reaching leaf. | Only a small fraction of values are found early. |
+| | Insertion and deletion are more complicated. |
+
+**Conclusion:** Advantages of B-Trees typically do not outweigh the disadvantages; $B^+$ Trees are used almost universally in practice.
