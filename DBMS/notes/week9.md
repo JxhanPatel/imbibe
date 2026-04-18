@@ -1,3 +1,13 @@
+### **Week 9: Indexing and Hashing**
+
+* **[9.1 Indexing I: Basic Concepts & Ordered Indices](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week9.md#91-indexing-and-hashing1-indexing1)**
+* **[9.2 Indexing II: Multi-level & Secondary Indices](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week9.md#92-indexing-and-hashing2-indexing2)**
+* **[9.3 Indexing III: B+ Tree Index Files](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week9.md#93-indexing-and-hashing3-indexing3)**
+* **[9.4 Hashing](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week9.md#94-indexing-and-hashing4-hashing)**
+* **[9.5 Index Design & Guidelines](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week9.md#95-indexing-and-hashing5-index-design)**
+
+
+
 # 9.1: Indexing and Hashing/1: Indexing/1
 
 
