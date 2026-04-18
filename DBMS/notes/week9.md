@@ -123,3 +123,128 @@ Consider a table: `Faculty(Name, Phone)`.
 ---
 
 
+
+
+
+
+
+
+# 9.2: Indexing and Hashing/2: Indexing/2
+
+
+
+## **Objectives**
+*   To recap Balanced Binary Search Trees as options for optimal in-memory search data structures.
+*   To understand the issues relating to external search data structures for persistent data.
+*   To study 2-3-4 Tree as a precursor to $B/B^+$-Tree for an efficient external data structure for database and index tables.
+
+
+
+
+## **1. Search Data Structures Recap**
+
+### **1.1 In-Memory Search Complexity**
+How to search a key in a list of $n$ data items?
+*   **Linear Search:** $O(n)$. For example, finding '28' in an unordered list of 16 items might take 16 comparisons.
+*   **Binary Search:** $O(\log n)$. Finding '28' in a sorted array of 16 items takes 4 comparisons (e.g., checking 25, 36, 30, 28).
+*   **Binary Search Tree (BST):** Search is performed recursively on the left or right subtrees.
+
+*   <img width="791" height="424" alt="image" src="https://github.com/user-attachments/assets/f73db50f-cd32-47e9-a542-547edd9fddee" />
+
+
+### **1.2 Complexity Comparison Table**
+Worst-case time with $n$ data items:
+
+| Data Structure | Search | Insert | Delete | Remarks |
+| :--- | :--- | :--- | :--- | :--- |
+| **Unordered Array** | $O(n)$ | $O(1)$ | $O(1)$ | Insert/Delete time is |
+| **Ordered Array** | $O(\log n)$| $O(n)$ | $O(n)$ | the time after the |
+| **Unordered List** | $O(n)$ | $O(1)$ | $O(1)$ | location has been |
+| **Ordered List** | $O(n)$ | $O(1)$ | $O(1)$ | ascertained by Search. |
+| **Binary Search Tree**| $O(h)$ | $O(1)$ | $O(1)$ | |
+
+
+
+### **1.3 The Need for Balancing**
+*   For a BST of $n$ nodes, $\log n \le h < n$, where $h$ is the height.
+*   **Bad Tree:** $h \sim O(n)$, occurring if keys are inserted in a skewed manner.
+*   **Desired Tree:** A balanced BST where $h \sim O(\log n)$.
+
+**Balancing Guarantees:**
+*   **Worst-case (AVL Tree):** Self-balancing BST where $|h_L - h_R| \le 1$. Rebalancing is done via rotations.
+*   **Randomized (Randomized BST / Skip List):** Guarantees $O(\log n)$ search time probabilistically.
+*   **Amortized (Splay Tree):** Recently accessed elements are quicker to access again.
+
+### **1.4 Scaling Issues for Databases**
+While these structures have optimal $O(\log n)$ complexity, they are:
+*   Good for in-memory operations and small volumes of data.
+*   Complex due to rotations or randomized operations.
+*   **Inefficient for external storage:** They do not scale for external data structures (persistent data on disk).
+
+---
+
+## **2. 2-3-4 Trees**
+
+### **2.1 Core Concepts**
+A 2-3-4 tree is a precursor to B-Trees and B+ Trees, designed to maintain balance differently than a standard BST.
+
+**Properties:**
+*   **Uniform Leaf Depth:** All leaves are at the same depth (bottom level).
+*   **Height:** $h \sim O(\log n)$.
+*   **Sorted Order:** All data is kept in sorted order.
+*   **Node Types:** Every node (leaf or internal) is a 2-node, 3-node, or 4-node based on the number of links (children).
+
+### **2.2 Node Structures**
+1.  **2-node:** Contains 1 data item (S) and 2 links.
+    *   Left link: Search keys < S.
+    *   Right link: Search keys > S.
+2.  **3-node:** Contains 2 data items (S, L) and 3 links.
+    *   Left link: < S.
+    *   Middle link: > S and < L.
+    *   Right link: > L.
+3.  **4-node:** Contains 3 data items (S, M, L) and 4 links.
+    *   Links represent ranges: < S; between S and M; between M and L; > L.
+
+<img width="754" height="384" alt="image" src="https://github.com/user-attachments/assets/de820a3d-0a4c-457c-8a71-adfff79cf767" />
+
+### **2.3 Search Operation**
+Search is a simple and natural extension of search in a standard BST, navigating the multiple links based on the value comparisons at each node.
+
+### **2.4 Insertion and Node Splitting**
+Insertion is performed at the leaf level. If a node is full, it must be split.
+
+**Splitting a 4-node:**
+*   A 4-node (S, M, L) is split into two 2-nodes (S) and (L).
+*   The middle element (M) is pushed up to the parent node.
+*   If the root is a 4-node and needs to split, a new root is created, increasing the tree height by 1.
+
+<img width="809" height="376" alt="image" src="https://github.com/user-attachments/assets/a6c65343-c62f-4dee-ad53-95c236472bed" />
+
+
+**Early vs. Late Splitting Strategies:**
+*   **Early Strategy:** Split any 4-node encountered while searching down the tree for the insertion point. This ensures that the parent of the leaf will always have room for a pushed-up element.
+*   **Late Strategy:** Split nodes only when an insertion actually overflows a leaf.
+*   Both are valid and have $O(h)$ complexity, though they lead to different tree structures.
+
+### **2.5 Insertion Example (Early Strategy)**
+Insert sequence: 10, 30, 60, 20, 50, 40, 70, 80, 15, 90, 100.
+1.  **10, 30, 60:** Forms a 4-node root.
+2.  **Insert 20:** Root is a 4-node, split it before inserting. Middle element (30) becomes the new root. 10 and 60 become 2-node children. Insert 20 into the (10) node to make it a 3-node (10, 20).
+3.  **Insert 50:** Added to the (60) node to make it a 3-node (50, 60).
+4.  **Insert 40:** Added to the (50, 60) node to make it a 4-node (40, 50, 60).
+5.  **Insert 70:** Encounter 4-node (40, 50, 60). Split it. 50 moves up to the root (30, 50). 40 and 60 become 2-node children. Insert 70 into the (60) node.
+
+<img width="781" height="400" alt="image" src="https://github.com/user-attachments/assets/718d7694-f78c-427f-9815-50cdb0e13365" />
+<img width="775" height="351" alt="image" src="https://github.com/user-attachments/assets/b81d8e75-1c72-42e5-ac6a-38a50370d19a" />
+<img width="788" height="340" alt="image" src="https://github.com/user-attachments/assets/88518146-4a6b-4bcd-9a1a-1bf5c35fdbd3" />
+<img width="755" height="351" alt="image" src="https://github.com/user-attachments/assets/655a3065-c6af-4483-9e33-75efa466c0ca" />
+<img width="677" height="347" alt="image" src="https://github.com/user-attachments/assets/ab47a952-bcbf-44a2-a429-5a9176885dd2" />
+
+---
+
+## **3. Observations and Transition to B-Trees**
+*   2-3-4 trees waste some space (holding only 1-3 items per node) but provide a powerful framework for external data.
+*   They easily generalize to larger nodes (e.g., $n=100$).
+*   **Definition:** A 2-3-4 Tree is essentially a B-Tree where $n=4$.
+
+
