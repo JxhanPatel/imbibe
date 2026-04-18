@@ -549,3 +549,125 @@ The procedure for finding a record with search-key value $V$:
 *   **Nulls:** Bitmaps should be kept for all values, including the null value, to handle SQL null semantics.
 *   **CPU Optimization:** Bitmaps are packed into words; a single word AND (basic CPU instruction) computes 32 or 64 bits at once.
 *   **Hybrid use:** Bitmaps can be used instead of Tuple-ID lists at leaf levels of $B^{+}$ trees for values with many matching records (worthwhile if $> 1/64$ of records have that value).
+
+
+
+
+
+---
+
+# 9.5: Indexing and Hashing/5: Index Design
+
+
+## **Objectives**
+*   To discuss how Indexes can be created in SQL.
+*   To deliberate on good index designs in terms of Guidelines for Indexing.
+
+
+## **1. Index Definition in SQL**
+
+### **1.1. Basic Commands**
+*   **Create an Index:**
+    `create index <index-name> on <relation-name> (<attribute-list>)`.
+    *   *Example:* `create index b-index on branch (branch_name)`.
+*   **Enforce Candidate Key:**
+    Use `create unique index` to indirectly specify and enforce the condition that the search key is a candidate key.
+    *   *Note:* This is not really required if the SQL `unique` integrity constraint is supported, which is preferred.
+*   **Drop an Index:**
+    `drop index <index-name>`.
+
+### **1.2. Advanced SQL Index Features**
+*   **Type and Clustering:** Most database systems allow the specification of the type of index (e.g., $B^+$-tree or hash) and whether it is a clustered index.
+*   **Cluster Indexing:** You can create an index for a cluster.
+*   **Composite Index:**
+    *   Can be created on multiple columns up to a maximum of 32 columns.
+    *   A composite index key cannot exceed roughly one-half (minus some overhead) of the available space in the data block.
+*   **Storage Settings Example:**
+    ```sql
+    CREATE INDEX emp_ename ON emp_tab(ename)
+    TABLESPACE users
+    STORAGE (
+        INITIAL 20K
+        NEXT 20K
+        PCTINCREASE 75
+        PCTFREE 0
+    )
+    COMPUTE STATISTICS;
+    ```.
+    *   `TABLESPACE`: Allocation of space in the Database to contain schema objects.
+    *   `STORAGE`: Specifies how the Database should store a database object.
+    *   `INITIAL`: Size of the $1^{st}$ extent of the object.
+    *   `NEXT`: Size in bytes of the $2^{nd}$ extent to be allocated.
+    *   `PCTINCREASE`: Percent by which later extents grow.
+    *   `PCTFREE`: Percentage of each data block in the table's data segment left as free space for future updates.
+
+### **1.3. Bitmap Index Definition**
+*   **Syntax:** `create bitmap index <index-name> on <relation-name>(<attribute-list>)`.
+*   **Example Usage:**
+    *   Table: `Student(Student_ID, Name, Address, Age, Gender, Semester)`.
+    *   `CREATE BITMAP INDEX Idx_Gender ON Student (Gender);`.
+    *   `CREATE BITMAP INDEX Idx_Semester ON Student (Semester);`.
+
+<img width="819" height="418" alt="image" src="https://github.com/user-attachments/assets/3c723344-167b-4dcd-b92a-71fe211abe1c" />
+
+*   **Query Processing:** To process `SELECT * FROM Student WHERE Gender = 'F' AND Semester = 4`, the system performs a bitwise **AND** between the 'F' bitmap ($0111$) and the 'Semester 4' bitmap ($0001$) to get the result $0001$ (indicating the 4th row).
+
+---
+
+## **2. Multiple-Key Access**
+
+### **2.1. Strategies for Processing Multiple Attributes**
+Consider the query: `select ID from instructor where dept_name = "Finance" and salary = 80000`.
+1.  **Single Index (Attribute 1):** Use index on `dept_name` to find instructors in Finance, then test if `salary = 80000`.
+2.  **Single Index (Attribute 2):** Use index on `salary` to find instructors with 80000, then test if `dept_name = "Finance"`.
+3.  **Pointer Intersection:** Use the `dept_name` index to find pointers for "Finance" and the `salary` index for 80000. Take the intersection of both sets of pointers.
+
+### **2.2. Composite Search Keys**
+*   Search keys containing more than one attribute, e.g., `(dept_name, salary)`.
+*   **Lexicographic Ordering:** $(a_1, a_2) < (b_1, b_2)$ if:
+    *   $a_1 < b_1$, or
+    *   $a_1 = b_1$ and $a_2 < b_2$.
+*   **Efficiency:**
+    *   The index on `(dept_name, salary)` can fetch records satisfying both conditions in a single traversal.
+    *   It can efficiently handle range queries on the second attribute if the first has an equality condition: `where dept_name = "Finance" and salary < 80000`.
+    *   It **cannot** efficiently handle queries where the first attribute is a range: `where dept_name < "Finance" and salary = 80000`, as it may fetch many records satisfying only the first condition.
+
+---
+
+## **3. Privileges Required to Create an Index**
+*   You must own the table or have the `INDEX` object privilege for it.
+*   The schema must have a quota for the intended `tablespace` or the `UNLIMITED TABLESPACE` system privilege.
+*   To create an index in another user's schema, you must have the `CREATE ANY INDEX` system privilege.
+*   **Function-based indexes** require:
+    *   `QUERY_REWRITE` privilege.
+    *   `QUERY_REWRITE_ENABLED` initialization parameter set to `TRUE`.
+
+---
+
+## **4. Guidelines for Indexing (Ground Rules)**
+
+### **Overview**
+Performance behavior evolves over time, requiring the continuous collection of statistics and adjustment of indexes. There is no sound theory for optimal performance; instead, designers use common guidelines.
+
+| Rule # | Rule Name | Description |
+| :--- | :--- | :--- |
+| **Rule 0** | **Access – Update Tradeoff** | Indexes speed up searches (queries) but penalize updates (insert/delete/value changes). Use informed judgment. |
+| **Rule 1** | **Index Correct Tables** | Index large tables if you frequently retrieve < 15% of rows. Small tables do not require indexes. |
+| **Rule 2** | **Index Correct Columns** | Choose columns with unique values, wide ranges (regular indexes), or small ranges (bitmap indexes). |
+| **Rule 3** | **Limit Number of Indexes** | Read-only tables can have more indexes; heavily updated tables should have fewer to reduce update overhead. |
+| **Rule 4** | **Choose Column Order** | In composite indexes, put the most frequently used or most selective column first. |
+| **Rule 5** | **Gather Statistics** | Use `COMPUTE STATISTICS` during index creation and periodically update them to help the optimizer. |
+| **Rule 6** | **Drop Unrequired Indexes** | Drop indexes that do not speed up queries, are unused by applications, or need rebuilding. |
+
+### **Rule 2 Details: Null Handling**
+A comparison like `WHERE COL_X > -9.99 * power(10, 125)` is often preferable to `IS NOT NULL` because the former can use an index on `COL_X`, whereas `IS NOT NULL` typically cannot (as nulls are not indexed).
+
+### **Rule 4 Details: Composite Index Example**
+*   Table: `VENDOR_PARTS` (5 vendors, each with 1000 parts).
+*   Query: `SELECT * FROM vendor_parts WHERE part_no = 457 AND vendor_id = 1012;`.
+*   **Strategy:** Create a composite index with the most selective column first:
+    `CREATE INDEX ind_vendor_id ON vendor_parts (part_no, vendor_id);`.
+*   This speeds up the combined query and any query using only the leading portion (`part_no`).
+
+
+
