@@ -403,3 +403,182 @@ Two schedules $S$ and $S'$ are view equivalent if three conditions are met for e
 *   Some schedules produce the same outcome as a serial schedule but are neither conflict equivalent nor view equivalent.
 *   Determining such equivalence requires analysis of operations other than just `read` and `write`, such as the mathematical properties of addition and subtraction.
 <img width="897" height="455" alt="image" src="https://github.com/user-attachments/assets/8a816aa4-28bf-4cfc-821a-a8ec8ecac97b" />
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+# 10.4 Concurrency Control/1
+
+
+
+## **Objectives**
+*   Concurrency Control through the design of a serializable schedule is difficult in general. Hence we take a look into the locking mechanism and **Lock-Based Protocols**.
+*   We need to understand how locks may be implemented.
+
+
+
+
+
+
+## **1. Concurrency Control**
+
+### **1.1. Core Requirements**
+A database must provide a mechanism that will ensure that all possible schedules are both:
+1.  **Conflict serializable**.
+2.  **Recoverable** and, preferably, **Cascadeless**.
+
+### **1.2. The Design Goal**
+*   A policy in which only one transaction can execute at a time generates serial schedules but provides a poor degree of concurrency.
+*   Concurrency-control schemes tradeoff between the amount of concurrency they allow and the amount of overhead that they incur.
+*   Testing a schedule for serializability after it has executed is too late. The goal is to develop protocols that **assure** serializability dynamically during execution.
+
+---
+
+## **2. Lock-Based Protocols**
+
+### **2.1. Basic Mechanism**
+*   Isolation can be ensured by requiring that data items be accessed in a mutually exclusive manner: while one transaction is accessing a data item, no other transaction can modify that data item.
+*   A **lock** is a mechanism used to implement this requirement, allowing a transaction to access a data item only if it is currently holding the lock on that item.
+
+### **2.2. Lock Modes**
+Data items can be locked in two modes:
+1.  **Exclusive (X) mode**: The data item can be both read as well as written. It is requested using the `lock-X` instruction.
+2.  **Shared (S) mode**: The data item can only be read. It is requested using the `lock-S` instruction.
+
+### **2.3. Lock-Compatibility Matrix**
+A lock-compatibility matrix determines if a data item can be locked by two transactions at the same time.
+
+| State of the lock | Shared | Exclusive |
+| :--- | :--- | :--- |
+| **Shared** | Yes | No |
+| **Exclusive** | No | No |
+
+
+
+> [!NOTE]
+> A transaction may be granted a lock if the requested mode is compatible with locks already held by other transactions. Multiple transactions can hold shared locks on an item, but if any transaction holds an exclusive lock, no other transaction may hold any lock on that item.
+
+---
+
+## **3. Lock Operations and Lifecycle**
+
+*   **Requesting/Granting**: Lock requests are made to the concurrency-control manager. The transaction can only proceed after the request is granted.
+*   **Waiting**: If a lock cannot be granted, the requesting transaction is made to wait until all incompatible locks held by others are released.
+*   **Holding**: A transaction must hold a lock as long as it accesses the item.
+*   **Unlocking**: A transaction can unlock a data item $Q$ using the `unlock(Q)` instruction. However, it is not always desirable to unlock an item immediately after its final access, as serializability may not be ensured.
+
+---
+
+## **4. Example: Fund Transfer and Total Balance**
+
+Consider two transactions on accounts $A$ and $B$ (Initial: $A=100$, $B=200$; Sum = 300):
+*   **$T_1$**: Transfers \$50 from account $B$ to account $A$.
+*   **$T_2$**: Displays the total amount $A+B$.
+
+### **4.1. Schedule 1 (Bad Concurrent Schedule)**
+If $T_1$ unlocks data item $B$ too early, $T_2$ may see an inconsistent state.
+
+<img width="936" height="452" alt="image" src="https://github.com/user-attachments/assets/5d300f81-5f29-475b-ac90-10cbd95d1c23" />
+
+
+*   **Result**: $T_2$ displays \$250, which is incorrect as \$50 is missing from the total.
+
+### **4.2. Schedule with Delayed Unlocking (Good)**
+Unlocking is delayed to the end of the transaction (defining $T_3$ and $T_4$).
+
+<img width="927" height="428" alt="image" src="https://github.com/user-attachments/assets/b716a8ad-fc29-46b5-bfd5-c846ce36cf67" />
+
+*   **Result**: $T_4$ correctly displays \$300.
+
+### **4.3. Deadlocks**
+Delayed unlocking can lead to a **deadlock**, where every transaction in a set is waiting for another in the set.
+
+<img width="897" height="455" alt="image" src="https://github.com/user-attachments/assets/139fb792-e9f8-4218-a716-5ce81d8e382a" />
+
+> [!IMPORTANT]
+> Deadlocks are a "necessary evil" of locking to avoid inconsistent states. They are handled by rolling back one of the transactions, which is preferable to leaving the database in a state that could lead to real-world problems.
+
+---
+
+## **5. Two-Phase Locking (2PL) Protocol**
+
+This protocol ensures conflict-serializable schedules by dividing the lifecycle into two phases:
+1.  **Phase 1: Growing Phase**:
+    *   A transaction may obtain locks.
+    *   A transaction may **not** release any locks.
+2.  **Phase 2: Shrinking Phase**:
+    *   A transaction may release locks.
+    *   A transaction may **not** obtain any new locks.
+
+*   **Lock Point**: The point in time where a transaction acquires its final lock (the end of the growing phase). Transactions can be serialized according to their lock points.
+
+### **5.1. Lock Conversions**
+A refinement that allows more concurrency by permitting:
+*   **Growing Phase**:
+    *   Acquire `lock-S` or `lock-X`.
+    *   **Upgrade**: Convert `lock-S` to `lock-X`.
+*   **Shrinking Phase**:
+    *   Release `lock-S` or `lock-X`.
+    *   **Downgrade**: Convert `lock-X` to `lock-S`.
+
+---
+
+## **6. Automatic Acquisition of Locks**
+
+To relieve programmers of inserting explicit lock/unlock calls, the system processes `read(D)` and `write(D)` instructions automatically:
+
+*   **`read(D)`**:
+    1.  If $T_i$ has a lock on $D$, execute `read(D)`.
+    2.  Else, wait until no other transaction has a `lock-X` on $D$.
+    3.  Grant $T_i$ a `lock-S` on $D$ and execute `read(D)`.
+*   **`write(D)`**:
+    1.  If $T_i$ has a `lock-X` on $D$, execute `write(D)`.
+    2.  Else, wait until no other transaction has **any** lock on $D$.
+    3.  If $T_i$ has a `lock-S`, **upgrade** it to `lock-X`.
+    4.  Else, grant $T_i$ a `lock-X` and execute `write(D)`.
+
+---
+
+## **7. Isolation Issues: Starvation and Cascading**
+
+### **7.1. Starvation**
+Occurs if the concurrency control manager is badly designed. For example, a transaction waits for an X-lock while a sequence of others are granted S-locks on the same item, or a transaction is repeatedly picked as a victim for deadlock rollback.
+
+### **7.2. Cascading Rollback**
+The failure of one transaction leads to a series of other rollbacks.
+
+<img width="856" height="386" alt="image" src="https://github.com/user-attachments/assets/b4cf45a6-113d-489c-a9fd-a18672cf369f" />
+
+### **7.3. Strict and Rigorous 2PL**
+*   **Strict Two-Phase Locking**: A transaction must hold all its **exclusive** locks until it commits/aborts to avoid cascading rollbacks.
+*   **Rigorous Two-Phase Locking**: All locks (shared and exclusive) are held until commit/abort. Transactions are serialized in the order in which they commit.
+
+---
+
+## **8. Implementation of Locking**
+
+### **8.1. Lock Manager**
+Implemented as a separate process. Transactions send lock/unlock requests and wait for responses (grant or rollback).
+
+### **8.2. Lock Table**
+An in-memory hash table indexed on the data item name.
+
+<img width="1115" height="564" alt="image" src="https://github.com/user-attachments/assets/aedf0d2c-bb4e-4572-b4f7-fc1f755fc4bb" />
+
+*   New requests are added to the end of a queue for the data item.
+*   If a transaction aborts, all its waiting and granted requests are deleted.
