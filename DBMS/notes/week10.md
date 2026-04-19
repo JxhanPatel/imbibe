@@ -287,3 +287,119 @@ graph LR
 *   A schedule $S$ is **view serializable** if it is view equivalent to a serial schedule.
 *   Every conflict serializable schedule is also view serializable.
 *   View serializable schedules that are not conflict serializable always involve **blind writes** (performing a $write(Q)$ without a preceding $read(Q)$).
+
+
+
+
+
+---
+
+
+
+
+
+
+
+# 10.3 Transactions/3: Recoverability
+
+
+
+## **Objectives**
+*   What happens if system fails while a transaction is in execution? Can a consistent state be reached for the database? Recoverability attempts to answer issues in state and transaction recovery in the face of system failures.
+*   Conflict serializability is a crisp concept for concurrent execution that guarantees ACID properties and has a simple detection algorithm. Yet only few schedules are Conflict serializable in practice. There is a need to explore – View Serializability – a weaker system for better concurrency.
+
+
+## **1. Recovery**
+
+### **1.1 What is Recovery?**
+*   Serializability helps to ensure Isolation and Consistency of a schedule.
+*   Yet, the Atomicity and Consistency may be compromised in the face of system failures.
+*   Consider a schedule comprising a single transaction (obviously serial):
+    1.  `read(A)`
+    2.  `A := A - 50`
+    3.  `write(A)`
+    4.  `read(B)`
+    5.  `B := B + 50`
+    6.  `write(B)`
+    7.  `commit` // Make the changes permanent; show the results to the user.
+*   If the system fails after Step 3 and before Step 6, it leads to an inconsistent state.
+*   The system needs to rollback the update of A; this is known as **Recovery**.
+
+### **1.2 Recoverable Schedules**
+*   **Definition:** If a transaction $T_j$ reads a data item previously written by a transaction $T_i$, then the commit operation of $T_i$ must appear before the commit operation of $T_j$.
+*   Database must ensure that schedules are recoverable to prevent transactions from reading and showing inconsistent states to the user.
+
+<img width="886" height="429" alt="image" src="https://github.com/user-attachments/assets/c565b24b-6278-4c95-9a11-e8561830ed50" />
+
+
+
+### **1.3 Cascading Rollbacks**
+*   **Cascading rollback:** A single transaction failure leads to a series of transaction rollbacks.
+*   If $T_{10}$ fails in a schedule where $T_{11}$ read from $T_{10}$, and $T_{12}$ read from $T_{11}$, then $T_{11}$ and $T_{12}$ must also be rolled back.
+*   This leads to the undoing of a significant amount of work.
+
+### **1.4 Cascadeless Schedules**
+*   **Definition:** For each pair of transactions $T_i$ and $T_j$ such that $T_j$ reads a data item previously written by $T_i$, the commit operation of $T_i$ appears before the read operation of $T_j$.
+*   Every cascadeless schedule is also recoverable.
+*   It is desirable to restrict schedules to those that are cascadeless.
+
+### **1.5 Recovery Examples**
+
+| Schedule Type | Scenario | Outcome |
+| :--- | :--- | :--- |
+| **Irrecoverable** | $T_2$ commits after reading $T_1$'s write, but $T_1$ fails later. | Computation of $T_1$ is lost; database is inconsistent. |
+| **Recoverable (Cascading)** | $T_2$ reads $T_1$'s write and has not committed when $T_1$ fails. | Rollback is possible, but $T_2$ must also be rolled back. |
+| **Recoverable (Non-cascading)** | $T_1$ commits before $T_2$ reads the value. | Rollback is possible without cascading wherever failure occurs. |
+
+---
+
+## **2. Transaction Definition in SQL**
+
+### **2.1 Basic Constructs**
+*   In SQL, a transaction begins implicitly.
+*   A transaction ends by:
+    *   `COMMIT WORK`: Commits the current transaction and begins a new one.
+    *   `ROLLBACK WORK`: Causes the current transaction to abort.
+*   By default, in almost all database systems, every SQL statement also commits implicitly if it executes successfully (AutoCommit).
+
+### **2.2 Transaction Control Language (TCL)**
+Transactional control commands are used only with DML commands (`INSERT`, `UPDATE`, `DELETE`).
+
+*   **COMMIT**: Saves all changes invoked by a transaction since the last `COMMIT` or `ROLLBACK`.
+*   **ROLLBACK**: Undoes transactions that have not already been saved to the database.
+*   **SAVEPOINT**: Creates a point in a transaction to which you can roll back without undoing the entire transaction.
+    *   *Syntax:* `SAVEPOINT SAVEPOINT_NAME;`
+    *   *Rollback Syntax:* `ROLLBACK TO SAVEPOINT_NAME;`
+*   **RELEASE SAVEPOINT**: Removes a created `SAVEPOINT`. Once released, you cannot roll back to it.
+*   **SET TRANSACTION**: Used to specify characteristics like `READ WRITE` or `READ ONLY`.
+
+---
+
+## **3. View Serializability**
+
+### **3.1 View Equivalence Conditions**
+Two schedules $S$ and $S'$ are view equivalent if three conditions are met for each data item $Q$:
+1.  **Initial Read:** If in schedule $S$, transaction $T_i$ reads the initial value of $Q$, then in schedule $S'$ also transaction $T_i$ must read the initial value of $Q$.
+2.  **Write-Read Pair:** If in schedule $S$ transaction $T_j$ reads a value produced by $T_i$, then in $S'$ also $T_j$ must read the value produced by the same `write(Q)` of $T_i$.
+3.  **Final Write:** The transaction (if any) that performs the final `write(Q)` operation in schedule $S$ must also perform the final `write(Q)` operation in schedule $S'$.
+
+### **3.2 Properties and Blind Writes**
+*   **Definition:** A schedule $S$ is view serializable if it is view equivalent to a serial schedule.
+*   Every conflict serializable schedule is also view serializable.
+*   **Blind Writes:** Performing a `write(Q)` without having performed a `read(Q)`.
+*   Every view serializable schedule that is not conflict serializable contains blind writes.
+
+
+<img width="833" height="464" alt="image" src="https://github.com/user-attachments/assets/98ef2122-95a9-47aa-9f99-f38c47313b57" />
+
+
+### **3.3 Test for View Serializability**
+*   The test for view serializability is **NP-complete**.
+*   Practical tests involve comparing the concurrent schedule against all possible $n!$ serial schedules to check if any satisfy the three view equivalence conditions.
+
+---
+
+## **4. Complex Notions of Serializability**
+*   Some schedules produce the same outcome as a serial schedule but are neither conflict equivalent nor view equivalent.
+*   Determining such equivalence requires analysis of operations other than just `read` and `write`, such as the mathematical properties of addition and subtraction.
+<img width="897" height="455" alt="image" src="https://github.com/user-attachments/assets/8a816aa4-28bf-4cfc-821a-a8ec8ecac97b" />
