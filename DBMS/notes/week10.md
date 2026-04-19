@@ -582,3 +582,120 @@ An in-memory hash table indexed on the data item name.
 
 *   New requests are added to the end of a queue for the data item.
 *   If a transaction aborts, all its waiting and granted requests are deleted.
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+# 10.5 Concurrency Control/2
+
+---
+
+
+## **1. Objectives**
+*   To understand how to **detect, prevent, and recover** from deadlocks, which are inherent perils of locking.
+*   To introduce a simple **time-based protocol** that avoids deadlocks.
+
+
+
+## **2. Deadlock Handling**
+
+### **2.1. Definition of Deadlock**
+*   A system is deadlocked if there is a set of transactions such that every transaction in the set is **waiting** for another transaction in the set.
+
+### **2.2. Deadlock Prevention**
+Deadlock prevention protocols ensure the system never enters a deadlock state.
+
+#### **2.2.1. Prevention Strategies**
+*   **Pre-declaration**: Require each transaction to lock all its data items before beginning execution. This is usually difficult and can significantly reduce concurrency.
+*   **Partial Ordering**: Impose a partial order on all data items and require transactions to lock items only in that specified order.
+
+#### **2.2.2. Transaction Timestamps**
+*   A **timestamp** is a unique identifier created by the DBMS to identify the relative starting time of a transaction.
+*   Two schemes use timestamps for deadlock prevention:
+
+| Scheme | Type | Description |
+| :--- | :--- | :--- |
+| **Wait-Die** | Non-preemptive | An older transaction may wait for a younger one. If a younger transaction requests a resource held by an older one, the younger one is killed ("dies") and restarted. |
+| **Wound-Wait** | Preemptive | An older transaction "wounds" (forces rollback) of a younger transaction instead of waiting. A younger transaction may wait for an older one. |
+
+> [!NOTE]
+> In both schemes, a rolled-back transaction **retains its original timestamp** upon restart to avoid starvation.
+
+#### **2.2.3. Timeout-Based Schemes**
+*   A transaction waits for a lock only for a specified amount of time. If not granted, the transaction is rolled back and restarted.
+*   **Pros**: Simple to implement.
+*   **Cons**: Starvation is possible; difficult to determine a good timeout interval.
+
+---
+
+## **3. Deadlock Detection**
+
+### **3.1. Wait-For Graph**
+*   Deadlocks are described using a **Wait-for Graph** $G = (V, E)$.
+    *   **$V$ (Vertices)**: All transactions in the system.
+    *   **$E$ (Edges)**: A directed edge $T_i \rightarrow T_j$ implies $T_i$ is waiting for $T_j$ to release a data item.
+*   An edge $T_i \rightarrow T_j$ is inserted when $T_i$ requests an item held by $T_j$. It is removed when $T_j$ no longer holds that item.
+*   The system is in a **deadlock state** if and only if the wait-for graph has a **cycle**.
+
+<img width="768" height="280" alt="image" src="https://github.com/user-attachments/assets/49513dbc-30f7-4efc-b859-f59162120f07" />
+
+---
+
+## **4. Deadlock Recovery**
+
+When a deadlock is detected, the system must take the following actions:
+
+1.  **Victim Selection**: Roll back a transaction (the "victim") to break the cycle. The victim should be the one that incurs **minimum cost**.
+2.  **Rollback**: Determine how far to roll back the transaction:
+    *   **Total Rollback**: Abort and restart the entire transaction.
+    *   **Partial Rollback**: Roll back only as far as necessary to break the deadlock (e.g., to a specific **lock point**).
+3.  **Starvation Prevention**: To prevent the same transaction from always being picked as a victim, include the **number of rollbacks** in the cost factor.
+
+---
+
+## **5. Timestamp-Based Protocols**
+
+### **5.1. Overview**
+*   Each transaction is assigned a unique timestamp $TS(T_i)$ when it enters the system.
+*   If $T_i$ is older than $T_j$, then $TS(T_i) < TS(T_j)$.
+*   The protocol maintains two timestamp values for each data item **Q**:
+    *   **W-timestamp(Q)**: The largest timestamp of any transaction that successfully executed `write(Q)`.
+    *   **R-timestamp(Q)**: The largest timestamp of any transaction that successfully executed `read(Q)`.
+
+### **5.2. Protocol Rules**
+
+#### **5.2.1. Read(Q) Operation**
+Suppose $T_i$ issues a `read(Q)`:
+1.  If **$TS(T_i) < W-timestamp(Q)$**: The transaction needs to read a value of Q that was already overwritten. The read is **rejected**, and $T_i$ is **rolled back**.
+2.  If **$TS(T_i) \ge W-timestamp(Q)$**: The read is executed. **R-timestamp(Q)** is updated to $\max(R-timestamp(Q), TS(T_i))$.
+
+#### **5.2.2. Write(Q) Operation**
+Suppose $T_i$ issues a `write(Q)`:
+1.  If **$TS(T_i) < R-timestamp(Q)$**: The value $T_i$ is producing was needed previously, and the system assumed it would never be produced. The write is **rejected**, and $T_i$ is **rolled back**.
+2.  If **$TS(T_i) < W-timestamp(Q)$**: $T_i$ is attempting to write an obsolete value. The write is **rejected**, and $T_i$ is **rolled back**.
+3.  **Otherwise**: The write is executed, and **W-timestamp(Q)** is set to $TS(T_i)$.
+
+<img width="872" height="389" alt="image" src="https://github.com/user-attachments/assets/245a540d-e347-4476-b72b-6eeacb2d10b2" />
+
+### **5.3. Correctness and Properties**
+*   **Serializability**: Guaranteed because all arcs in the precedence graph flow from transactions with smaller timestamps to those with larger timestamps, preventing cycles.
+*   **Deadlock Freedom**: No transaction ever waits; therefore, the system is free from deadlocks.
+*   **Drawbacks**: Schedules may not be cascade-free and may not even be recoverable.
