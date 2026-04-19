@@ -137,7 +137,153 @@ Consider $T_1$ (transfer \$50 from A to B) and $T_2$ (transfer 10% from A to B).
 
 
 
+
+
+
 ---
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# 10.2 Transactions/2: Serializability
+
+
+## **Objectives**
+*   To understand the issues that arise when two or more transactions work concurrently.
+*   To introduce the notions of Serializability that ensure schedules for transactions that may run in concurrent fashion but still guarantee and serial behavior.
+*   To analyze the conditions, called conflicts, that need to be honored to attain Serializable schedules.
+
+## **1. Serializability**
+
+### **1.1. Basic Assumptions and Definition**
+*   **Assumption:** Each transaction preserves database consistency.
+*   Thus, serial execution of a set of transactions preserves database consistency.
+*   A (possibly concurrent) schedule is **serializable** if it is equivalent to a serial schedule.
+*   Different forms of schedule equivalence give rise to the notions of:
+    *   **Conflict Serializability**.
+    *   **View Serializability**.
+
+### **1.2. Simplified View of Transactions**
+*   We ignore operations other than **read** and **write** instructions.
+*   Other operations happen in memory (are temporary in nature) and (mostly) do not affect the state of the database.
+*   This is a simplifying assumption for analysis.
+*   We assume that transactions may perform arbitrary computations on data in local buffers in between reads and writes.
+*   Our simplified schedules consist of only read and write instructions.
+
+### **1.3. Conflicting Instructions**
+Let $I_i$ and $I_j$ be two instructions from transactions $T_i$ and $T_j$ respectively $(i \neq j)$. Instructions $I_i$ and $I_j$ conflict if and only if there exists some item $Q$ accessed by both $I_i$ and $I_j$, and at least one of these instructions writes to $Q$.
+
+Since we are dealing with only read and write instructions, there are four cases that we need to consider:
+1.  **$I_i = read(Q), I_j = read(Q)$**: The order of $I_i$ and $I_j$ does not matter, since the same value of $Q$ is read by $T_i$ and $T_j$, regardless of the order. They **do not conflict**.
+2.  **$I_i = read(Q), I_j = write(Q)$**: If $I_i$ comes before $I_j$, then $T_i$ does not read the value of $Q$ that is written by $T_j$ in instruction $J$. If $I_j$ comes before $I_i$, then $T_i$ reads the value of $Q$ that is written by $T_j$. Thus, the order of $I_i$ and $I_j$ matters. They **conflict**.
+3.  **$I_i = write(Q), I_j = read(Q)$**: The order of $I_i$ and $I_j$ matters for reasons similar to those of the previous case. They **conflict**.
+4.  **$I_i = write(Q), I_j = write(Q)$**: Since both instructions are write operations, the order of these instructions does not affect either $T_i$ or $T_j$. However, the value obtained by the next $read(Q)$ instruction is affected, since the result of only the latter of the two write instructions is preserved in the database. If there is no other $write(Q)$ instruction after $I_i$ and $I_j$, then the order directly affects the final value of $Q$. They **conflict**.
+
+> [!NOTE]
+> A conflict between $I_i$ and $I_j$ forces a (logical) temporal order. If $I_i$ and $I_j$ are consecutive in a schedule and they do not conflict, then the results of the schedule remain the same even if they had been interchanged (swapped) in the schedule.
+
+---
+
+## **2. Conflict Serializability**
+
+### **2.1. Conflict Equivalence**
+*   If a schedule $S$ can be transformed into a schedule $S'$ by a series of swaps of non-conflicting instructions, we say that $S$ and $S'$ are **conflict equivalent**.
+
+### **2.2. Conflict Serializability Definition**
+*   We say that a schedule $S$ is **conflict serializable** if it is conflict equivalent to a serial schedule.
+
+### **2.3. Example: Serializable Schedule (Schedule 3)**
+Schedule 3 can be transformed into Schedule 6 (a serial schedule where $T_2$ follows $T_1$) by a series of swaps of non-conflicting instructions:
+1.  Swap $T_1.read(B)$ and $T_2.write(A)$.
+2.  Swap $T_1.read(B)$ and $T_2.read(A)$.
+3.  Swap $T_1.write(B)$ and $T_2.write(A)$.
+4.  Swap $T_1.write(B)$ and $T_2.read(A)$.
+
+These swaps do not conflict as they work with different items ($A$ or $B$) in different transactions.
+
+<img width="874" height="293" alt="image" src="https://github.com/user-attachments/assets/134c4c67-71c3-4fce-8467-008e17cbd809" />
+
+### **2.4. Example: Non-Conflict Serializable (Schedule 7)**
+Consider Schedule 7:
+| $T_3$ | $T_4$ |
+| :--- | :--- |
+| $read(Q)$ | |
+| | $write(Q)$ |
+| $write(Q)$ | |
+
+We are unable to swap instructions in the above schedule to obtain either the serial schedule $<T_3, T_4>$, or the serial schedule $<T_4, T_3>$ because both operations are on $Q$ and one is a write.
+
+### **2.5. Example: Bad Schedule (Not Serializable)**
+Consider two transactions:
+*   **Transaction 1:** $r_1(A), w_1(A)$ (Withdraw \$100 from $A$).
+*   **Transaction 2:** $r_2(A), w_2(A), r_2(B), w_2(B)$ (Credit 0.5% interest to all accounts).
+*   **Initial:** $A = 200, B = 100$.
+*   **Schedule S:** $r_1(A), r_2(A), w_1(A), w_2(A), r_2(B), w_2(B)$.
+    *   $r_1(A)$ reads 200.
+    *   $r_2(A)$ reads 200.
+    *   $w_1(A)$ writes 100 (200 - 100).
+    *   $w_2(A)$ writes 201 (200 * 1.005).
+*   **Result:** Withdrawal of \$100 is lost; final $A = 201$. This is a **bad schedule**.
+
+
+<img width="916" height="553" alt="image" src="https://github.com/user-attachments/assets/e97189a8-951b-42da-b6b6-78f07a24d29e" />
+
+---
+
+## **3. Testing for Conflict Serializability**
+
+### **3.1. Precedence Graph**
+To determine conflict serializability, we construct a directed graph called a **precedence graph** $G = (V, E)$.
+*   **Vertices ($V$):** The set of all transactions participating in the schedule.
+*   **Edges ($E$):** We draw an arc from $T_i$ to $T_j$ if the two transactions conflict, and $T_i$ accessed the data item on which the conflict arose earlier.
+
+**Conditions for drawing an edge $T_i \rightarrow T_j$:**
+1.  $T_i$ executes $write(Q)$ and $T_j$ later executes $read(Q)$.
+2.  $T_i$ executes $read(Q)$ and $T_j$ later executes $write(Q)$.
+3.  $T_i$ executes $write(Q)$ and $T_j$ later executes $write(Q)$.
+
+### **3.2. Serializability Test**
+*   A schedule is conflict serializable if and only if its precedence graph is **acyclic**.
+*   If the graph contains no cycles, then the schedule $S$ is conflict serializable.
+*   **Serializability Order:** A serializability order of the transactions can be obtained by a **topological sorting** of the graph (a linear order consistent with the partial order of the graph).
+*   There are, in general, several possible linear orders obtained through topological sort.
+
+### **3.3. Algorithm Complexity**
+*   Cycle-detection algorithms take $O(n^2)$ time where $n$ is the number of vertices.
+*   Better algorithms take $O(n + e)$ time where $e$ is the number of edges.
+
+### **3.4. Example: Precedence Graph Construction**
+**Schedule:** $w_1(A), r_2(A), w_1(B), w_3(C), r_2(C), r_4(B), w_2(D), w_4(E), r_5(D), w_5(E)$.
+*   $w_1(A)$ followed by $r_2(A) \Rightarrow T_1 \rightarrow T_2$.
+*   $w_1(B)$ followed by $r_4(B) \Rightarrow T_1 \rightarrow T_4$.
+*   $w_3(C)$ followed by $r_2(C) \Rightarrow T_3 \rightarrow T_2$.
+*   $w_2(D)$ followed by $r_5(D) \Rightarrow T_2 \rightarrow T_5$.
+*   $w_4(E)$ followed by $w_5(E) \Rightarrow T_4 \rightarrow T_5$.
+
+```mermaid
+graph LR
+    T1 --> T2
+    T1 --> T4
+    T3 --> T2
+    T2 --> T5
+    T4 --> T5
+```
+*Graph is acyclic; therefore, the schedule is conflict serializable.*
+
+---
+
+## **4. View Serializability (Brief Intro)**
+*   There is another form of equivalence that is less stringent than conflict equivalence, called **view equivalence**.
+*   A schedule $S$ is **view serializable** if it is view equivalent to a serial schedule.
+*   Every conflict serializable schedule is also view serializable.
+*   View serializable schedules that are not conflict serializable always involve **blind writes** (performing a $write(Q)$ without a preceding $read(Q)$).
