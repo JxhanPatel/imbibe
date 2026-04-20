@@ -483,3 +483,148 @@ Speedup and scaleup are often sublinear due to:
 
 
 
+
+
+
+
+# 12.4: Non-Relational DBMS: NOSQL
+
+
+
+## **Objectives**
+*   To understand issues in Big Data.
+*   To understand the approach of NOSQL and CAP theorem viz-a-viz ACID.
+*   To take tour of common types of NOSQL database.
+
+
+
+## **1. What is Big Data?**
+
+### **1.1. Evolution of Storage Capacity**
+*   In 1986, global information storage capacity was 2.6 exabytes (99% analog).
+*   In 2002, the "beginning of the digital age" occurred, where digital storage reached 50%.
+*   By 2007, capacity reached 295 exabytes (94% digital).
+
+### **1.2. The 5V's (Characteristics) of Big Data**
+*   **Volume:** The quantity of generated and stored data. The size determines potential insight and if it is considered big data.
+*   **Velocity:** The speed at which data is generated and processed to meet demands and challenges.
+*   **Variety:** The type and nature of the data (structured, semi-structured, unstructured).
+*   **Variability:** The inconsistency of data flows can be periodic with daily, seasonal, and event-triggered peak data loads.
+*   **Veracity:** The data quality of captured data can vary greatly, affecting accurate analysis.
+
+
+<img width="1077" height="557" alt="image" src="https://github.com/user-attachments/assets/2a96ad8c-7178-4c1c-9e77-c141772b0314" />
+
+---
+
+## **2. What is NOSQL?**
+
+### **2.1. Basic Concepts**
+*   **Definition:** A NoSQL database provides a mechanism for storage and retrieval of data that is modeled in means other than the tabular relations used in relational databases.
+*   **Meaning:** Stands for "Not Only SQL". It is also referred to as Non-Relational DBMS (NDBMS) and Multi-Model Databases.
+*   **Origin:** The term was introduced by Carl Strozzi in 1998 for his lightweight open-source relational database and re-introduced by Eric Evans for open-source distributed databases.
+*   **Historical Context:** These are evolutions of older models that existed since the late 1960s:
+    *   **Network Database Model (NDBMS):** Introduced in 1969; schema viewed as a graph where object types are nodes and relationship types are arcs.
+    *   **Hierarchical Database Model (HDBMS):** Organized into a tree-like structure of records connected through links.
+
+### **2.2. Advantages and Disadvantages**
+
+| **Advantages** | **Disadvantages** |
+| :--- | :--- |
+| Non-relational; don't require schema. | Don't fully support relational features (no join, group by, order by except within partitions). |
+| Replicated to multiple nodes (fault-tolerant) and can be partitioned. | No referential integrity constraints across partitions. |
+| No single point of failure; down nodes easily replaced. | No declarative query language (like SQL) $\rightarrow$ more programming. |
+| Horizontally scalable; cheap and easy to implement (open-source). | Relaxed ACID (CAP theorem) $\rightarrow$ fewer guarantees. |
+| Massive write performance and fast key-value access. | No easy integration with other applications that support SQL. |
+
+### **2.3. The "Perfect Storm"**
+The rise of NOSQL resulted from three factors coming together:
+1. Large datasets.
+2. Acceptance of alternatives.
+3. Dynamically-typed data.
+
+> [!NOTE]
+> NOSQL is not a backlash against RDBMS. For applications like net banking, RDBMS is still used due to strict guarantees. SQL is a rich query language that cannot be rivaled by current NOSQL offerings.
+
+---
+
+## **3. CAP Theorem**
+
+### **3.1. The Three Properties**
+For any system sharing data, the CAP theorem defines three properties:
+1.  **Consistency (C):** All clients always have the same view of the data. All copies have the same value.
+2.  **Availability (A):** Each client can always read and write. Reads and writes always succeed.
+3.  **Partition-tolerance (P):** System properties hold even when network failures prevent machines from communicating.
+
+### **3.2. Brewer’s CAP Theorem**
+*   It is "impossible" to guarantee all three properties simultaneously for a system sharing data.
+*   You can have at most **two** of these three properties.
+*   **Tradeoffs:**
+    *   **CA:** Traditional RDBMS (MySQL, Postgres). Prioritize C and A over P.
+    *   **AP:** Dynamo, Cassandra, CouchDB. Prioritize A and P (results in eventual consistency).
+    *   **CP:** BigTable, MongoDB, HBase. Prioritize C and P (availability may be low).
+
+<img width="786" height="524" alt="image" src="https://github.com/user-attachments/assets/af0722d7-a133-4b03-bfd1-feb71e846362" />
+
+### **3.3. Consistency Models**
+*   **Strong Consistency (ACID):** Atomicity, Consistency, Isolation, Durability.
+*   **Weak Consistency (BASE):**
+    *   **B**asically **A**vailable.
+    *   **S**oft-state.
+    *   **E**ventual consistency: When no updates occur for a long time, all updates eventually propagate and nodes become consistent.
+
+---
+
+## **4. Types of NOSQL Databases**
+
+### **4.1. Key-value Stores**
+*   **Concept:** Work by matching keys with values, similar to a dictionary. No structure or relations.
+*   **Data Model:** Global collection of Key-value pairs. Attributes can be single-valued or multi-valued like a set.
+*   **Basic API access:** `get(key)`, `put(key, value)`, `delete(key)`, `execute(key, operation, parameters)`.
+*   **Pros:** Very fast, very scalable, simple data model, fault-tolerant.
+*   **Cons:** Cannot model complex data structures like objects.
+*   **Examples:** DynamoDB (Amazon), Redis (Salvatore Sanfilippo), Voldemort (LinkedIn), SimpleDB (Amazon), MemcacheDB.
+
+### **4.2. Document Stores**
+*   **Concept:** Inspired by Lotus Notes. Collection of documents (JSON, XML, or semi-structured formats).
+*   **Features:** Allows deep nesting and complex structures (document within a document).
+*   **Querying:** Manipulations with objects in collections (find, delete, update) via selections or MapReduce.
+*   **Examples:** MongoDB (10gen), Couchbase/CouchDB.
+
+
+<img width="1100" height="324" alt="image" src="https://github.com/user-attachments/assets/c7925534-69e7-4faa-b861-2df9296bb725" />
+
+### **4.3. Column Stores**
+*   **Concept:** Based on Google's BigTable paper. Like column-oriented RDBMS but with a twist.
+*   **Data Model:** Collection of **Column Families**. 
+    *   Column family = (key, value) where value = set of related columns.
+    *   Indexed by row key, column key, and timestamp (vital for eventual consistency).
+*   **Data Locality:** All columns in a family are stored together on disk, so multiple rows can be retrieved in one read operation.
+*   **Examples:** BigTable (Google), Cassandra (Apache/originally Facebook), HBase (Apache), PNUTS (Yahoo).
+
+### **4.4. Graph Stores**
+*   **Concept:** Focus on modeling interconnectivity (structure) of data. Inspired by mathematical Graph Theory $G=(E, V)$.
+*   **Data Model:** Property Graph consisting of nodes and edges. 
+    *   Nodes: May have properties (including ID).
+    *   Edges: May have labels or roles. 
+    *   Both can have key-value pairs.
+*   **Interfaces:** Vary from single-step to full recursion/path expressions.
+*   **Examples:** Neo4j, OrientDB, InfoGrid, FlockDB, Pregel.
+
+---
+
+## **5. Relational vs. Non-Relational Comparison**
+
+| **Parameter** | **Relational** | **Non-Relational** |
+| :--- | :--- | :--- |
+| **Data Model** | Structured data (tables). | Unstructured and semi-structured (XML, JSON). Dynamic schema. |
+| **Speed/Complexity**| Faster for simple operations; cheaper and less complex. | Supports more operations; highly complex internally and costlier. |
+| **Scalability** | Distributed architecture incurs data integrity issues at all levels. | Better scalability via sharding and partitioning in distributed systems. |
+| **Consistency** | Enforces strong consistency (ACID). | Enforces eventual consistency (BASE). |
+| **Integration** | Fits into Enterprise IT stack; secure and robust. | Designed for agility in modern cloud-based Web 2.0 applications. |
+
+
+
+<img width="617" height="634" alt="image" src="https://github.com/user-attachments/assets/9939a890-ced6-4cf6-8990-f1a68617302e" />
+
+<img width="855" height="648" alt="image" src="https://github.com/user-attachments/assets/1a9c4ff9-1a76-4fb5-bd0a-d6da968a9292" />
