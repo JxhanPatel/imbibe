@@ -293,3 +293,187 @@ The system scans backwards to find the most recent $<checkpoint~L>$ record.
 
 
 
+# 11.3: Backup & Recovery/3: Recovery/2
+
+
+
+### **1.  Objectives**
+*   To understand Transactional Logging with Hot Backup.
+*   To focus on concurrent transactions and understand the recovery algorithms.
+
+
+## **2. Transactional Logging**
+
+### **2.1 Hot Backup: Recap**
+*   In systems where high availability is a requirement Hot backup is preferable wherever possible.
+*   Hot backup refers to keeping a database up and running while the backup is performed concurrently.
+*   Such a system usually has a module or plug-in that allows the database to be backed up while staying available to end users.
+*   Databases which stores transactions of asset management companies, hedge funds, high frequency trading companies etc. try to implement Hot backups as these data are highly dynamic and the operations run $24\times7$.
+*   Real time systems like sensor and actuator data in embedded devices, satellite transmissions etc. also use Hot backup.
+
+### **2.2 Transactional Logging as Hot Backup**
+*   In regular database systems, Hot Backup is mainly used for **Transaction Log Backup**.
+*   Cold backup strategies like Differential, Incremental are preferred for **Data backup**.
+*   Transactional Logging is used in circumstances where a possibly inconsistent backup is taken, but another file generated and backed up (after the database file has been fully backed up) can be used to restore consistency.
+*   The information regarding data backup versions while recovery at a given point can be inferred from the Transactional Log backup set.
+*   Thus they play a vital role in database recovery.
+
+### **2.3 Transactional Logging with Recovery: Example**
+To understand how Transactional Logging works we consider a chunk of a database just before a backup has been started.
+
+<img width="1141" height="572" alt="image" src="https://github.com/user-attachments/assets/3e44d2d1-dbe8-462f-ae9a-c93237b49d69" />
+
+*   While the backup is in progress, modifications may continue to occur to the database. For example, a request to modify the data at location "4325" to '0' arrives.
+*   When a request comes through to modify a part of the DB, the modifications will be written in the given order compulsorily:
+    1. Transaction Log
+    2. Database (itself).
+
+
+*   If a crash occurs before writing to the database then the inconsistent backed up file is recovered first, and then the pending modifications in the transaction log (backed up*) are applied to re-establish consistency.
+*   **Note:** The Transactional Log itself is backed up using Hot Backup; the Data is backed up incrementally.
+
+#### **Extended Example: Multiple Requests**
+*   Consider in the previous scenario before the occurrence of crash, another request modifies the content of location "4321" to '0'. Incidentally, this change gets written in the database itself (Immediate Modification).
+
+<img width="1133" height="566" alt="image" src="https://github.com/user-attachments/assets/d1ba4895-b03f-4d01-b7a7-91185676e000" />
+
+*   The system crashes. Note that this part has already been backed up, and hence, the backup is inconsistent with the database.
+*   **Recovery Phase:**
+    *   Data recovery is done from the last data backup set (Figure 1).
+    *   Log recovery is done from the Transaction Log backup set. It will be same as the current transaction log because of Hot backup.
+
+
+*   The recovered database is inconsistent. To re-establish consistency all transaction logs generated between the start of the backup and the end of the backup must be replayed.
+
+### **2.4 Recover vs. Restore**
+When using transactional logging we distinguish between recover and restore:
+*   **Recover:** retrieve from the backup media the database files and transaction logs.
+*   **Restore:** reapply database consistency based on the transaction logs.
+
+<img width="1127" height="562" alt="image" src="https://github.com/user-attachments/assets/1a4a228d-c13d-4059-83dd-6486444bb706" />
+
+*   **Note:** an unnecessary log replay might occur for a block (e.g., 4325) depending on the database vendor. Replaying all logs is often faster than determining if a specific activity needs replaying.
+*   Once all transaction logs have been replayed, the database is said to have been restored and can be opened for user access.
+
+---
+
+## **3. Recovery Algorithm**
+
+### **3.1 Concurrency Control and Recovery**
+*   With concurrent transactions, all transactions share a single disk buffer and a single log.
+*   A buffer block can have data items updated by one or more transactions.
+*   **Assumption:** if a transaction $T_i$ has modified an item, no other transaction can modify the same item until $T_i$ has committed or aborted.
+    *   Updates of uncommitted transactions should not be visible to other transactions.
+    *   This is ensured by obtaining exclusive locks on updated items and holding the locks till end of transaction (**strict two-phase locking**).
+*   Log records of different transactions may be interspersed in the log.
+
+### **3.2 Data Access: Comparison**
+
+<img width="704" height="530" alt="image" src="https://github.com/user-attachments/assets/e0099938-e153-4e98-9e37-3b86b7384faa" />
+
+<img width="695" height="567" alt="image" src="https://github.com/user-attachments/assets/fcbb1c2d-060d-47a1-904f-2f0e3e7a5ffc" />
+
+### **3.3 Normal Logging and Rollback**
+*   **Logging (during normal operation):**
+    *   $<T_i \text{ start}>$ at transaction start.
+    *   $<T_i, X_j, V_1, V_2>$ for each update.
+    *   $<T_i \text{ commit}>$ at transaction end.
+
+*   **Transaction rollback (during normal operation):**
+    1. Scan log backwards from the end.
+    2. For each log record of $T_i$ of the form $<T_i, X_j, V_1, V_2>$:
+        *   Perform the undo by writing $V_1$ to $X_j$.
+        *   Write a log record $<T_i, X_j, V_1>$ (**Compensation Log Record or CLR**).
+    3. Once the record $<T_i \text{ start}>$ is found, stop the scan and write the log record $<T_i \text{ abort}>$.
+
+### **3.4 Checkpoints Recap**
+*   Let the time of checkpointing be $t_{check}$ and the time of system crash be $t_{fail}$.
+*   **Transaction Scenarios:**
+    *   $T_a$: commits before checkpoint.
+    *   $T_b$: starts before checkpoint and commits before system crash.
+    *   $T_c$: starts after checkpoint and commits before system crash.
+    *   $T_d$: starts after checkpoint and was active at time of system crash.
+
+*   **Recovery Actions:**
+    *   $T_a$: Nothing is done.
+    *   $T_b$ and $T_c$: **Transaction redo** is performed.
+    *   $T_d$: **Transaction undo** is performed.
+
+### **3.5 Redo-Undo Phases Strategy**
+Recovery from failure involves two phases:
+1.  **Redo phase:** Replay updates of all transactions, whether they committed, aborted, or are incomplete.
+2.  **Undo phase:** Undo all incomplete transactions.
+
+| Transaction Type | State at Failure | Strategy |
+| :--- | :--- | :--- |
+| **$T_1$** | Committed before Checkpoint | Ignore. |
+| **$T_2$ / $T_4$** | Committed since Checkpoint | Redo. |
+| **$T_3$ / $T_5$** | Running at Failure | Redo then Undo. |
+
+> [!TIP]
+> Redo $T_3, T_5$ (which are incomplete) brings the system to the point of failure so they can then be undone to reach a consistent state.
+
+### **3.6 The Algorithms**
+
+#### **Redo Phase Algorithm**
+1. Find last $<checkpoint~L>$ record, and set **undo-list** to $L$.
+2. Scan forward from the checkpoint record.
+3. Whenever a record $<T_i, X_j, V_1, V_2>$ is found, redo it by writing $V_2$ to $X_j$.
+4. Whenever a log record $<T_i \text{ start}>$ is found, add $T_i$ to **undo-list**.
+5. Whenever a log record $<T_i \text{ commit}>$ or $<T_i \text{ abort}>$ is found, remove $T_i$ from **undo-list**.
+
+*   **Operation mapping:**
+    *   INSERT $\rightarrow$ Recovery manager generates an insert from the log.
+    *   DELETE $\rightarrow$ Recovery manager generates a delete from the log.
+    *   UPDATE $\rightarrow$ Recovery manager generates an update from the log.
+
+#### **Undo Phase Algorithm**
+1. Scan log backwards from the end.
+2. Whenever a log record $<T_i, X_j, V_1, V_2>$ is found where $T_i$ is in **undo-list**:
+    *   Perform undo by writing $V_1$ to $X_j$.
+    *   Write a CLR log record $<T_i, X_j, V_1>$.
+3. Whenever a log record $<T_i \text{ start}>$ is found where $T_i$ is in **undo-list**:
+    *   Write a log record $<T_i \text{ abort}>$.
+    *   Remove $T_i$ from **undo-list**.
+4. Stop when **undo-list** is empty.
+
+*   **Operation mapping:**
+    *   Faulty INSERT $\rightarrow$ deletes data item(s).
+    *   Faulty DELETE $\rightarrow$ inserts deleted data item(s) from log.
+    *   Faulty UPDATE $\rightarrow$ writes before-update value from log.
+
+---
+
+## **4. Comprehensive Example: Failure Recovery**
+
+<img width="932" height="524" alt="image" src="https://github.com/user-attachments/assets/afe1591c-1a96-48d6-8990-66f4d0fd70ac" />
+
+*   **Scenario:**
+    *   $T_1$ had committed before the crash.
+    *   $T_0$ had been completely rolled back before the crash.
+    *   Checkpoint record contains active list $\{T_0, T_1\}$.
+*   **Redo Pass:** Replays every log record since checkpoint.
+    *   **undo-list** initially $\{T_0, T_1\}$.
+    *   $T_1$ removed (commit found).
+    *   $T_2$ added (start found).
+    *   $T_0$ removed (abort found).
+    *   **Final undo-list:** $\{T_2\}$.
+*   **Undo Pass:** Scans backwards.
+    *   Finds $T_2$ update on A, restores old value, writes redo-only record.
+    *   Finds $T_2$ start record, adds $T_2$ abort, terminates.
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
