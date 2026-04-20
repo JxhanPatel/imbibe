@@ -599,3 +599,125 @@ Several factors determine the setup of a Backup and Recovery plan:
 
 
 
+
+
+
+# 11.5: Backup & Recovery/5: Backup/2: RAID
+
+### **1. Objectives**
+*   Understanding RAID: Array of redundant disks in parallel to enhance speed and reliability.
+
+
+## **2. RAID: Redundant Array of Independent Disks**
+
+### **2.1. Basic Concepts**
+*   **Definition:** RAID refers to disk organization techniques that manage a large number of disks, providing the view of a single disk.
+*   **Primary Benefits:**
+    *   **High Capacity and High Speed:** Achieved by using multiple disks in parallel.
+    *   **High Reliability:** Data is stored redundantly so it can be recovered even if a disk fails.
+*   **Terminology:** The "I" in RAID originally stood for "inexpensive" (as a cost-effective alternative to large disks) but is now interpreted as "independent".
+*   **Motivation:** The chance that *some* disk out of a set of $N$ disks will fail is much higher than the chance that a specific single disk will fail. 
+    *   *Example:* A system with 100 disks, each with a Mean Time To Failure (MTTF) of 100,000 hours (~11 years), will have a system MTTF of only 1,000 hours (~41 days).
+
+### **2.2. Improvement of Reliability via Redundancy**
+Redundancy involves storing extra information that is not needed normally but can be used in the event of a disk failure to rebuild lost information.
+
+#### **2.2.1. Mirroring**
+*   Also known as **shadowing**.
+*   **Mechanism:** Duplicate every disk. A logical disk consists of two physical disks.
+*   Every write is carried out on both disks.
+*   Reads can take place from either disk.
+*   If one disk fails, data is still available on the other. Data loss occurs only if the second disk fails before the first is repaired.
+
+#### **2.2.2. Striping**
+Striping improves the transfer rate by splitting data across multiple disks.
+*   **Bit-level Striping:** Split the bits of each byte across multiple disks (e.g., in an 8-disk array, write bit $i$ of each byte to disk $i$). 
+    *   *Evaluation:* Each access can read data at eight times the rate of a single disk, but seek/access time is worse. It is not used much anymore.
+*   **Byte-level Striping:** Each file is split into parts one byte in size and distributed across drives in a round-robin fashion.
+*   **Block-level Striping:** With $n$ disks, logical block $i$ of a file goes to disk $(i \pmod n) + 1$.
+    *   *Evaluation:* Requests for different blocks can run in parallel. A request for a long sequence of blocks can utilize all disks in parallel.
+
+#### **2.2.3. Parity**
+*   **Bit-Interleaved Parity:** A single parity bit is used for error correction. To recover data on a damaged disk, the system computes the XOR of bits from other disks (including the parity disk).
+*   **Block-Interleaved Parity:** Uses block-level striping and keeps a parity block on a separate disk for corresponding blocks from $n$ other disks.
+    *   *Recovery:* To find the value of a damaged block, compute the XOR of bits from corresponding blocks (including the parity block) from the remaining disks.
+
+---
+
+## **3. Standard RAID Levels**
+
+RAID levels are categorized by their cost-performance trade-offs. The numerical values serve as identifiers and do not signify a performance metric.
+
+| RAID Level | Description | Characteristics |
+| :--- | :--- | :--- |
+| **RAID 0** | Block striping; no redundancy. | 100% space utilization. Best write performance. Reliability is poor; one failure loses all data. |
+| **RAID 1** | Disk mirroring with block striping. | Most expensive. Excellent fault tolerance. 50% space utilization. Parallel reads possible. |
+| **RAID 2** | Bit-level striping with Hamming codes. | Can detect/correct errors. Uses 3 check bits for 4-bit data. Not used in practice. |
+| **RAID 3** | Byte-level striping with dedicated parity. | High transfer rate. Cannot service multiple requests simultaneously. Not used in practice. |
+| **RAID 4** | Block-level striping with dedicated parity. | Good read performance. Write bottleneck at the parity disk. Tolerates 1 disk failure. Not used in practice. |
+| **RAID 5** | Block-level striping with distributed parity. | Eliminates the dedicated parity disk bottleneck. High read parallelism. Tolerates 1 disk failure. |
+| **RAID 6** | $P+Q$ redundancy (Dual Parity). | Uses error-correcting codes (Reed-Solomon). Tolerates **two** simultaneous disk failures. Poorer write performance than RAID 5. |
+
+<img width="1283" height="652" alt="image" src="https://github.com/user-attachments/assets/357fce94-f366-41fc-9c39-df6c0033c49b" />
+
+---
+
+## **4. Hybrid (Nested) RAID Levels**
+
+Hybrid RAID combines two or more standard levels to gain performance and/or additional redundancy.
+
+*   **RAID 01 (RAID 0+1): Mirror of Stripes**
+    *   Uses striping to create a RAID 0 array and then mirrors it onto another RAID 0 array.
+    *   Achieves both replication and sharing. Requires at least 4 disks.
+*   **RAID 10 (RAID 1+0): Stripe of Mirrors**
+    *   A RAID 0 array of mirrors.
+    *   Provides better throughput and latency than all levels except RAID 0. Preferable for I/O-intensive applications (database, email, web servers).
+
+---
+
+## **5. Hardware and Maintenance Issues**
+
+### **5.1. Hardware vs. Software RAID**
+*   **Software RAID:** Implemented via software modification with no hardware changes. Requires background scans ("resynchronizing") to detect partially written blocks after power failure.
+*   **Hardware RAID:** Uses special-purpose hardware and non-volatile RAM to record writes. Can complete writes immediately upon restart after power failure.
+
+### **5.2. Maintenance Features**
+*   **Hot Swapping:** Faulty disks are replaced without turning power off. The controller reconstructs data onto the new disk immediately.
+*   **Scrubbing:** During idle periods, the controller reads every sector; if unreadable, data is recovered from other disks and written back.
+*   **Hot Spare Disks:** A spare disk is assigned to the array and automatically used as a replacement if a disk fails, reducing mean time to repair.
+*   **Redundancy of Components:** Good implementations have redundant power supplies, disk interfaces, and interconnections to avoid single points of failure.
+
+---
+
+## **6. Choice of RAID Level**
+
+Factors in choosing a RAID level include monetary cost, I/O performance requirements, performance during failure, and rebuild performance.
+
+*   **RAID 0:** Used only when data safety is not critical (e.g., transitory data).
+*   **RAID 1:** Popular for log files due to high write performance (Level 1 needs 2 writes; Level 5 needs 2 reads and 2 writes for random updates).
+*   **RAID 5:** Preferred for applications where data is read frequently but written rarely, and for large volumes of data.
+*   **RAID 6:** Used where data safety is vital and latent sector failures must be guarded against.
+
+---
+
+## **7. Practical Comparison of RAID**
+
+| Feature | RAID 0 | RAID 1 | RAID 5 | RAID 6 | RAID 10 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Min. Drives** | 2 | 2 | 3 | 4 | 4 |
+| **Fault Tolerance** | None | 1 drive | 1 drive | 2 drives | 1 per sub-array |
+| **Read Performance** | High | Medium | Low | Low | High |
+| **Write Performance** | High | Medium | Low | Low | Medium |
+| **Capacity Utilization**| 100% | 50% | 67%–94% | 50%–88% | 50% |
+| **Typical Apps** | High-end workstations, real-time rendering | Operating systems, transaction DBs | Data warehouse, web servers | Data archive, large capacity needs | Fast databases, application servers |
+
+
+---
+
+## **8. Limitations of RAID**
+
+> [!WARNING]
+> *   **Not 100% Uptime:** RAID minimizes downtime but does not eliminate risks like RAID card failure.
+> *   **Does Not Replace Backups:** RAID protects against drive failure but not against data corruption, human error, or security issues.
+> *   **No Dynamic Resizing:** You usually cannot simply add a drive to increase size; the array must often be rebuilt from scratch.
+
