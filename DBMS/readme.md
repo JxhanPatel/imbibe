@@ -11,7 +11,7 @@
 | **Week 6** | Normalization II | BCNF, 4NF & Multi-valued Deps | 🟢 Done |
 | **Week 7** | Application Development | DB Connectivity (JDBC/ODBC) & Security | 🟢 Done |
 | **Week 8** | Storage Management | File Org, Buffer Mgmt & RAID | 🟢 Done |
-| **Week 9** | Indexing & Hashing | B+ Trees & Performance Tuning | 🟡 In Progress |
-| **Week 10** | Transactions | ACID Properties & Concurrency Control | ⚪ Planned |
-| **Week 11** | Backup & Recovery | Log-based Recovery & Checkpoints | ⚪ Planned |
-| **Week 12** | Query Optimization | Execution Plans & Heuristics | ⚪ Planned |
+| **Week 9** | Indexing & Hashing | B+ Trees & Performance Tuning | 🟢 Done |
+| **Week 10** | Transactions | ACID Properties & Concurrency Control | 🟢 Done|
+| **Week 11** | Backup & Recovery | Log-based Recovery & Checkpoints | 🟢 Done |
+| **Week 12** | Query Optimization | Execution Plans & Heuristics | 🟢 Done |
