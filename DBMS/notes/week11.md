@@ -477,3 +477,125 @@ Recovery from failure involves two phases:
 
 
 
+
+
+
+
+# 11.4: Backup & Recovery/4: Recovery/3
+
+### **1. Objectives**
+*   To understand Recovery with Early Lock Release.
+*   To understand how to plan for backup and recovery.
+
+
+## **2. Recovery with Early Lock Release**
+
+### **2.1. Motivation and Problem**
+*   Any index used in processing a transaction, such as a $B^+$-tree, can be treated as normal data.
+*   To increase concurrency, the $B^+$-tree concurrency control algorithm often allows locks to be released early, in a non-two-phase manner.
+*   **The Problem:** As a result of early lock release, it is possible that a value in a $B^+$-tree node is updated by one transaction $T_1$, which inserts an entry $(V_1, R_1)$, and subsequently updated by another transaction $T_2$, which inserts an entry $(V_2, R_2)$ in the same node.
+*   If $T_1$ must be undone, we cannot simply replace the contents of the node with the old value prior to $T_1$’s insert, since that would also undo the insert performed by $T_2$; $T_2$ may still commit or may have already committed.
+*   **The Solution:** The only way to undo the effect of the insertion of $(V_1, R_1)$ is to execute a corresponding delete operation.
+
+### **2.2. Core Concepts**
+*   **Logical Undo:** Supports high-concurrency locking techniques by executing a counter-operation (like a delete to undo an insert) instead of restoring old physical values.
+*   **Repeating History:** Recovery is based on executing exactly the same actions as normal processing, including redo of log records of incomplete transactions, followed by subsequent undo.
+*   **System Applicability:** Early lock release is vital for indices and frequently updated system data structures, such as those tracking records of a relation, free space in a block, and free blocks.
+
+<img width="1478" height="826" alt="image" src="https://github.com/user-attachments/assets/2e8c52ed-5b2b-480e-9610-ede89e368ede" />
+
+---
+
+## **3. Logical Undo Logging**
+
+### **3.1. Physical Redo vs. Logical Undo**
+*   **Logical Undo Logging:** Undo log records contain the operation to be executed (logical operation). Examples include:
+    *   Delete of a tuple to undo an insert of a tuple (allows early lock release on space allocation).
+    *   Subtracting a deposited amount to undo a deposit (allows early lock release on bank balances).
+*   **Physical Redo:** Redo information is still logged physically (new value for each write) because logical redo is complicated by the fact that the database state on disk may not be "operation consistent" when recovery starts.
+
+### **3.2. Operation Logging Process**
+1.  **Start:** When an operation begins, log $\langle T_i, O_j, \text{operation-begin} \rangle$, where $O_j$ is a unique identifier of the operation instance.
+2.  **Execution:** While executing, normal update log records are created for all updates. These include old-value (physical undo) and new-value (physical redo) information.
+3.  **End:** When the operation completes, $\langle T_i, O_j, \text{operation-end}, U \rangle$ is logged, where $U$ contains information to perform a logical undo.
+
+### **3.3. Operation Logging Rules**
+*   If a crash/rollback occurs **before** the operation completes: The operation-end record is not found; the physical undo information is used.
+*   If a crash/rollback occurs **after** the operation completes: The operation-end record is found; logical undo is performed using $U$, and physical undo information is ignored.
+*   **Redo:** Redo after a crash always uses physical redo information.
+
+<img width="805" height="351" alt="image" src="https://github.com/user-attachments/assets/82a7e49e-669a-4860-b90a-8c142ec2fc67" />
+
+---
+
+## **4. Transaction Rollback with Logical Undo**
+
+The rollback of transaction $T_i$ involves scanning the log backwards and applying these rules:
+
+*   **(a)** If a physical log record $\langle T_i, X, V_1, V_2 \rangle$ is found, perform the undo by writing $V_1$ to $X$ and log a compensation record $\langle T_i, X, V_1 \rangle$.
+*   **(b)** If an operation-end record $\langle T_i, O_j, \text{operation-end}, U \rangle$ is found:
+    *   Roll back the operation logically using $U$.
+    *   Log updates during rollback like normal operations.
+    *   Generate an operation-abort record $\langle T_i, O_j, \text{operation-abort} \rangle$.
+    *   Skip all preceding log records for $T_i$ until the $\langle T_i, O_j, \text{operation-begin} \rangle$ record is found.
+*   **(c)** If a redo-only record is found, ignore it.
+*   **(d)** If an operation-abort record is found, skip preceding log records for $T_i$ until $\langle T_i, O_j, \text{operation-begin} \rangle$ to prevent multiple rollbacks of the same operation.
+*   **(e)** Stop the scan when $\langle T_i, \text{start} \rangle$ is found.
+*   **(f)** Add $\langle T_i, \text{abort} \rangle$ to the log.
+
+<img width="619" height="445" alt="image" src="https://github.com/user-attachments/assets/b4349e09-6519-4aee-8c83-224f71ec82a2" />
+
+---
+
+## **5. Recovery Algorithm with Logical Undo**
+
+Recovery from a system crash takes place in two phases:
+
+### **5.1. Redo Phase**
+*   Scan the log forward from the last $\langle \text{checkpoint } L \rangle$ record to the end of the log.
+*   Repeat history by physically redoing all updates of all transactions.
+*   Create an **undo-list**:
+    *   Set to $L$ initially.
+    *   Add $T_i$ when $\langle T_i, \text{start} \rangle$ is found.
+    *   Delete $T_i$ when $\langle T_i, \text{commit} \rangle$ or $\langle T_i, \text{abort} \rangle$ is found.
+
+### **5.2. Undo Phase**
+*   Scan the log backwards, performing undo on log records of transactions in the undo-list.
+*   Log records are processed using the logical undo rules (skipping records where an operation-end or operation-abort is found).
+*   When $\langle T_i, \text{start} \rangle$ is found for a transaction in the undo-list, write a $\langle T_i, \text{abort} \rangle$ record.
+*   The phase terminates when the undo-list is empty.
+
+---
+
+## **6. Planning for Backup and Recovery**
+
+Several factors determine the setup of a Backup and Recovery plan:
+
+*   **Data Importance:** How critical is the information? Business-critical data requires extra copies and easy restoration plans.
+*   **Frequency of Change:** How often is the database updated? Critical data modified daily requires a daily backup schedule.
+*   **Speed:** How much time is allocated for backup and recovery? This determines the maximum period that can be spent on these tasks.
+*   **Equipment:** Availability of necessary software and hardware resources (e.g., storage media, servers).
+*   **Employees:** Who is responsible? Ideally, one supervisor and several specialists (system administrators) for actual execution.
+*   **Storing:** 
+    *   **Online/Offsite:** Allows recovery from natural disasters (fire, flood).
+    *   **Onsite:** Essential for quick restoration but has capacity and maintenance bottlenecks.
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
