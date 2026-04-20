@@ -133,3 +133,163 @@
 
 
 
+
+
+
+# 11.2 Backup & Recovery/2: Recovery/1
+
+---
+
+
+
+### **1. Objectives**
+*   To understand the possible sources for failure for transactions in a database.
+*   To explore storage models (volatile, non-volatile, stable) used for recovery to ensure Atomicity, Consistency, and Durability.
+*   To understand recovery schemes based on logging.
+*   To focus on single transactions.
+
+---
+
+## **2. Failure Classification**
+
+All database reads/writes occur within a transaction which must satisfy **ACID properties**: **Atomicity** (all or nothing), **Consistency** (preserves database integrity), **Isolation** (execute as if run alone), and **Durability** (results not lost by failure). 
+
+*   **Concurrency Control** guarantees Isolation and contributes to Consistency.
+*   The **Application Program** guarantees Consistency.
+*   The **Recovery Subsystem** guarantees Atomicity and Durability, and contributes to Consistency.
+
+### **2.1. Types of Failures**
+1.  **Transaction Failure:**
+    *   **Logical Errors:** The transaction cannot complete due to an internal error condition (e.g., bad input, data not found, overflow, or resource limit exceeded).
+    *   **System Errors:** The database system must terminate an active transaction due to an error condition, such as a deadlock.
+2.  **System Crash:** A power failure or other hardware or software failure causes the system to crash.
+    *   **Fail-stop Assumption:** Non-volatile storage contents are assumed not to be corrupted as a result of a system crash.
+    *   Database systems use numerous integrity checks to prevent corruption of disk data.
+3.  **Disk Failure:** A head crash or similar failure destroys all or part of disk storage. 
+    *   Destruction is assumed to be detectable; disk drives use checksums to detect failures.
+
+---
+
+## **3. Recovery Algorithms**
+
+Recovery algorithms have two distinct parts:
+1.  **Normal Actions:** Taken during normal transaction processing to ensure enough information exists to allow recovery from failures.
+2.  **Recovery Actions:** Taken after a failure to recover the database contents to a state ensuring atomicity, consistency, and durability.
+
+---
+
+## **4. Storage Structure**
+
+Storage media are distinguished by speed, capacity, and resilience to failure.
+
+| Storage Type | Characteristics | Examples |
+| :--- | :--- | :--- |
+| **Volatile Storage** | Does not survive system crashes; extremely fast access. | Main memory, cache memory. |
+| **Non-volatile Storage** | Survives system crashes but may still fail, losing data. | Disk, tape, flash memory, non-volatile (battery-backed) RAM. |
+| **Stable Storage** | A mythical/theoretical form of storage that is never lost. | Approximated by maintaining multiple copies on distinct non-volatile media. |
+
+### **4.1. Stable Storage Implementation**
+To approximate stable storage, information is replicated in several non-volatile storage media (usually disks) with independent failure modes. 
+
+**Output Protocol (for two copies):**
+1.  Write the information onto the $1^{st}$ physical block.
+2.  When the $1^{st}$ write is successful, write the same information onto the $2^{nd}$ physical block.
+3.  The output is completed only after the second write successfully completes.
+
+<img width="844" height="457" alt="image" src="https://github.com/user-attachments/assets/144afd8d-dc9f-41e0-a54a-35ec17e88314" />
+
+**Failure Recovery for Blocks:**
+If the system fails during an output operation, copies may differ. 
+*   **Checksums:** Errors in a disk block (like partial writes) are detected using checksums.
+*   **Comparison:** If one copy has an error (bad checksum), overwrite it with the other copy.
+*   **Inconsistency:** If both have no error but are different, overwrite the second block with the first.
+*   **Optimization:** Record in-progress writes on non-volatile RAM to avoid comparing every block during recovery.
+
+---
+
+## **5. Data Access**
+
+*   **Physical Blocks:** Blocks residing on the disk.
+*   **System Buffer Blocks:** Blocks residing temporarily in main memory.
+*   **Operations:**
+    *   `input(B)`: Transfers physical block $B$ to main memory.
+    *   `output(B)`: Transfers buffer block $B$ to the disk and replaces the physical block there.
+*   **Local Copies:** Each transaction $T_i$ has a private work-area for local copies of data items (e.g., $x_i$ is $T_i$'s local copy of $X$).
+    *   `read(X)`: Assigns the value of $X$ from the buffer to local variable $x_i$.
+    *   `write(X)`: Assigns the value of $x_i$ to data item $X$ in the buffer block.
+
+<img width="587" height="428" alt="image" src="https://github.com/user-attachments/assets/4d902030-37fa-4010-92a2-43ca210da9c8" />
+
+---
+
+## **6. Log-Based Recovery**
+
+The system maintains a **log** on stable storage, which is a sequence of log records recording all update activities.
+
+### **6.1. Log Record Types**
+*   **$<T_i \text{ start}>$:** Transaction $T_i$ has started.
+*   **$<T_i, X, V_1, V_2>$:** $T_i$ performed a write on $X$. $V_1$ is the old value (before write), and $V_2$ is the new value (after write).
+*   **$<T_i \text{ commit}>$:** $T_i$ has committed.
+*   **$<T_i \text{ abort}>$:** $T_i$ has aborted.
+
+### **6.2. Modification Schemes**
+1.  **Immediate-Modification:** Allows updates of an uncommitted transaction to be made to the buffer or disk before the transaction commits. An update log record must be written to stable storage before the database item is written.
+2.  **Deferred-Modification:** Performs updates to the buffer/disk only at the time of transaction commit.
+
+### **6.3. Transaction Commit**
+A transaction is committed when its **commit log record** is output to stable storage. All previous log records of that transaction must have been output already.
+
+---
+
+## **7. Undo and Redo Operations**
+
+### **7.1. Basic Definitions**
+*   **Undo:** Sets the data item to the old value $V_1$ using a log record.
+*   **Redo:** Sets the data item to the new value $V_2$ using a log record.
+
+### **7.2. Transactional Undo and Redo**
+*   **$undo(T_i)$:** Restores all data items updated by $T_i$ to their old values, scanning the log **backwards**.
+    *   Writes a **Compensation Log Record (CLR)** (redo-only record) $<T_i, X, V_1>$ for each restoration.
+    *   Writes $<T_i \text{ abort}>$ when complete.
+*   **$redo(T_i)$:** Sets all data items updated by $T_i$ to the new values, scanning the log **forward**.
+    *   No logging is done during redo.
+
+### **7.3. Use Cases**
+*   **Rollback:** Undo is used for transaction rollback during normal operation (e.g., due to a logical error).
+*   **Failure Recovery:** Both undo and redo are used.
+    *   **Undo $T_i$:** If the log contains $<T_i \text{ start}>$ but neither $<T_i \text{ commit}>$ nor $<T_i \text{ abort}>$.
+    *   **Redo $T_i$:** If the log contains $<T_i \text{ start}>$ and either $<T_i \text{ commit}>$ or $<T_i \text{ abort}>$.
+    *   **Repeating History:** Redoing aborted transactions (which include CLRs) ensures the end result is the same as the original undo.
+
+---
+
+## **8. Checkpoints**
+
+Redoing/undoing the entire log is slow. **Checkpoints** streamline recovery by periodically flushing the state to disk.
+
+### **8.1. Checkpoint Procedure**
+1.  Stop all updates.
+2.  Output all log records in main memory to stable storage.
+3.  Output all modified buffer blocks to disk.
+4.  Write a log record **$<checkpoint~L>$** where $L$ is a list of active transactions at that time.
+
+### **8.2. Recovery with Checkpoints**
+The system scans backwards to find the most recent $<checkpoint~L>$ record.
+*   **Ignore:** Transactions that committed or aborted before the checkpoint.
+*   **Redo:** Transactions in $L$ or those that started after the checkpoint if they have a commit or abort record in the log.
+*   **Undo:** Transactions in $L$ or those that started after the checkpoint if they lack a commit or abort record.
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
