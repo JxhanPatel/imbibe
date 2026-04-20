@@ -628,3 +628,4 @@ For any system sharing data, the CAP theorem defines three properties:
 <img width="617" height="634" alt="image" src="https://github.com/user-attachments/assets/9939a890-ced6-4cf6-8990-f1a68617302e" />
 
 <img width="855" height="648" alt="image" src="https://github.com/user-attachments/assets/1a9c4ff9-1a76-4fb5-bd0a-d6da968a9292" />
+
