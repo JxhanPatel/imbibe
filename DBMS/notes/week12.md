@@ -1,3 +1,27 @@
+## **Index: Week 12**
+
+
+ **[12.1 Query Processing](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week12.md#121-query-processing-and-optimization1-processing)**
+
+
+
+
+ **[12.2 Query Optimization](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week12.md#122-query-processing-and-optimization2-optimization)**
+
+
+
+ **[12.3 RDBMS Performance & Architecture](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week12.md#123-rdbms-performance--architecture)**
+
+
+
+
+ **[12.4 Non-Relational DBMS (NoSQL)](https://github.com/JxhanPatel/imbibe/blob/main/DBMS/notes/week12.md#124-non-relational-dbms-nosql)**
+
+
+
+
+
+
 # 12.1: Query Processing and Optimization/1: Processing
 
 ## **Recap**
