@@ -1,4 +1,4 @@
-<img width="870" height="429" alt="image" src="https://github.com/user-attachments/assets/c7eda01d-bdd5-4706-b324-542fff7df294" /># 12.1: Query Processing and Optimization/1: Processing
+# 12.1: Query Processing and Optimization/1: Processing
 
 ## **Recap**
 *   Learnt the importance of backup and analysed different backup strategies.
