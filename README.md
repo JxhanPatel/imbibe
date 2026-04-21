@@ -19,7 +19,7 @@ I’ve organized my learning into specific domains. Each section contains my per
 
 | Module | Description | Status |
 | --- | --- | --- |
-| **DSA** | Data Structures & Algorithms implementations and LeetCode patterns. | 🟡 In Progress |
+| **DSA** | Data Structures & Algorithms implementations and LeetCode patterns. | 🟢 Done |
 | **DBMS** | Database management, SQL deep dives, and schema design notes. | 🟢 Done |
 | **ML** | Mathematics, Scikit-learn, and building models from scratch. | 🟡 In Progress |
 | **Projects** | Mini-applications that bridge the gap between theory and practice. | ⚪ Planned |
