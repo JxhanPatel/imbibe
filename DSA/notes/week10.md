@@ -588,3 +588,70 @@ Independent set and vertex cover **reduce to each other**.
 
 
 
+
+
+
+# 10.7: Intractability - P and NP
+
+## 10.7.1: The Class NP
+The class **NP** is defined by the existence of a **checking algorithm** $C$ that can verify a solution "certificate" $S$ for an input instance $I$ in time that is polynomial in the $size(I)$. 
+
+### Characteristics of NP
+*   **Polynomial Certificate**: For the check to be efficient, the solution $S$ presented to the algorithm must also be small (polynomial in the size of input $I$); a gigantic certificate cannot be validated in polynomial time.
+*   **Optimization to Checking**: Optimization problems can be converted into checking problems by providing a bound $K$ (e.g., "Is there a tour with cost at most $K$?"). This transformation adds only a logarithmic factor to the complexity because one can perform a binary search through the solution space.
+*   **Examples in NP**: Factorization, Boolean satisfiability (SAT), the Traveling Salesman Problem (TSP), vertex cover, and independent set are all members of the class NP.
+
+### Why "NP"?
+The name stands for **Non-deterministic Polynomial time**. 
+*   **Concept**: It involves "guessing" a correct solution (non-determinism) and then validating that guess in polynomial time.
+*   **Theoretical Origins**: The term originates from computability theory and is formally defined via **non-deterministic Turing machines**.
+
+## 10.7.2: The Class P
+**P** is the class of problems that admit regular, deterministic polynomial-time algorithms for their worst-case complexity. 
+
+### Relationship Between P and NP
+*   **Inclusion**: $P \subseteq NP$. 
+*   **Reasoning**: If a problem can be solved from start to finish in polynomial time, it is inherently checkable in polynomial time. To check a claimed solution, one could simply generate their own solution in polynomial time and compare the two.
+
+## 10.7.3: The $P = NP$ Question
+The central question in theoretical computer science asks if $P = NP$, or whether efficient checking is fundamentally the same as efficient generation.
+
+*   **Intuition**: Intuitively, checking should be easier than generation. For example, it is much harder for a student to find two large prime factors of $N$ than it is for a teacher to multiply them to verify the answer.
+*   **General Belief**: Most researchers believe $P \ne NP$. 
+*   **Formal Evidence**: Many "natural" problems in NP are inter-reducible. If a polynomial-time algorithm is found for just one of these hard problems, it would yield efficient solutions for all of them, implying $P = NP$.
+
+## 10.7.4: Reductions Within NP
+Reductions allow problems to be transformed into one another, proving they are "equally hard".
+
+### Reducing SAT to 3-SAT
+The standard Boolean Satisfiability problem (SAT) can be reduced to **3-SAT**, where each clause contains at most three literals.
+*   **Process**: A clause with more than three literals is split by introducing new variables. 
+*   **Example**: A 5-literal clause $(v \vee \neg w \vee x \vee \neg y \vee z)$ is split into $(v \vee \neg w \vee a) \wedge (\neg a \vee x \vee \neg y \vee z)$. This new formula is satisfiable if and only if the original clause was.
+*   **Conclusion**: Since this process can be repeated for all large clauses, if SAT is hard, 3-SAT must also be hard.
+
+### Reducing 3-SAT to Independent Set
+A 3-SAT formula can be transformed into a graph problem.
+1.  **Nodes**: Create one node per literal in the formula.
+2.  **Triangle Edges**: Connect nodes representing literals within the same clause to form a triangle (or an edge if the clause has only two literals).
+3.  **Consistency Edges**: Connect every literal to its negation wherever it appears in other clauses.
+4.  **Goal**: An independent set in this graph must pick exactly one literal per clause to satisfy the formula while consistency edges prevent setting a variable to both True and False.
+
+<img width="924" height="465" alt="image" src="https://github.com/user-attachments/assets/246a5e61-f72f-4797-9259-3161926ae526" />
+
+### Chain of Transitivity
+Reductions are transitive. Because $SAT \to 3-SAT \to \text{Independent Set} \to \text{Vertex Cover}$, it follows that SAT reduces to Vertex Cover. Other inter-reducible problems include Traveling Salesman and Integer Linear Programming.
+
+## 10.7.5: NP-Completeness
+A problem is **NP-complete** if it is both in the class NP and every other problem in NP reduces to it.
+
+*   **Cook-Levin Theorem**: This fundamental theorem proves that every problem in NP can be reduced to SAT. 
+*   **Proving Completeness**: To show a new problem $P$ is NP-complete, one must show $P \in NP$ and then reduce a known NP-complete problem (like SAT or 3-SAT) to $P$.
+*   **Representative Nature**: NP-complete problems are representatives of the hardest problems in NP; solving any one of them in polynomial time would prove $P = NP$.
+
+## 10.7.6: Current Status of $P \ne NP$
+*   **Practical Scope**: Many commercially important tasks, such as scheduling, bin-packing, and finding optimal tours, are NP-complete. 
+*   **Empirical Evidence**: Despite centuries of work by mathematicians and researchers, no efficient algorithm has been found for any of these problems. 
+*   **The Prize**: A formal proof that $P \ne NP$ (or $P = NP$) is considered one of the greatest unsolved problems in mathematics and carries a **\$1 million prize** from the Clay Mathematics Institute.
+
+> [!IMPORTANT]
+> The Cook-Levin theorem is approximately 50 years old (1971). Despite decades of formulate and study, the computer science community is "no closer" to proving the $P \ne NP$ conjecture, though it is strongly believed to be true.
