@@ -113,3 +113,94 @@ It is always possible to construct a linear combination of constraints that tigh
 
 
 
+
+
+# 10.2: Linear Programming: Production Planning
+
+## 10.2.1: Production Planning Scenario - Handwoven Carpets
+A company makes handwoven carpets. The production parameters are as follows:
+*   **Workforce**: The company has 30 employees at the beginning of the year.
+*   **Standard Production**: Each employee produces 20 carpets a month.
+*   **Wages**: Each employee is paid a salary of Rs 20,000.
+*   **Labor Cost**: The labor cost is Rs 1,000 per carpet ($20,000 / 20 = 1,000$).
+*   **Seasonal Demand**: Monthly demand varies from January to December, represented as $d_{1}, d_{2}, \dots, d_{12}$.
+
+## 10.2.2: Coping with Varying Demand
+To meet demand that fluctuates above or below the standard capacity of 600 carpets ($30 \text{ workers} \times 20 \text{ carpets}$), the business has several options:
+
+1.  **Overtime**:
+    *   Workers are paid 80% extra for overtime carpets.
+    *   The cost of an overtime carpet is Rs 1,800 (Rs 1,000 regular cost + Rs 800 bonus).
+    *   Overtime limit is 30% per worker, meaning a worker can make at most 6 extra carpets per month (26 total).
+2.  **Hiring and Firing**:
+    *   **Hiring Cost**: Rs 3,200 per worker (due to training, searching, etc.).
+    *   **Firing Cost**: Rs 4,000 per worker (due to bonus for hardship, etc.).
+3.  **Surplus Storage**:
+    *   Excess carpets made in one month can be stored to meet future demand.
+    *   **Storage Cost**: Rs 80 per carpet per month.
+
+## 10.2.3: Formulating the Linear Program
+To find the minimum cost to meet monthly demand exactly for 12 months, the problem is modeled using 74 variables.
+
+### Variables
+For each month $i \in \{1, 2, \dots, 12\}$:
+*   $w_{i}$: number of workers employed in month $i$.
+*   $x_{i}$: total carpets made in month $i$.
+*   $o_{i}$: carpets made in overtime during month $i$.
+*   $h_{i}$: workers hired at the start of month $i$.
+*   $f_{i}$: workers fired at the start of month $i$.
+*   $s_{i}$: surplus carpets stored after month $i$.
+
+**Boundary Conditions**:
+*   $w_{0} = 30$ (initial workforce).
+*   $s_{0} = 0$ (initial inventory).
+
+### Constraints
+For each month $i \in \{1, 2, \dots, 12\}$, the following linear constraints must be satisfied:
+
+1.  **Non-negativity**: All variables must be greater than or equal to zero.
+    *   $w_{i}, x_{i}, o_{i}, h_{i}, f_{i}, s_{i} \ge 0$.
+2.  **Production Composition**: Total carpets made equals regular production plus overtime production.
+    *   $x_{i} = 20w_{i} + o_{i}$.
+3.  **Workforce Consistency**: The number of workers must match hiring and firing actions.
+    *   $w_{i} = w_{i-1} + h_{i} - f_{i}$.
+4.  **Inventory Consistency**: Stored carpets are connected to the earlier stock, current production, and current demand.
+    *   $s_{i} = s_{i-1} + x_{i} - d_{i}$.
+5.  **Overtime Limit**: Overtime production is at most 6 carpets per worker (30% of regular production).
+    *   $o_{i} \le 6w_{i}$.
+
+### Objective Function
+The goal is to **minimize the total cost** over 12 months:
+$$\text{Minimize: } 20000(w_{1} + \dots + w_{12}) + 3200(h_{1} + \dots + h_{12}) + 4000(f_{1} + \dots + f_{12}) + 80(s_{1} + \dots + s_{12}) + 1800(o_{1} + \dots + o_{12})$$.
+
+> [!NOTE]
+> The objective includes the full salary for all workers, hiring/firing fees, storage fees, and the total cost (Rs 1,800) for every carpet made during overtime.
+
+## 10.2.4: Solving the Linear Program
+The linear program can be solved using the **Simplex algorithm**.
+
+<img width="950" height="440" alt="image" src="https://github.com/user-attachments/assets/64b18dbf-e0ef-4780-b9a6-a6d11ab207aa" />
+
+### Fractional vs. Integer Solutions
+A standard linear program solution may result in fractional values (e.g., hiring 10.6 workers in March).
+*   **Rounding**: One approach is to round the fraction to the nearest integer (e.g., 10 or 10) and recompute the cost.
+    *   If the values are "large," rounding does not affect the quality of the solution much.
+    *   If the values are "small," rounding requires more care as it can significantly change the overall cost.
+*   **Integer Linear Programming (ILP)**: Insisting that variables must be integers (since people and carpets are indivisible) makes the problem **computationally intractable**.
+*   **Intractability**: Computationally intractable means there is no clever shortcut; an exhaustive search of integer points within the feasible region may be unavoidable in the worst case.
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
