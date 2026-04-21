@@ -179,7 +179,7 @@ $$\text{Minimize: } 20000(w_{1} + \dots + w_{12}) + 3200(h_{1} + \dots + h_{12})
 ## 10.2.4: Solving the Linear Program
 The linear program can be solved using the **Simplex algorithm**.
 
-<img width="950" height="440" alt="image" src="https://github.com/user-attachments/assets/64b18dbf-e0ef-4780-b9a6-a6d10ab207aa" />
+<img width="950" height="440" alt="image" src="https://github.com/user-attachments/assets/64b18dbf-e0ef-4780-b9a6-a6d11ab207aa" />
 
 ### Fractional vs. Integer Solutions
 A standard linear program solution may result in fractional values (e.g., hiring 10.6 workers in March).
@@ -281,3 +281,92 @@ The current strategy of using one variable per path **does not scale well**.
 *   **Exponential Growth**: In general, the number of possible paths between any two nodes in a graph is **exponential**.
 *   **Large Encodings**: If one variable is constructed for every possible route, the resulting linear program becomes excessively large relative to the original graph.
 *   **Alternative Approach**: Such problems are more effectively solved using a better approach to analyze **network flows** directly on the graph rather than converting them to a standard linear program with path-based variables.
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+# 10.4: Network Flows
+
+## 10.4.1: The Oil Network Example
+Imagine we have a network of pipelines. We are trying to transport oil from one place to another place. The edges represent the directions in which the oil will flow, and the capacities of each of the pipelines is the number indicated.
+
+*   **Goal**: Ship as much oil as possible from the source $s$ to the target (sink) $t$.
+*   **Constraints**: There is no storage along the way. All the liquid must flow; we cannot transport 3 units to a node and move only 1 unit out in another direction. Everything must keep flowing.
+
+<img width="970" height="417" alt="image" src="https://github.com/user-attachments/assets/1e94656b-5f53-4d96-80b5-114735418536" />
+
+## 10.4.2: Formal Definitions
+Formally, a network is a graph $G = (V, E)$.
+*   **Special Nodes**: $s$ (source) and $t$ (sink).
+*   **Edge Capacity**: Each edge $e$ has a capacity $c_{e}$.
+*   **Flow**: $f_{e}$ for each edge $e$.
+
+### The Constraints
+1.  **Capacity Constraint**: $f_{e} \le c_{e}$ for each edge $e$. The quantity that flows through each pipe cannot exceed its capacity.
+2.  **Conservation of Flow**: At each node, except $s$ and $t$, the sum of incoming flows must equal the sum of outgoing flows.
+3.  **Total Volume**: The total volume of flow is the sum of the outgoing flow from $s$. Alternatively, it is the sum of the incoming edges of the target $t$.
+
+## 10.4.3: Linear Programming (LP) Formulation
+Network flow can be captured as an LP problem using variables for each edge rather than paths.
+
+*   **Variables**: $f_{e}$ for each edge $e$ (e.g., $f_{sa}, f_{bd}, f_{ce}, \dots$).
+*   **Capacity Constraints**: $f_{ba} \le 10, \dots$ (one per edge).
+*   **Conservation Constraints**: $f_{ad} + f_{bd} = f_{dc} + f_{de} + f_{dt}, \dots$ (one per internal node).
+*   **Objective**: Maximize flow volume (e.g., Maximize $f_{sa} + f_{sb} + f_{sc}$).
+
+> [!NOTE]
+> Simplex explores vertices of the feasible region to find the maximum flow. Moving from vertex to vertex directly gives a more direct algorithm for maximum flow without invoking Simplex.
+
+## 10.4.4: The Ford-Fulkerson Algorithm
+This algorithm starts with zero flow and incrementally augments it.
+
+1.  **Start with zero flow**.
+2.  **Find a path**: Choose a path from $s$ to $t$ that is not saturated.
+3.  **Augment flow**: Increase the flow along this path as much as possible given the path's capacity.
+4.  **Build residual graph**: Update capacities to account for the new flow and add reverse edges.
+5.  **Repeat**: Continue the process until there is no feasible flow from $s$ to $t$ in the residual graph.
+
+<img width="949" height="455" alt="image" src="https://github.com/user-attachments/assets/b6467275-0892-45ac-b0f3-743a4ea653f6" />
+
+## 10.4.5: Residual Graphs
+If a bad path is chosen initially, we need a way to "undo" that flow.
+*   **Reverse Edges**: For each edge $e$ with capacity $c_{e}$ and current flow $f_{e}$:
+    *   **Reduce forward capacity** to $c_{e} - f_{e}$.
+    *   **Add a reverse edge** with capacity $f_{e}$.
+*   The reverse edge allows us to "push back" flow, which is effectively the same as reducing the original forward flow.
+
+
+## 10.4.6: Max Flow-Min Cut Theorem
+How do we know the achieved flow is maximum? We use a **Certificate of Optimality**.
+
+*   **$(s, t)$-cut**: A set of edges that disconnects $s$ and $t$. It partitions the graph into a part containing $s$ and a part containing $t$.
+*   **Cut Capacity**: Any flow from $s$ to $t$ must go through the edges of the cut. Therefore, the flow cannot exceed the cut capacity.
+*   **The Theorem**: In fact, the max flow is always equal to the capacity of the minimum cut.
+*   **At Max Flow**: In the residual graph, there is no path from $s$ to $t$. Any edge from the $s$-side ($L$) to the $t$-side ($R$) must be at full capacity, and any edge from $R$ to $L$ must be at zero capacity.
+
+<img width="997" height="484" alt="image" src="https://github.com/user-attachments/assets/e0e16a8a-f3e0-4231-84e4-a620ed68263e" />
+
+## 10.4.7: Efficiency and Augmenting Paths
+The Ford-Fulkerson algorithm can be inefficient if augmenting paths are chosen poorly.
+*   **Proportional to Capacity**: In some cases, it can take time proportional to the maximum capacity (e.g., 200 iterations for a flow of 200).
+*   **BFS Improvement (Edmonds-Karp)**: Use **Breadth-First Search (BFS)** to find the augmenting path with the fewest edges.
+*   **Guaranteed Complexity**: With the BFS heuristic, the number of iterations is bounded by $|V| \times |E|$, regardless of the actual capacity values. This makes the complexity proportional to the size of the graph.
+
+<img width="952" height="400" alt="image" src="https://github.com/user-attachments/assets/7edc8bfe-962e-44f6-83ec-c3bbf09b26b5" />
+
+
+
+
+
+
+
