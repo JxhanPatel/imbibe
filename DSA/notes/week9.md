@@ -418,3 +418,149 @@ def LCS(u,v):
 ```
 **Complexity**:
 $O(mn)$ using dynamic programming or memoization. We fill a table of size $O(mn)$ where each entry takes constant time to compute.
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+# 9.5: Edit Distance
+
+## 9.5.1: Document Similarity
+The concept of similarity between documents can be illustrated by comparing two sentences:
+1. "The students were able to appreciate the concept optimal substructure property and its use in designing algorithms"
+2. "The lecture taught the students to appreciate how the concept of optimal substructures can be used in designing algorithms"
+
+Clearly these are similar sentences and one could imagine that the second sentence was perhaps created by editing the first one. Our goal is to try and find out how much editing was done or what is the minimum amount of editing needed to make the first document look like the second document.
+
+## 9.5.2: Edit Operations
+To transform one document to another, three types of character-level operations are used:
+*   **Insert a character**: Adding a character to the document.
+*   **Delete a character**: Removing a character from the document.
+*   **Substitute one character by another**: Replacing one character with another.
+
+Every operation applies to one character at a time, one symbol at a time.
+
+<img width="980" height="483" alt="image" src="https://github.com/user-attachments/assets/1a0d95e0-415f-41ff-956a-0d6f67050bc8" />
+
+## 9.5.3: Defining Edit Distance
+The **Edit distance** (also called **Levenshtein distance**, named after Vladimir Levenshtein, 1965) is the minimum number of edit operations needed to transform one document to the other. 
+
+In the provided example, the transformation involves:
+*   24 characters inserted.
+*   18 characters deleted.
+*   2 characters substituted.
+*   **Total cost (Edit distance)**: at most 44.
+
+> [!NOTE]
+> We are assuming that each of these has the same cost whether you delete a character or you insert a character or you substitute a character, you are paying the same cost in terms of the editing cost.
+
+### Applications of Edit Distance:
+*   Suggestions for spelling correction: Looking for the nearest words in terms of edit operations to a misspelled word.
+*   Genetic similarity of species: Measuring how many genes must be altered to go from one species to another.
+
+## 9.5.4: Edit Distance and Longest Common Subsequence (LCS)
+Longest common subsequence is equivalent to edit distance without substitution.
+*   If $LCS(u, v) = k$, then the minimum number of deletes needed to make $u$ and $v$ equal is $(m-k) + (n-k)$.
+*   Deleting a letter from $u$ is equivalent to inserting it in $v$.
+
+**Example: bisect vs. secret**
+*   LCS is "sect".
+*   Transformation involves deleting "b", "i" in "bisect" and "r", "e" in "secret".
+*   Equivalently, delete "b", "i" and then insert "r", "e" in "bisect".
+
+## 9.5.5: Inductive Structure
+Let $u = a_{0}a_{1}...a_{m-1}$ and $v = b_{0}b_{1}...b_{n-1}$. 
+Let $ED(i, j)$ be the edit distance for the suffixes $a_{i}a_{i+1}...a_{m-1}$ and $b_{j}b_{j+1}...b_{n-1}$.
+
+If $a_{i} = b_{j}$, there is nothing to be done for this position:
+$$ED(i, j) = ED(i+1, j+1)$$
+
+If $a_{i} \ne b_{j}$, we choose the best among three options:
+1.  **Substitute** $a_{i}$ by $b_{j}$: $1 + ED(i+1, j+1)$
+2.  **Delete** $a_{i}$: $1 + ED(i+1, j)$
+3.  **Insert** $b_{j}$ before $a_{i}$: $1 + ED(i, j+1)$
+
+**Recurrence Relation**:
+$$ED(i, j) = 1 + \min[ED(i+1, j+1), ED(i+1, j), ED(i, j+1)]$$
+
+### Base Cases:
+*   **Both strings empty**: $ED(m, n) = 0$
+*   **Second string empty**: $ED(i, n) = m - i$. This corresponds to deleting the entire remaining suffix $a_{i}a_{i+1}...a_{m-1}$ from $u$.
+*   **First string empty**: $ED(m, j) = n - j$. This corresponds to inserting the suffix $b_{j}b_{j+1}...b_{n-1}$ into $u$.
+
+## 9.5.6: Subproblem Dependency
+Subproblems are $ED(i, j)$ for $0 \le i \le m$ and $0 \le j \le n$.
+These can be represented in a table of $(m+1) \cdot (n+1)$ values.
+$ED(i, j)$ depends on three neighbors: $ED(i+1, j+1)$, $ED(i, j+1)$, and $ED(i+1, j)$.
+
+<img width="987" height="484" alt="image" src="https://github.com/user-attachments/assets/724ed438-1135-4606-ae4d-b8f04f7adc6b" />
+
+## 9.5.7: Reading off the Solution
+The final edit distance is the value at $ED(0, 0)$. To recover the actual sequence of operations, trace back the path by which each entry was filled:
+*   **Vertical move (Down)**: Corresponds to a deletion.
+*   **Horizontal move (Right)**: Corresponds to an insertion.
+*   **Diagonal move**: Corresponds to a match (if $a_{i} = b_{j}$) or a substitution (if $a_{i} \ne b_{j}$).
+
+**Example: bisect to secret**
+1.  Delete "b"
+2.  Delete "i"
+3.  Insert "r"
+4.  Insert "e"
+
+## 9.5.8: Implementation
+```python
+def ED(u,v):
+    import numpy as np
+    (m,n) = (len(u),len(v))
+    ed = np.zeros((m+1,n+1))
+
+    # Initialize boundaries
+    for i in range(m-1,-1,-1):
+        ed[i,n] = m-i
+    for j in range(n-1,-1,-1):
+        ed[m,j] = n-j
+
+    # Fill table inductively
+    for j in range(n-1,-1,-1):
+        for i in range(m-1,-1,-1):
+            if u[i] == v[j]:
+                ed[i,j] = ed[i+1,j+1]
+            else:
+                ed[i,j] = 1 + min(ed[i+1,j+1], 
+                                  ed[i,j+1], 
+                                  ed[i+1,j])
+    return(ed)
+```
+
+## 9.5.9: Complexity Analysis
+*   **Space Complexity**: The algorithm fills a table of size $O(mn)$.
+*   **Time Complexity**: Each table entry takes constant time to compute by looking at its neighbors.
+*   **Overall Complexity**: $O(mn)$ using dynamic programming or memoization.
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
