@@ -218,3 +218,77 @@ Dynamic programming is a related technique that anticipates the structure of sub
 
 
 
+
+# 9.3: Grid Paths
+
+## 9.3.1: Defining Grid Paths
+A rectangular grid of one-way roads is considered, often called a Manhattan grid. In this grid, movement is restricted: one can only go **up** and **right**, and cannot go left or down. The objective is to determine how many paths exist from the starting point $(0,0)$ at the bottom-left corner to a target intersection $(m,n)$ at the top-right.
+
+<img width="988" height="493" alt="image" src="https://github.com/user-attachments/assets/ca023ce0-b58b-472f-a3a6-368fc15d19e0" />
+
+## 9.3.2: Combinatorial Solution (No Holes)
+Every path from $(0,0)$ to $(m,n)$ consists of exactly $m+n$ segments.
+*   For a target $(5,10)$, every path has exactly 15 segments.
+*   Out of these 15 segments, exactly 5 must be right moves and 10 must be up moves.
+*   The path is uniquely determined by fixing the positions of the 5 right moves among the 15 total positions.
+
+**Mathematical Formula**:
+$$\binom{15}{5} = \frac{15!}{10! \cdot 5!} = 3003$$.
+
+This is symmetric to fixing the 10 up moves: $\binom{15}{5} = \binom{15}{10}$.
+
+## 9.3.3: Blocked Intersections (Holes)
+If an intersection is blocked (e.g., due to road work), paths passing through that point must be discarded.
+
+**Example with one hole at (2,4)**:
+To find the number of valid paths avoiding $(2,4)$, subtract paths passing through $(2,4)$ from the total.
+1.  **Paths to the hole**: From $(0,0)$ to $(2,4)$, there are $\binom{2+4}{2} = 15$ paths.
+2.  **Paths from the hole to target**: From $(2,4)$ to $(5,10)$, there are $\binom{3+6}{3} = 84$ paths.
+3.  **Total paths via (2,4)**: $15 \times 84 = 1260$ paths.
+4.  **Valid paths**: $3003 - 1260 = 1743$ paths.
+
+**Example with multiple holes**:
+If two intersections (e.g., $(2,4)$ and $(4,4)$) are blocked, some paths passing through both holes are counted twice. The counting requires the **Inclusion-Exclusion principle**, which becomes messy as the number of holes increases.
+
+## 9.3.4: Inductive Formulation
+To reach intersection $(i,j)$, there are exactly two neighboring corners from which the last step could have been taken:
+1.  Moving **up** from $(i, j-1)$.
+2.  Moving **right** from $(i-1, j)$.
+
+Each path to these neighbors extends to a unique path to $(i,j)$.
+
+**Recurrence for $P(i,j)$**:
+$$P(i,j) = P(i-1,j) + P(i,j-1)$$.
+
+**Base Cases and Boundary Conditions**:
+*   $P(0,0) = 1$ (Only one way to stay at the start: doing nothing).
+*   $P(i,0) = P(i-1,0)$ (Bottom row: can only come from the left).
+*   $P(0,j) = P(0,j-1)$ (Left column: can only come from below).
+*   **Hole property**: $P(i,j) = 0$ if there is a hole at $(i,j)$.
+
+## 9.3.5: Dynamic Programming Approach
+Naive recursion recomputes the same subproblems repeatedly. For instance, $P(5,10)$ needs $P(4,10)$ and $P(5,9)$, both of which require $P(4,9)$.
+
+**DAG Structure**:
+The dependencies form a Directed Acyclic Graph (DAG) where each $(i,j)$ depends on $(i-1,j)$ and $(i,j-1)$. $P(0,0)$ has no dependencies.
+
+<img width="1001" height="498" alt="image" src="https://github.com/user-attachments/assets/6f24782b-3740-4fc4-8a66-c983cc12c03d" />
+
+**Evaluation Orders**:
+Any order respecting the topological sort of the DAG is valid:
+*   **Row by row**: Fill the bottom row, then the next row from left to right.
+*   **Column by column**: Fill the left column, then the next column from bottom to top.
+*   **Diagonal by diagonal**: Fill all entries where $i+j$ is constant (e.g., $(0,3), (1,2), (2,1), (3,0)$).
+
+## 9.3.6: Example with Holes
+Using dynamic programming to calculate paths for a grid with holes at $(2,4)$ and $(4,4)$:
+1.  Initialize $P(0,0) = 1$.
+2.  Fill entries using the recurrence.
+3.  At hole positions, override the sum and set the value to $0$.
+4.  Final result for $(5,10)$ with these two holes is **1358** paths.
+
+## 9.3.7: Memoization vs. Dynamic Programming
+Consider a barrier of holes just inside the border.
+*   **Memoization**: A top-down strategy that only explores reachable subproblems. It never explores the region behind the barrier, filling only $O(m+n)$ entries.
+*   **Dynamic Programming**: A bottom-up strategy that blindly fills all $mn$ cells of the table, including the shaded region blocked by holes.
+*   **Tradeoff**: While dynamic programming can be "wasteful" by filling irrelevant cells, iterative evaluation is generally better than recursion in practice.
