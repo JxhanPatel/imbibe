@@ -292,3 +292,129 @@ Consider a barrier of holes just inside the border.
 *   **Memoization**: A top-down strategy that only explores reachable subproblems. It never explores the region behind the barrier, filling only $O(m+n)$ entries.
 *   **Dynamic Programming**: A bottom-up strategy that blindly fills all $mn$ cells of the table, including the shaded region blocked by holes.
 *   **Tradeoff**: While dynamic programming can be "wasteful" by filling irrelevant cells, iterative evaluation is generally better than recursion in practice.
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+# 9.4: Common Subwords and Subsequences
+
+## 9.4.1: Longest Common Subword
+Given two strings, the goal is to find the length of the longest common subword. A subword is a segment that occurs as a block in both strings.
+
+**Examples**:
+*   "secret", "secretary" $\rightarrow$ "secret", length 6
+*   "bisect", "trisect" $\rightarrow$ "isect", length 5
+*   "bisect", "secret" $\rightarrow$ "sec", length 3
+*   "director", "secretary" $\rightarrow$ "ec", "re", length 2
+
+**Formal Definition**:
+Let $u=a_{0}a_{1}...a_{m-1}$ and $v=b_{0}b_{1}...b_{n-1}$. A common subword of length $k$ exists if for some positions $i$ and $j$:
+$$a_{i}a_{i+1}...a_{i+k-1} = b_{j}b_{j+1}...b_{j+k-1}$$.
+We want to find the largest such $k$.
+
+## 9.4.2: Brute Force Approach
+Try every pair of starting positions $i$ in $u$ and $j$ in $v$. Match $(a_{i}, b_{j}), (a_{i+1}, b_{j+1}), \dots$ as far as possible and keep track of the longest match.
+
+**Complexity**:
+Assuming $m > n$, there are $mn$ pairs of starting positions, and from each, the scan could be $O(n)$. Thus, the overall complexity is $O(mn^2)$.
+
+## 9.4.3: Inductive Structure for LCW
+Let $LCW(i, j)$ be the length of the longest common subword in the suffixes $a_{i}a_{i+1}...a_{m-1}$ and $b_{j}b_{j+1}...b_{n-1}$.
+
+*   If $a_{i} \neq b_{j}$, then $LCW(i,j) = 0$, as there is a mismatch at the start.
+*   If $a_{i} = b_{j}$, then $LCW(i,j) = 1 + LCW(i+1, j+1)$.
+
+**Base Cases**:
+*   $LCW(m, n) = 0$
+*   $LCW(i, n) = 0$ for all $0 \le i \le m$
+*   $LCW(m, j) = 0$ for all $0 \le j \le n$
+
+## 9.4.4: Subproblem Dependency and Dynamic Programming
+Subproblems are $LCW(i, j)$ for $0 \le i \le m, 0 \le j \le n$. $LCW(i, j)$ depends only on $LCW(i+1, j+1)$.
+
+<img width="985" height="482" alt="image" src="https://github.com/user-attachments/assets/0ac21102-dcce-4bde-8f82-c6cebcf9e5b2" />
+
+**Filling the Table**:
+*   Start at the bottom-right and fill row by row or column by column.
+*   **Reading off the solution**: Find the entry $(i, j)$ with the largest $LCW$ value. The actual subword can be read off diagonally.
+
+## 9.4.5: LCW Implementation and Complexity
+```python
+def LCW(u,v):
+    import numpy as np
+    (m,n) = (len(u), len(v))
+    lcw = np.zeros((m+1, n+1))
+    maxlcw = 0
+    for c in range(n-1, -1, -1):
+        for r in range(m-1, -1, -1):
+            if u[r] == v[c]:
+                lcw[r,c] = 1 + lcw[r+1, c+1]
+            else:
+                lcw[r,c] = 0
+            if lcw[r,c] > maxlcw:
+                maxlcw = lcw[r,c]
+    return(maxlcw)
+```
+.
+
+**Complexity**:
+The inductive solution is $O(mn)$ because we fill a table of size $O(mn)$ and each entry takes constant time to compute.
+
+## 9.4.6: Longest Common Subsequence (LCS)
+In a subsequence, one can drop some letters in between.
+
+**Examples**:
+*   "secret", "secretary" $\rightarrow$ 6
+*   "bisect", "secret" $\rightarrow$ "sect", length 4
+*   "director", "secretary" $\rightarrow$ "ectr", "retr", length 4
+
+**Applications**:
+*   **Analyzing genes**: DNA is a long string over {A, T, G, C}. Two species are similar if their DNA has long common subsequences.
+*   **Unix `diff` command**: Compares text files by finding the longest matching subsequence of lines.
+
+## 9.4.7: Inductive Structure for LCS
+Let $LCS(i, j)$ be the length of the longest common subsequence in $a_{i}a_{i+1}...a_{m-1}$ and $b_{j}b_{j+1}...b_{n-1}$.
+
+*   If $a_{i} = b_{j}$, we can assume $(a_{i}, b_{j})$ is part of the LCS: $LCS(i, j) = 1 + LCS(i+1, j+1)$.
+*   If $a_{i} \neq b_{j}$, $a_{i}$ and $b_{j}$ cannot both be part of the LCS. We solve $LCS(i, j+1)$ and $LCS(i+1, j)$ and take the maximum.
+
+**Base Cases**:
+*   $LCS(i, n) = 0$ for all $0 \le i \le m$.
+*   $LCS(m, j) = 0$ for all $0 \le j \le n$.
+
+## 9.4.8: Subproblem Dependency for LCS
+$LCS(i, j)$ depends on three values: $LCS(i+1, j+1)$, $LCS(i, j+1)$, and $LCS(i+1, j)$.
+
+<img width="980" height="490" alt="image" src="https://github.com/user-attachments/assets/913a791b-fc2c-47af-b2f5-206177ea2216" />
+
+**Reading off the solution**:
+Trace back the path by which each entry was filled. Each diagonal step (where $a_i = b_j$) corresponds to an element of the LCS.
+
+## 9.4.9: LCS Implementation and Complexity
+```python
+def LCS(u,v):
+    import numpy as np
+    (m,n) = (len(u), len(v))
+    lcs = np.zeros((m+1, n+1))
+    for c in range(n-1, -1, -1):
+        for r in range(m-1, -1, -1):
+            if u[r] == v[c]:
+                lcs[r,c] = 1 + lcs[r+1, c+1]
+            else:
+                lcs[r,c] = max(lcs[r+1, c], lcs[r, c+1])
+    return(lcs)
+```
+**Complexity**:
+$O(mn)$ using dynamic programming or memoization. We fill a table of size $O(mn)$ where each entry takes constant time to compute.
