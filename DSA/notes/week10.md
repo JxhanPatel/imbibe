@@ -465,3 +465,126 @@ Linear Programming and network flows are considered "big hammers".
 *   They are very powerful techniques to which many other algorithmic problems can be reduced.
 *   Efficient, off-the-shelf implementations (libraries) are publicly and commercially available in languages like Python.
 *   It is useful to understand what can and cannot be modeled in terms of LP and flows to leverage these existing solvers.
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+# 10.6: Intractability - Checking Algorithms
+
+## 10.6.1: Context - Efficient Algorithms
+Till now the focus of the course has been on trying to find efficient algorithms, but sometimes efficient algorithms do not exist.
+*   **Efficient Problems**: Shortest path, minimum cost spanning tree, and maximum flow have polynomial time algorithms ($O(n \log n)$, $O(n^{3})$, etc.).
+*   **Definition of Efficient**: In the abstract perspective of algorithms, anything of the form polynomial $n^{k}$ for some fixed $k$ is considered to be good.
+*   **Pruning the Search Space**: While the search space for solutions is often exponential (all possible paths, all possible spanning trees), efficient algorithms find the correct solution without examining every possibility.
+*   **The Problem**: For a large class of "natural" problems, no shortcut (polynomial time algorithm) is known to exist. Brute force—scanning exponential possibilities—is the only known way, making them computationally intractable.
+
+## 10.6.2: Generating vs. Checking
+There is an intuitive difference between finding an answer and verifying an answer.
+
+**The Homework Example (Factorization)**:
+*   **Teacher's Task**: Give a student a large number $N$ that is the product of two large primes $p$ and $q$. Ask the student to find $p$ and $q$.
+*   **Student's Task (Generate a solution)**: The student must find $p, q$ such that $pq = N$. This is complicated because they must search through all primes up to $p$. No known efficient way exists to generate this solution.
+*   **Teacher's Task (Check a solution)**: Given the student’s proposed factors $p$ and $q$, the teacher simply multiplies them. This is a simple, efficient procedure to validate if $pq = N$.
+
+### Defining Checking Algorithms
+A checking algorithm $C$ for a problem $P$ takes two inputs:
+1.  An **input instance** $I$ for the problem $P$.
+2.  A **solution "certificate"** $S$ for the instance $I$.
+The algorithm $C$ outputs **yes** if $S$ represents a valid solution for $I$, and **no** otherwise.
+
+> [!NOTE]
+> For factorization, $I$ is $N$, $S$ is $\{p, q\}$, and $C$ involves verifying that $pq = N$.
+
+## 10.6.3: Boolean Satisfiability (SAT)
+Boolean satisfiability is central to the notion of intractability.
+*   **Variables**: $x_{1}, x_{2}, x_{3}, \dots$ can take values $\{\text{True, False}\}$.
+*   **Operators**:
+    *   $\neg x_{i}$ : Negation (NOT)
+    *   $x_{i} \vee x_{j}$ : Disjunction (OR)
+    *   $x_{i} \wedge x_{j}$ : Conjunction (AND).
+*   **Clause**: A disjunction of literals (variables or negated variables). Example: $(x_{1} \vee \neg x_{2} \vee x_{3})$.
+*   **Formula**: A conjunction of clauses: $C_{1} \wedge C_{2} \wedge \dots \wedge C_{k}$.
+
+**Goal**: Assign values to $x_{1}, x_{2}, \dots$ such that the formula evaluates to **True**.
+
+### SAT Complexity
+*   **Generating a solution**: With $n$ variables, there are $2^{n}$ possible assignments. No better algorithm is known than trying each one.
+*   **Checking a solution**: Given a formula $F$ and a valuation $V(x)$, substitute the values and evaluate. This is efficient and can be done in linear time.
+
+### Importance of Input Format (CNF)
+Satisfiability must be stated in **Conjunctive Normal Form** (ORs inside clauses, ANDs between clauses).
+If the format were reversed (a disjunction of conjunctions):
+$$(x_{1} \wedge \neg x_{2} \wedge x_{3}) \vee (x_{2} \wedge \neg x_{4}) \dots$$
+Then each clause forces a unique valuation, and the problem becomes trivial because you only need to find one satisfiable clause to make the whole formula True.
+
+## 10.6.4: Travelling Salesman Problem (TSP)
+*   **Input**: A network of cities with distances between each pair (a complete graph $G=(V,E)$ with edge weights).
+*   **Goal**: Find the shortest tour (simple cycle) that visits each city exactly once.
+
+### Designing a Checking Algorithm for TSP
+If a solution $S$ (a cycle) is proposed, we can easily verify if it is a cycle and compute its cost.
+**The Bottleneck**: How to check that $S$ is the **least cost** cycle? There is no reference to validate that no shorter cycle exists.
+
+**Transformation to a Checking Version**:
+Ask: "Is there a tour with cost at most $K$?".
+*   Now, given a solution $S$, we can check if its cost is $\le K$.
+*   To find the optimum, test different values of $K$ using **binary search**.
+
+## 10.6.5: Independent Set
+*   **Independence**: Two nodes $u, v$ are independent if there is no edge $(u,v)$ between them.
+*   **Independent Set**: A set $U$ where each pair $u, v \in U$ is independent.
+*   **Problem**: Find the largest independent set in a given graph.
+*   **Checking Version**: Is there an independent set of size $K$?.
+*   
+<img width="971" height="428" alt="image" src="https://github.com/user-attachments/assets/1edcae51-8fc7-4d1f-a452-a5d106718157" />
+<img width="971" height="428" alt="image" src="https://github.com/user-attachments/assets/77a4e5a1-414c-4b8f-aa65-8bea215f6af1" />
+
+## 10.6.6: Vertex Cover
+*   **Coverage**: Node $u$ covers every edge $(u,v)$ incident on it.
+*   **Vertex Cover**: A set $U$ where every edge in the graph is incident on at least one vertex in $U$.
+*   **Problem**: Find the smallest vertex cover in a given graph.
+*   **Checking Version**: Is there a vertex cover of size $K$?.
+
+## 10.6.7: Connecting Independent Set and Vertex Cover
+The two problems are duals of each other.
+**Theorem**: $U$ is an independent set of size $K$ if and only if $V \setminus U$ (the complement) is a vertex cover of size $N-K$.
+
+**Proof**:
+*   ($\Rightarrow$) If $U$ is an independent set, every edge $(u,v)$ has at most one endpoint in $U$. Therefore, at least one endpoint must be in the complement $V \setminus U$, making it a vertex cover.
+*   ($\Leftarrow$) If $V \setminus U$ is a vertex cover, then for any edge $(u,v)$, at least one endpoint is in $V \setminus U$. This implies there can be no edge $(u,v)$ where both endpoints are in $U$, making $U$ an independent set.
+
+## 10.6.8: Reductions
+Independent set and vertex cover **reduce to each other**.
+*   If we can solve one efficiently, we can solve the other.
+*   If one is known to be intractable and $A$ reduces to $B$, then $B$ must also be intractable.
+*   Many pairs of checkable problems are inter-reducible and thus "equally hard".
+
+<img width="953" height="446" alt="image" src="https://github.com/user-attachments/assets/2df8c69c-9bfe-4787-82ad-0c470b8c86db" />
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
