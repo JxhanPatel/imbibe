@@ -370,3 +370,98 @@ The Ford-Fulkerson algorithm can be inefficient if augmenting paths are chosen p
 
 
 
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+# 10.5: Reductions
+
+## 10.5.1: Bipartite Matching
+A specific problem that can be modeled using network flows is **bipartite matching**.
+
+### Scenario: Course Allocation
+*   Each instructor is willing to teach a set of courses.
+*   **Goal**: Find an allocation so that:
+    1.  Each course is taught by a single instructor.
+    2.  Each instructor teaches only one course, which he/she is willing to teach.
+*   The allocation must respect the preferences (edges).
+
+### Formal Definition
+*   The vertex set $V$ is partitioned into $V_{0}$ and $V_{1}$.
+*   All edges go from $V_{0}$ to $V_{1}$.
+*   **Matching**: A subset of edges so that no two of them share an endpoint.
+*   **Largest Matching**: Find a matching with the maximum number of edges.
+*   **Perfect Matching**: A matching where all nodes are covered.
+
+<img width="918" height="396" alt="image" src="https://github.com/user-attachments/assets/94858ec4-956b-4545-853a-688af6848b05" />
+
+## 10.5.2: Reducing Bipartite Matching to Max Flow
+To solve bipartite matching using max flow, the graph is modified:
+1.  Add a **source** $s$ and a **sink** $t$.
+2.  Add directed edges from $s$ to every vertex in $V_{0}$.
+3.  Add directed edges from every vertex in $V_{1}$ to $t$.
+4.  Set all edge capacities to **1**.
+5.  Find a **maximum flow** from $s$ to $t$.
+
+The edges between $V_{0}$ and $V_{1}$ that carry flow in the max flow solution correspond to the edges in the matching.
+
+<img width="1000" height="483" alt="image" src="https://github.com/user-attachments/assets/55700441-bf9b-4f7c-8af4-d4f643af55b7" />
+
+## 10.5.3: Formal Definition of Reductions
+A reduction is a method used to solve problem $A$ by using an algorithm for another problem $B$.
+
+### The Reduction Process
+1.  **Preprocess**: Convert the input for $A$ (denoted $x$) into an appropriate input for $B$ (denoted $y$).
+2.  **Apply Algorithm**: Solve problem $B$ using the converted input $y$ to get output $B(y)$.
+3.  **Postprocess**: Interpret the output $B(y)$ as a valid output for the original problem $A(x)$.
+
+```mermaid
+graph LR
+    X(Input for A) --> Pre[Preprocess]
+    Pre --> Y(Input for B)
+    Y --> AlgB[Algorithm for B]
+    AlgB --> BY(Output of B)
+    BY --> Post[Postprocess]
+    Post --> AX(Output of A)
+```
+
+
+## 10.5.4: Efficiency and Polynomial Time
+For a reduction to be useful in transferring efficient solutions from $B$ to $A$:
+*   Preprocessing and postprocessing must be **efficient**.
+*   Typically, both should run in **polynomial time** relative to the size of the input for $A$.
+*   The size of the output from $B$ must also not be too large to allow polynomial-time reconstruction of the answer for $A$.
+
+## 10.5.5: Chain of Reductions
+Reductions can be chained to show a hierarchy of problem-solving techniques:
+*   **Bipartite Matching** reduces to **Max Flow**.
+*   **Max Flow** reduces to **Linear Programming (LP)**.
+    *   In the reduction from Max Flow to LP, the number of variables and constraints is **linear** in the size of the graph.
+    *   One variable is attached for each flow $f_{e}$.
+    *   Constraints express that flows respect edge capacities and that flow is conserved at each internal node.
+<img width="947" height="433" alt="image" src="https://github.com/user-attachments/assets/2e1754e3-ee16-4575-b6ea-88e947e88a46" />
+
+## 10.5.6: Reverse Interpretation (Intractability)
+Reductions are also used to prove that problems are difficult.
+*   **Theorem**: If problem $A$ is known to be **intractable** and $A$ reduces to $B$, then $B$ must also be **intractable**.
+*   **Reasoning**: If $B$ could be solved efficiently, then an efficient solution for $A$ would be possible through the reduction, contradicting the fact that $A$ is hard.
+
+## 10.5.7: Powerful Computational Tools ("Big Hammers")
+Linear Programming and network flows are considered "big hammers".
+*   They are very powerful techniques to which many other algorithmic problems can be reduced.
+*   Efficient, off-the-shelf implementations (libraries) are publicly and commercially available in languages like Python.
+*   It is useful to understand what can and cannot be modeled in terms of LP and flows to leverage these existing solvers.
