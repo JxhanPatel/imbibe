@@ -102,3 +102,119 @@ A naive recursive implementation evaluates each instance of a subproblem from sc
 
 
 
+# 9.2: Memoization
+
+## 9.2.1: Inductive Definitions, Recursive Programs, Subproblems
+Recursive functions typically arise from inductive definitions.
+
+**Factorial**:
+*   $fact(0)=1$
+*   $fact(n)=n\times fact(n-1)$
+
+**Insertion sort**:
+*   $isort([])=[]$
+*   $isort([x_{0},x_{1},...,x_{n}])=insert(isort([x_{0},x_{1},...,x_{n-1}]),x_{n})$
+
+Inductive definitions are converted into code easily as recursive programs. The solution to the original problem can be derived by combining solutions to subproblems.
+*   $fact(n-1)$ is a subproblem of $fact(n)$.
+*   $isort([x_{0},x_{1},...,x_{n-1}])$ is a subproblem of $isort([x_{0},x_{1},...,x_{n}])$.
+
+## 9.2.2: Evaluating Subproblems - Fibonacci Numbers
+Consider the Fibonacci numbers:
+*   $fib(0)=0$
+*   $fib(1)=1$
+*   $fib(n)=fib(n-1)+fib(n-2)$
+
+**Recursive Implementation**:
+```python
+def fib(n):
+    if n <= 1:
+        value = n
+    else:
+        value = fib(n-1) + fib(n-2)
+    return(value)
+```
+
+
+## 9.2.3: Wasteful Recomputation
+Evaluating `fib(5)` generates a sequence of recursive calls:
+1.  `fib(5)` requires `fib(4)` and `fib(3)`.
+2.  `fib(4)` requires `fib(3)` and `fib(2)`.
+3.  `fib(3)` requires `fib(2)` and `fib(1)`.
+4.  `fib(2)` requires `fib(1)` and `fib(0)`.
+
+<img width="978" height="462" alt="image" src="https://github.com/user-attachments/assets/22926142-f5af-4196-aebe-9119ef96d444" />
+
+> [!CAUTION]
+> **Performance Issue**: This recursive implementation leads to wasteful recomputation. The computation tree grows exponentially, making even relatively small inputs like `fib(50)` computationally infeasible.
+
+## 9.2.4: Building a Memory Table (Memoization)
+One way to avoid this wasteful recomputation is actually to remember. Build a table of values already computed, known as a **Memory table**.
+
+**Memoization Process**:
+*   Check if the value to be computed was already seen before.
+*   Store each newly computed value in a table.
+*   Look up the table before making a recursive call.
+
+By doing this, the computation tree becomes **linear** instead of exponential.
+
+<img width="988" height="456" alt="image" src="https://github.com/user-attachments/assets/c6651108-e820-4513-8083-f49c6e359850" />
+
+## 9.2.5: Memoizing Recursive Implementations
+To memoize the implementation, assume a dictionary called `fibtable` exists globally and is initially empty.
+
+```python
+def fib(n):
+    if n in fibtable.keys():
+        return(fibtable[n])
+    if n <= 1:
+        value = n
+    else:
+        value = fib(n-1) + fib(n-2)
+    fibtable[n] = value
+    return(value)
+```
+
+
+## 9.2.6: Generic Memoization Pattern
+There is nothing specific to the Fibonacci function; any recursive function can be memoized using a dictionary where the keys are the argument combinations (e.g., triples).
+
+```python
+def f(x,y,z):
+    if (x,y,z) in ftable.keys():
+        return(ftable[(x,y,z)])
+    
+    # recursively compute value from subproblems
+    
+    ftable[(x,y,z)] = value
+    return(value)
+```
+
+
+## 9.2.7: Dynamic Programming
+Dynamic programming is a related technique that anticipates the structure of subproblems.
+*   Derive the structure from the inductive definition.
+*   Dependencies form a **DAG** (Directed Acyclic Graph).
+*   Solve subproblems in **topological order**.
+*   This iterative evaluation means you never need to make a recursive call.
+
+<img width="918" height="435" alt="image" src="https://github.com/user-attachments/assets/96ace054-4b58-4a64-b282-aaf538859f39" />
+
+## 9.2.8: Summary
+*   **Memoization**: Store subproblem values in a table; look up the table before making a recursive call. It is a **top-down** strategy.
+*   **Dynamic Programming**: Solve subproblems in topological order of dependency; iterative evaluation without recursion. It is a **bottom-up** strategy.
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
