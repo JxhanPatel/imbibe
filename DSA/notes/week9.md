@@ -564,3 +564,104 @@ def ED(u,v):
 
 
 
+# 9.6: Matrix Multiplication
+
+## 9.6.1: Multiplying Matrices
+To multiply matrices $A$ and $B$, the dimensions must be compatible. If $A$ is an $m \times n$ matrix and $B$ is an $n \times p$ matrix, the resulting matrix $AB$ is $m \times p$. The entry in the $i^{th}$ row and the $j^{th}$ column of $AB$ is defined as:
+$$AB[i,j] = \sum_{k=0}^{n-1} A[i,k]B[k,j]$$.
+
+### Complexity of Single Multiplication
+*   Computing each entry in $AB$ requires running through the summation, which takes $O(n)$ time.
+*   There are $m \times p$ entries to compute.
+*   Overall, the cost of computing $AB$ is $O(mnp)$.
+
+<img width="969" height="492" alt="image" src="https://github.com/user-attachments/assets/86808cc0-e572-4121-802f-69d045770258" />
+
+## 9.6.2: Matrix Chain Associativity
+Matrix multiplication is associative, meaning for matrices $A, B, C$:
+$$ABC = (AB)C = A(BC)$$.
+Bracketing the expression does not change the final answer, but it can drastically affect the complexity of the computation.
+
+### Example of Cost Difference
+Let $A: 1 \times 100$, $B: 100 \times 1$, and $C: 1 \times 100$.
+
+1.  **Computing $A(BC)$**:
+    *   $BC$ results in a $100 \times 100$ matrix. Steps: $100 \cdot 1 \cdot 100 = 10,000$.
+    *   $A(BC)$ results in a $1 \times 100$ matrix. Steps: $1 \cdot 100 \cdot 100 = 10,000$.
+    *   **Total Cost**: $20,000$ steps.
+
+2.  **Computing $(AB)C$**:
+    *   $AB$ results in a $1 \times 1$ matrix. Steps: $1 \cdot 100 \cdot 1 = 100$.
+    *   $(AB)C$ results in a $1 \times 100$ matrix. Steps: $1 \cdot 1 \cdot 100 = 100$.
+    *   **Total Cost**: $200$ steps.
+
+> [!IMPORTANT]
+> By choosing a better order, an enormous saving in time can be achieved (20,000 steps vs. 200 steps).
+
+## 9.6.3: The Matrix Chain Problem
+Given $n$ matrices $M_{0}: r_{0} \times c_{0}, M_{1}: r_{1} \times c_{1}, \dots, M_{n-1}: r_{n-1} \times c_{n-1}$.
+*   **Compatibility**: Dimensions must match such that $r_{j} = c_{j-1}$ for $0 < j < n$.
+*   **Goal**: Find an optimal order to compute the product $M_{0} \cdot M_{1} \dots M_{n-1}$ by bracketing the expression to minimize total cost.
+
+## 9.6.4: Inductive Structure
+Any final step in the computation combines two subproducts:
+$$(M_{0} \cdot M_{1} \dots M_{k-1}) \cdot (M_{k} \cdot M_{k+1} \dots M_{n-1})$$ for some $0 < k < n$.
+
+*   The first factor has dimensions $r_{0} \times c_{k-1}$.
+*   The second factor has dimensions $r_{k} \times c_{n-1}$.
+*   Note: $r_{k} = c_{k-1}$.
+
+### Recurrence for Cost $C(j, k)$
+Let $C(j, k)$ be the cost of multiplying the chain from $M_{j}$ to $M_{k}$.
+*   **Generic Case**: $C(j, k) = \min_{j < l \le k} [C(j, l-1) + C(l, k) + r_{j} r_{l} c_{k}]$.
+*   **Base Case**: $C(j, j) = 0$ for $0 \le j < n$, as a single matrix requires no multiplication.
+
+To find the minimum cost for the entire chain, we try all possible values of $k$ and choose the minimum.
+
+## 9.6.5: Subproblem Dependency
+We must compute $C(i, j)$ for $0 \le i, j < n$.
+*   **Constraint**: $j \ge i$ because multiplication must proceed from left to right; we only compute entries on and above the main diagonal.
+*   **Dependencies**: $C(i, j)$ depends on all pairs $(C(i, k-1), C(k, j))$ for every $i < k \le j$.
+*   Unlike LCS or Edit Distance, each entry has $O(n)$ dependencies, requiring information from its left and below.
+
+<img width="985" height="485" alt="image" src="https://github.com/user-attachments/assets/a38cb442-980c-4282-a376-f1bced3a8666" />
+<img width="984" height="483" alt="image" src="https://github.com/user-attachments/assets/00902d94-95d6-4861-9431-76b0e84378b0" />
+
+### Evaluation Order
+Because of these dependencies, the matrix cannot be filled row-by-row or column-by-column. It must be filled **diagonal by diagonal**, starting from the main diagonal and moving towards the top-right corner $C(0, n-1)$.
+
+## 9.6.6: Implementation
+The implementation assumes an input matrix `dim` containing pairs $(r_i, c_i)$ for each matrix.
+
+```python
+def C(dim):
+    import numpy as np
+    n = dim.shape
+    C = np.zeros((n,n))
+    
+    # Base case: main diagonal
+    for i in range(n):
+        C[i,i] = 0
+    
+    # Fill diagonal by diagonal
+    for diff in range(1, n):
+        for i in range(0, n - diff):
+            j = i + diff
+            # Initialize with the first possible split (k = i+1)
+            C[i,j] = C[i,i] + C[i+1,j] + dim[i]*dim[i+1]*dim[j]
+            
+            # Find minimum over all other possible splits
+            for k in range(i+2, j+1):
+                C[i,j] = min(C[i,j], C[i,k-1] + C[k,j] + dim[i]*dim[k]*dim[j])
+                
+    return(C[0,n-1])
+```
+.
+
+## 9.6.7: Complexity Analysis
+*   **Space**: We fill a table of size $O(n^2)$.
+*   **Time per entry**: Filling each entry requires a `for` loop to check $O(n)$ possible split points.
+*   **Overall Complexity**: $O(n^3)$.
+
+> [!NOTE]
+> This problem is distinct from LCW/LCS/ED because the number of subproblems considered for each entry is not constant but proportional to $n$.
