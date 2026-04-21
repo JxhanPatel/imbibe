@@ -11,6 +11,5 @@
 | **Week 6** | Trees & Heaps | BST, Min/Max Heaps, Union-Find | 🟢 Done |
 | **Week 7** | Balanced Trees & Greedy | AVL/Red-Black Trees, Huffman Coding | 🟢 Done |
 | **Week 8** | Divide & Conquer | Master Theorem, Quick Sort | 🟢 Done |
-| **Week 9** | Dynamic Programming | Overlapping Subproblems, Memoization | 🟡 In Progress |
-| **Week 10** | Pattern Matching | KMP Algorithm, Rabin-Karp | ⚪ Planned |
-| **Week 11** | Advanced Topics | Network Flow, LP, P vs NP | ⚪ Planned |
+| **Week 9** | Dynamic Programming | Overlapping Subproblems, Memoization | 🟢 Done |
+| **Week 10** | Advanced Topics | Network Flow, LP, P vs NP | 🟢 Done |
