@@ -179,7 +179,7 @@ $$\text{Minimize: } 20000(w_{1} + \dots + w_{12}) + 3200(h_{1} + \dots + h_{12})
 ## 10.2.4: Solving the Linear Program
 The linear program can be solved using the **Simplex algorithm**.
 
-<img width="950" height="440" alt="image" src="https://github.com/user-attachments/assets/64b18dbf-e0ef-4780-b9a6-a6d11ab207aa" />
+<img width="950" height="440" alt="image" src="https://github.com/user-attachments/assets/64b18dbf-e0ef-4780-b9a6-a6d10ab207aa" />
 
 ### Fractional vs. Integer Solutions
 A standard linear program solution may result in fractional values (e.g., hiring 10.6 workers in March).
@@ -204,3 +204,80 @@ A standard linear program solution may result in fractional values (e.g., hiring
 
 
 
+
+
+
+
+
+# 10.3: Linear Programming: Bandwidth Allocation
+
+## 10.3.1: Network Bandwidth Scenario
+A telecom network or an internet service provider (ISP) has three users (or locations of a company), **A**, **B**, and **C**, that need to be connected to each other. The hubs maintained by the ISP are represented as **a**, **b**, and **c**. Each company office is linked to its nearest hub, and these hubs are linked to each other.
+
+*   **Capacity Constraints**: Each link has a bandwidth capacity measured in Mbps.
+    *   Example: No more than 10 Mbps can flow between hub **b** and office **B**.
+*   **Service Requirements**: Each connection between pairs (A-B, B-C, A-C) must have a minimum of **2 Mbps** of bandwidth.
+*   **Connection Types**: Bandwidth is not affected by the number of hops. Both direct (short) and indirect (long) connections are allowed.
+    *   **A-B Short Route**: A-a-b-B.
+    *   **A-B Long Route**: A-a-c-b-B.
+*   **Revenue**: The ISP earns differential revenue per Mbps for each route.
+    *   **A-B**: Rs 300/Mbps.
+    *   **B-C**: Rs 200/Mbps.
+    *   **A-C**: Rs 400/Mbps.
+
+**Goal**: Allocate bandwidth across the network to **maximize revenue** while satisfying all capacity and service constraints.
+
+
+<img width="987" height="496" alt="image" src="https://github.com/user-attachments/assets/28456bc7-d7b7-4f8f-a300-f7e9c971f531" />
+<img width="987" height="496" alt="image" src="https://github.com/user-attachments/assets/6a9a26aa-6624-4422-908a-11712e76fdd0" />
+
+## 10.3.2: Formulating the Linear Program
+To model this, variables are created for each possible route between the offices.
+
+### Variables
+Let $x$ denote a short route and $y$ denote a long route.
+*   $x_{AB}, y_{AB}$: Bandwidth for A-B via short and long connections.
+*   $x_{AC}, y_{AC}$: Bandwidth for A-C via short and long connections.
+*   $x_{BC}, y_{BC}$: Bandwidth for B-C via short and long connections.
+
+### Constraints
+The constraints must reconcile the link capacities with the traffic flowing across them.
+
+1.  **Link Capacity Constraints**: The sum of all traffic on a specific edge cannot exceed its Mbps capacity.
+    *   **Edge b-B (Capacity 10)**: $x_{AB} + y_{AB} + x_{BC} + y_{BC} \le 10$.
+    *   **Edge a-A (Capacity 12)**: $x_{AB} + y_{AB} + x_{AC} + y_{AC} \le 12$.
+    *   **Edge c-C (Capacity 8)**: $x_{AC} + y_{AC} + x_{BC} + y_{BC} \le 8$.
+    *   **Internal Edge a-b (Capacity 6)**: $x_{AB} + y_{AC} + y_{BC} \le 6$ (Each internal link supports one short and two long edges).
+    *   **Internal Edge a-c (Capacity 13)**: $y_{AB} + x_{BC} + y_{AC} \le 13$.
+    *   **Internal Edge b-c (Capacity 10)**: $y_{AB} + y_{BC} + x_{AC} \le 10$.
+
+2.  **Service Quality Constraints**: Minimum pairwise bandwidth must be at least 2 Mbps.
+    *   $x_{AB} + y_{AB} \ge 2$.
+    *   $x_{BC} + y_{BC} \ge 2$.
+    *   $x_{AC} + y_{AC} \ge 2$.
+
+3.  **Implicit Constraints**: Traffic on all routes must be non-negative.
+    *   $x_{AB}, y_{AB}, x_{AC}, y_{AC}, x_{BC}, y_{BC} \ge 0$.
+
+### Objective Function
+Maximize the total revenue earned from allocated bandwidth:
+$$\text{Maximize: } 300(x_{AB} + y_{AB}) + 200(x_{BC} + y_{BC}) + 400(x_{AC} + y_{AC})$$
+
+## 10.3.3: Solution and Analysis
+Using the **Simplex algorithm**, the following optimal values are obtained:
+*   $x_{AB} = 0, y_{AB} = 7$ (Total A-B bandwidth = 7).
+*   $x_{BC} = 1.5, y_{BC} = 1.5$ (Total B-C bandwidth = 3).
+*   $x_{AC} = 0.5, y_{AC} = 4.5$ (Total A-C bandwidth = 5).
+
+> [!NOTE]
+> **Observations on Solution**:
+> *   **Fractional Values**: Unlike production planning (people/carpets), bandwidth is infinitely divisible, so fractional solutions are perfectly acceptable.
+> *   **Saturation**: In this solution, all edges are at full capacity except for edge **a-c**.
+> *   **Revenue Logic**: The least allocation is given to the B-C route (3 Mbps), which provides the lowest revenue (Rs 200/Mbps).
+
+## 10.3.4: Limitations of the LP Modeling Strategy
+The current strategy of using one variable per path **does not scale well**.
+
+*   **Exponential Growth**: In general, the number of possible paths between any two nodes in a graph is **exponential**.
+*   **Large Encodings**: If one variable is constructed for every possible route, the resulting linear program becomes excessively large relative to the original graph.
+*   **Alternative Approach**: Such problems are more effectively solved using a better approach to analyze **network flows** directly on the graph rather than converting them to a standard linear program with path-based variables.
