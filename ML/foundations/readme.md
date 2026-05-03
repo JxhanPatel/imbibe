@@ -11,8 +11,5 @@
 | **Week 6** | Linear Algebra IV | SVD & PCA (Image Processing) | 🟢 Done |
 | **Week 7** | Optimization I | Unconstrained Optimization | 🟢 Done |
 | **Week 8** | Optimization II | Convex Sets & Functions | 🟢 Done |
-| **Week 9** | Optimization III | Lagrange Multipliers & Logistic Reg. | 🟡 In Progress |
-| **Week 10** | Probability I | Probabilistic Models | ⚪ Planned |
-| **Week 11** | Probability II | Exponential Family | ⚪ Planned |
-| **Week 12** | Parameter Estimation | EM Algorithm | ⚪ Planned |
-
+| **Week 9** | Optimization III | Lagrange Multipliers & Logistic Reg. | 🟢 Done |
+| **Week 10** | Probability | Probabilistic Models, Exponential Family | 🟢 Done |
