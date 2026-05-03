@@ -219,3 +219,103 @@ $$
 | **Exponential ($\lambda$)**    | $\lambda e^{-\lambda t}, t \ge 0$                                | $1/\lambda$           | $1/\lambda^2$         |
 | **Gaussian ($\mu, \sigma^2$)** | $\frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(u-\mu)^2}{2\sigma^2}}$ | $\mu$                 | $\sigma^2$            |
 | **Rayleigh ($\sigma^2$)**      | $\frac{t}{\sigma^2} e^{-\frac{t^2}{2\sigma^2}}, t \ge 0$         | $\sigma \sqrt{\pi/2}$ | $\sigma^2(2 - \pi/2)$ |
+
+
+
+
+
+
+---
+---
+
+
+
+# 11.1 Parameter Estimation: EM Algorithm
+
+
+## 11.1.1 Principles of Parameter Estimation
+
+Sometimes when we devise a probability model for some situation we have a reason to use a particular type of probability distribution, but there may be a parameter that has to be selected. A common approach is to collect some data and then estimate the parameter using the observed data.
+
+### 1. The Likelihood Function
+
+* **Discrete Case**: Suppose an experiment is accurately modeled by a probability model with a random variable $X$, and that the pmf of $X$ is $p_{\theta}$, where $\theta$ ★ is a parameter whose value is not known before the experiment is performed. When the experiment is performed, suppose we observe a particular value $k$ for $X$. According to the probability model, the probability of $k$ being the observed value for $X$, before the experiment was performed, would have been $p_{\theta}(k)$. It is said that the **likelihood** that $X = k$ is $p_{\theta}(k)$.
+* **Continuous Case**: For continuous-type observations, the probability of a specific observation $u$ is zero for any value of $\theta$ ★. however, if $f_{\theta}$ is a continuous pdf for each value of $\theta$ ★, then for $\epsilon$ sufficiently small, $f_{\theta}(u) \approx \frac{1}{\epsilon} P{u - \frac{\epsilon}{2} < X < u + \frac{\epsilon}{2}}$. That is, $f_{\theta}(u)$ is proportional to the probability that the observation is in an $\epsilon$-width interval centered at $u$, where the constant of proportionality, namely $\frac{1}{\epsilon}$, is the same for all $\theta$ ★. In this context, $f_{\theta}(u)$ is called the **likelihood of the observation $u$**.
+
+### 2. Maximum Likelihood Estimate (MLE)
+
+The maximum likelihood estimate of $\theta$ ★ for observation $k$ (or $u$), denoted by $\hat{\theta}_{ML}$, is the value of $\theta$ ★ that maximizes the likelihood with respect to $\theta$ ★.
+
+> [!NOTE]
+> Intuitively, the maximum likelihood estimate is the value of $\theta$ ★ that best explains the observed value, or makes it the least surprising.
+
+<img width="1103" height="389" alt="image" src="https://github.com/user-attachments/assets/9e49e3d5-0424-4a79-90d7-47c0d13d7f39" />
+
+## 11.1.2 MLE for Discrete-Type Variables
+
+### 1. Bernoulli/Binomial Distribution (Bent Coin)
+
+Suppose a coin shows heads with probability $p$ each time it is flipped. A student flips the coin $n$ times and heads shows on $k$ of the flips.
+
+* **Likelihood**: $p_X(k) = \binom{n}{k} p^k (1-p)^{n-k}$.
+* **Estimation**: To find $\hat{p}_{ML}$, we maximize $p^k (1-p)^{n-k}$. The derivative with respect to $p$ is:
+  $$\frac{d(p^k(1-p)^{n-k})}{dp} = (k - np)p^{k-1}(1-p)^{n-k-1}$$.
+* **Result**: The derivative is zero if $p = \frac{k}{n}$. Therefore, **$\hat{p}_{ML}(k) = \frac{k}{n}$**.
+
+### 2. Geometric Distribution
+
+Suppose $X$ has the geometric distribution with unknown parameter $p$, and a particular value $k$ is observed.
+
+* **Likelihood**: $p_X(k) = (1-p)^{k-1}p$ for $k \ge 1$.
+* **Estimation**: Differentiating yields $((1-p)^{k-1}p)' = (1-kp)(1-p)^{k-2}$.
+* **Result**: The likelihood is increasing in $p$ for $0 \le p \le \frac{1}{k}$ and decreasing for $\frac{1}{k} \le p \le 1$. Therefore, **$\hat{p}_{ML} = \frac{1}{k}$**.
+
+### 3. Poisson Distribution
+
+It is assumed that $X$ has a Poisson distribution with parameter $\lambda \ge 0$, and $X = k$ is observed.
+
+* **Likelihood**: $\frac{\lambda^k e^{-\lambda}}{k!}$.
+* **Estimation**: Maximizing $\lambda^k e^{-\lambda}$ for $k \ge 1$ involves the derivative $\frac{d(\lambda^k e^{-\lambda})}{d\lambda} = (k-\lambda)\lambda^{k-1}e^{-\lambda}$.
+* **Result**: The likelihood is maximized at **$\hat{\lambda}_{ML}(k) = k$**.
+
+## 11.1.3 MLE for Continuous-Type Variables
+
+### 1. Uniform Distribution
+
+Suppose $X$ is drawn at random from the uniform distribution on the interval $[0, b]$, where $b$ is to be estimated, and $X = u$ is observed.
+
+* **Likelihood**: $f_b(u) = \frac{1}{b} I_{{0 \le u \le b}}$.
+* **Estimation**: The function is zero if $b < u$, jumps to $\frac{1}{u}$ at $b = u$, and then decreases as $b$ increases.
+* **Result**: **$\hat{b}_{ML}(u) = u$**.
+
+### 2. Normal (Gaussian) Distribution
+
+In the case of independent observations assumed to follow a normal distribution, the discrepancies between model and observations are $\epsilon_j = \phi(x; t_j) - y_j$.
+
+* **Likelihood**: Under the assumption of independent and identically distributed errors with variance $\sigma^2$ and normal density $g_\sigma(\epsilon) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp(-\frac{\epsilon^2}{2\sigma^2})$, the likelihood of a set of observations is:
+  $$p(y; x, \sigma) = \prod_{j=1}^m g_\sigma(\phi(x; t_j) - y_j)$$.
+* **Result**: Maximizing $p(y; x, \sigma)$ with respect to $x$ provides the maximum likelihood estimate.
+
+## 11.1.4 Estimation of Signal Ascent Rate (Drone Altimeter Example)
+
+Observations $X_1, \dots, X_T$ are assumed to be $X_t = bt + W_t$, where $b$ is the unknown rate of ascent and $W_t$ are independent $N(0, 1)$ noise variables.
+
+* **Joint PDF (Likelihood)**:
+  $$f_{X_1, \dots, X_T}(u_1, \dots, u_T) = \frac{1}{(2\pi)^{T/2}} \exp(-\sum_{t=1}^T \frac{(u_t - bt)^2}{2})$$.
+* **Estimation**: The estimator $\hat{b}*{ML}$ minimizes the quadratic function $\sum*{t=1}^T \frac{(u_t - bt)^2}{2}$. Setting the derivative with respect to $b$ to zero:
+  $$\frac{d}{db}(\sum_{t=1}^T \frac{(u_t - bt)^2}{2}) = b \sum_{t=1}^T t^2 - \sum_{t=1}^T u_t t = 0$$.
+* **Result**: **$\hat{b}*{ML} = \frac{\sum*{t=1}^T u_t t}{\sum_{t=1}^T t^2}$**.
+
+> [!IMPORTANT]
+> An estimator is called **unbiased** if the mean of the estimator is equal to the parameter being estimated. Since $E[X_t] = bt$, the expectation $E[\hat{b}_{ML}] = b$, confirming the MLE in this case is unbiased.
+
+## 11.1.5 Summary of MLE Properties
+
+| Distribution              | Parameter  | Observed Value | ML Estimate ($\hat{\theta}_{ML}$) |
+| :------------------------ | :--------- | :------------- | :-------------------------------- |
+| **Binomial ($n, p$)**     | $p$        | $k$ successes  | $k/n$                             |
+| **Uniform ($[1, n]$)**    | $n$        | $k$            | $k$                               |
+| **Geometric ($p$)**       | $p$        | $k$            | $1/k$                             |
+| **Poisson ($\lambda$)**   | $\lambda$  | $k$            | $k$                               |
+| **Uniform ($[0, b]$)**    | $b$        | $u$            | $u$                               |
+| **Rayleigh ($\sigma^2$)** | $\sigma^2$ | $u$            | $u^2/2$                           |
