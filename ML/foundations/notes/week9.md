@@ -68,3 +68,129 @@ This condition implies that the Lagrange multiplier $\lambda_i$ can be strictly 
 *   **Linearized Feasible Directions**: Given a feasible point $x$, the set $\mathcal{F}(x)$ is:
     $$\mathcal{F}(x) = \{d | d^T \nabla c_i(x) = 0, \forall i \in \mathcal{E}; d^T \nabla c_i(x) \ge 0, \forall i \in \mathcal{A}(x) \cap \mathcal{I} \}$$.
 *   **Constraint Qualifications**: These are assumptions, such as the Linear Independence Constraint Qualification (LICQ), which ensure that the linearized approximation $\mathcal{F}(x)$ captures the essential geometric features of the feasible set by making $\mathcal{F}(x) = T_{\Omega}(x)$.
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+# 9.2 Method of Lagrange Multiplier, Projected Gradient Descent
+
+## 9.2.1 The Method of Lagrange Multipliers
+
+The method of Lagrange multipliers is a technique for finding the stationary points of a function subject to one or more constraints. It escapes from linear equations by determining an unknown vector $x$ through a minimum principle.
+
+### The Lagrangian Function
+
+To build constraints into the objective function, we introduce new unknowns $y_1, \dots, y_l$ (or $\lambda_1, \dots, \lambda_m$) called **Lagrange multipliers**. For the general constrained optimization problem:
+$$\min_{x \in \mathbb{R}^n} f(x) \quad \text{subject to } c_i(x) = 0, i \in \mathcal{E}; \quad c_i(x) \ge 0, i \in \mathcal{I}$$
+The **Lagrangian function** is defined as:
+$$\mathcal{L}(x, \lambda) = f(x) - \sum_{i \in \mathcal{E} \cup \mathcal{I}} \lambda_i c_i(x)$$.
+
+> [!NOTE]
+> In physical applications, $\frac{1}{2}x^T Ax$ often represents internal energy and $-x^T b$ represents external work. The system automatically goes to a point where the total energy is a minimum.
+
+### First-Order Necessary Conditions (KKT)
+
+If $x★$ is a local solution and the linear independence constraint qualification (LICQ) holds, there exists a Lagrange multiplier vector $\lambda★$ such that the following **Karush-Kuhn-Tucker (KKT)** conditions are satisfied:
+
+1. **Stationarity**: $\nabla_x \mathcal{L}(x★, \lambda★) = \nabla f(x★) - \sum_{i \in \mathcal{A}(x★)} \lambda_i★ \nabla c_i(x★) = 0$.
+2. **Primal Feasibility**: $c_i(x★) = 0, i \in \mathcal{E}$ and $c_i(x★) \ge 0, i \in \mathcal{I}$.
+3. **Dual Feasibility**: $\lambda_i★ \ge 0, i \in \mathcal{I}$.
+4. **Complementary Slackness**: $\lambda_i★ c_i(x★) = 0, i \in \mathcal{E} \cup \mathcal{I}$.
+
+### The Idea Behind Lagrange Multipliers: Sensitivity
+
+Lagrange multipliers represent the **sensitivity** of the optimal objective value $f(x★)$ to the presence of a constraint.
+
+* **Dual Unknowns**: The dual variables $y$ tell how much the constrained minimum $P_{C/min}$ exceeds the unconstrained minimum $P_{min}$:
+  $$P_{C/min} = P_{min} + \frac{1}{2}y^T(CA^{-1}b - d) \ge P_{min}$$.
+* **Shadow Prices**: In economics, the components of $\lambda★$ are known as shadow prices. They give the rate of change of the minimum cost (the derivative) with respect to changes in the constraint vector $b$.
+* **Marginal Cost**: If an inequality constraint is active, a perturbation by $\epsilon$ results in a change to the optimal value:
+
+
+$$
+\frac{df(x★(\epsilon))}{d\epsilon} = -\lambda_i★ ||\nabla c_i(x★)||
+$$
+
+<img width="829" height="394" alt="image" src="https://github.com/user-attachments/assets/b37eda5f-9660-42db-9f1c-6a6c578712f9" />
+
+## 9.2.2 Projected Gradient Descent
+
+The gradient projection method is an approach that allows the active set to change rapidly from iteration to iteration, which is particularly efficient for problems with simple bounds on the variables.
+
+### Definition and Framework
+
+For a bound-constrained problem $\min q(x) = \frac{1}{2}x^T Gx + x^T c$ subject to $l \le x \le u$, each iteration consists of two stages:
+
+1. **Stage 1: Cauchy Point Computation**: We search along the steepest descent direction $-g = -(Gx + c)$. Whenever a bound is encountered, the direction is "bent" to stay feasible.
+2. **Stage 2: Subspace Minimization**: We explore the face of the feasible box on which the Cauchy point lies by approximately solving a subproblem where the components active at the Cauchy point are fixed.
+
+### The Projected Path
+
+The projection of an arbitrary point $x$ onto the feasible "box" is defined component-wise as:
+
+$$
+P(x, l, u)_i = \begin{cases} l_i & \text{if } x_i < l_i \ x_i & \text{if } x_i \in [l_i, u_i] \ u_i & \text{if } x_i > u_i \end{cases}
+$$
+
+The piecewise-linear path $x(t)$ starting at $x$ is given by:
+
+$$
+x(t) = P(x - tg, l, u)
+$$
+
+<img width="534" height="473" alt="image" src="https://github.com/user-attachments/assets/66463cba-e79d-43d1-a0d6-3e81e7ec2965" />
+
+### Identifying the Cauchy Point
+
+The **Cauchy point** $x^c$ is defined as the first local minimizer of the univariate, piecewise-quadratic function $q(x(t))$ for $t \ge 0$.
+
+* **Breakpoints**: We identify values $t_i$ where each component reaches its bound:
+
+$$
+\bar{t}_i = \begin{cases} (x_i - u_i)/g_i & \text{if } g_i < 0 \text{ and } u_i < +\infty \ (x_i - l_i)/g_i & \text{if } g_i > 0 \text{ and } l_i > -\infty \ \infty & \text{otherwise} \end{cases}
+$$
+  
+* **Search**: Intervals between sorted breakpoints $[t_{j-1}, t_j]$ are examined. In each interval, the quadratic is $q(x(t)) = f_{j-1} + f'{j-1}\Delta t + \frac{1}{2}f''*{j-1}(\Delta t)^2$. We stop at the first local minimizer found.
+
+### Subspace Minimization and Step Selection
+
+Once $x^c$ is found, we define the active set $\mathcal{A}(x^c)$ and solve:
+
+$$
+\min_{x} q(x) \quad \text{subject to } x_i = x_i^c, i \in \mathcal{A}(x^c); \quad l_i \le x_i \le u_i, i \notin \mathcal{A}(x^c)
+$$
+
+In large-scale cases, the conjugate gradient method is often used to solve this subspace problem.
+
+### Convergence and the Maratos Effect
+
+For non-linear functions, a line search is performed along $p_k = \hat{x} - x_k$ to satisfy the sufficient decrease condition:
+
+$$
+f(x_k + \alpha_k p_k) \le f(x_k) + \eta \alpha_k \nabla f_k^T p_k
+$$
+
+> [!IMPORTANT]
+> The search direction $p_k$ is a descent direction if $B_k$ is positive definite, because the algorithm ensures $q_k(x_k) > q_k(x^c) \ge q_k(\hat{x})$.
+
+### Summary Table: Lagrange Multipliers vs. Gradient Projection
+
+| Feature           | Lagrange Multipliers                   | Gradient Projection                          |
+| :---------------- | :------------------------------------- | :------------------------------------------- |
+| **Primary Use**   | Theoretical optimality and sensitivity | Practical algorithm for bound constraints    |
+| **Key Mechanism** | Introduces dual variables to objective | Projects descent direction onto feasible set |
+| **Stationarity**  | $\nabla_x \mathcal{L} = 0$             | $x - P(x - \nabla f(x), l, u) = 0$           |
+| **Movement**      | Shifts between working sets            | Moves along piecewise-linear "bent" paths    |
