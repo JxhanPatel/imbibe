@@ -296,3 +296,81 @@ The convex hull of ${x_1, x_2, \dots, x_m}$ is the set of all convex combination
 
 
 
+
+
+
+
+# 9.4: Convex Functions and Properties of Convex Functions
+
+The concept of convexity is fundamental in optimization. Many practical problems possess this property, which generally makes them easier to solve both in theory and practice.
+
+## 9.4.1 Definition of Convex Functions
+
+The term "convex" can be applied both to sets and to functions.
+
+### Formal Definition
+
+The function $f$ is a **convex function** if its domain $S$ is a convex set and if for any two points $x$ and $y$ in $S$, the following property is satisfied:
+$$f(\alpha x + (1 - \alpha)y) \le \alpha f(x) + (1 - \alpha)f(y), \text{ for all } \alpha \in [0,1].$$
+
+This definition can also be expressed by the following equivalent inequality for all $\alpha \in [0,1]$ and all $x, y \in \mathbb{R}^n$:
+$$f(y + \alpha(x - y)) - \alpha f(x) - (1 - \alpha)f(y) \le 0.$$
+
+### Strict Convexity
+
+We say that $f$ is **strictly convex** if the inequality in the definition is strict whenever $x \ne y$ and $\alpha$ is in the open interval $(0, 1)$.
+
+### Concave Functions
+
+A function $f$ is said to be **concave** if $-f$ is convex.
+
+<img width="2869" height="1848" alt="image" src="https://github.com/user-attachments/assets/0866c2ec-82cd-4a31-b64f-df63309ef81e" />
+
+## 9.4.2 Examples of Convex Functions
+
+* **Linear Functions**: The linear function $f(x) = c^T x + \alpha$, for any constant vector $c \in \mathbb{R}^n$ and scalar $\alpha$.
+* **Convex Quadratic Functions**: The quadratic function $f(x) = x^T Hx$, where $H$ is a symmetric positive semidefinite matrix.
+* **Dual Objective Function**: The dual objective function $q(\lambda) = \inf_x \mathcal{L}(x, \lambda)$ is concave.
+
+## 9.4.3 Properties of Convex Functions
+
+### 1. Local and Global Minimizers
+
+If the objective function in the optimization problem $\min_{x \in \Omega} f(x)$ and the feasible region $\Omega$ are both convex, then any local solution of the problem is in fact a global solution.
+
+**Theorem 2.5**:
+
+1. When $f$ is convex, any local minimizer $x★$ is a global minimizer of $f$.
+2. If in addition $f$ is differentiable, then any stationary point $x★$ (where $\nabla f(x★) = 0$) is a global minimizer of $f$.
+
+### 2. Stationary Points and Global Minimum
+
+Suppose that $x★$ is not a global minimizer of a differentiable convex function $f$. Then we can find a point $z \in \mathbb{R}^n$ with $f(z) < f(x★)$. By the convexity property, we have:
+$$\nabla f(x★)^T (z - x★) = \left. \frac{d}{d\lambda} f(x★ + \lambda(z - x★)) \right|*{\lambda=0}$$
+$$= \lim*{\lambda \downarrow 0} \frac{f(x★ + \lambda(z - x★)) - f(x★)}{\lambda}$$
+$$\le \lim_{\lambda \downarrow 0} \frac{\lambda f(z) + (1 - \lambda)f(x★) - f(x★)}{\lambda}$$
+$$= f(z) - f(x★) < 0.$$
+Therefore, $\nabla f(x★) \ne 0$, and so $x★$ is not a stationary point.
+
+### 3. Convexity of the Solution Set
+
+If $f$ is a convex function, the set of global minimizers of $f$ is a convex set.
+
+### 4. Lagrangian and Duality Properties
+
+* When $f$ and $-c_i$ are convex functions and $\lambda \ge 0$, the Lagrangian function $\mathcal{L}(\cdot, \lambda) = f(x) - \lambda^T c(x)$ is convex.
+* In this situation, all local minimizers of $\mathcal{L}(\cdot, \lambda)$ are global minimizers.
+* The domain $\mathcal{D}$ of the dual objective function $q$ is convex.
+
+### 5. Convexity of the Feasible Set
+
+The feasible set $\Omega$ of a constrained optimization problem is convex if:
+
+1. The objective function is convex.
+2. The equality constraint functions $c_i(\cdot), i \in \mathcal{E}$, are linear.
+3. The inequality constraint functions $c_i(\cdot), i \in \mathcal{I}$, are concave.
+
+> [!NOTE]
+> For convex programming problems, local solutions are also global solutions. General nonlinear problems may possess local solutions that are not global solutions.
+
+<img width="653" height="441" alt="image" src="https://github.com/user-attachments/assets/a734e7f6-8902-4226-9169-64a0240e31cd" />
