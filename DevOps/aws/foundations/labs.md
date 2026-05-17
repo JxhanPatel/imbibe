@@ -2,3 +2,23 @@
   <summary>Lab 1: Introduction to AWS IAM</summary>
 <img width="1705" height="900" alt="image" src="https://github.com/user-attachments/assets/29d47c8a-65ca-4024-b5df-4051b267b6d1" />
 </details>
+
+
+<details>
+  <summary>Lab 2: Build your VPC and Launch a Web Server</summary>
+
+<img width="1133" height="681" alt="image" src="https://github.com/user-attachments/assets/0b883eca-8f3c-460a-b33f-85ce580bae94" />
+
+</details>
+
+
+
+
+<details>
+  <summary>Lab 3: Introduction to Amazon EC2</summary>
+
+<img width="1118" height="767" alt="image" src="https://github.com/user-attachments/assets/2ed5becd-da54-46de-a3d2-a3252fbd32ae" />
+
+
+</details>
+
