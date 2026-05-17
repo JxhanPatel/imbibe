@@ -1,6 +1,8 @@
 # Module 3: AWS Global Infrastructure Overview
 
-The AWS Global Infrastructure is designed and built to deliver a flexible, reliable, scalable, and secure cloud computing environment with high-quality global network performance. Understanding this layout is essential for designing resilient, high-performance architectures and passing the AWS Certified Cloud Practitioner exam.
+
+
+<img width="837" height="487" alt="image" src="https://github.com/user-attachments/assets/93bc1074-7976-4c1d-9ada-c078e9055384" />
 
 
 ## Section 1: AWS Global Infrastructure Components
