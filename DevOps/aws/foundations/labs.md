@@ -6,9 +6,7 @@
 
 <details>
   <summary>Lab 2: Build your VPC and Launch a Web Server</summary>
-
 <img width="1133" height="681" alt="image" src="https://github.com/user-attachments/assets/0b883eca-8f3c-460a-b33f-85ce580bae94" />
-
 </details>
 
 
@@ -16,9 +14,17 @@
 
 <details>
   <summary>Lab 3: Introduction to Amazon EC2</summary>
-
 <img width="1118" height="767" alt="image" src="https://github.com/user-attachments/assets/2ed5becd-da54-46de-a3d2-a3252fbd32ae" />
-
-
 </details>
+
+
+
+
+
+<details>
+  <summary>Activity: AWS Lambda</summary>
+<img width="1760" height="689" alt="image" src="https://github.com/user-attachments/assets/80f1b92b-b3c4-4327-873c-2c488a5dd511" />
+</details>
+
+
 
