@@ -35,5 +35,14 @@
 </details>
 
 
+<details>
+  <summary>Lab 4: Working with EBS</summary>
+<img width="1753" height="820" alt="image" src="https://github.com/user-attachments/assets/ae7098d3-e701-41ff-84e1-199892bcbea8" />
+</details>
+
+
+
+
+
 
 
