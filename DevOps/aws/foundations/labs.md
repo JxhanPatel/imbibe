@@ -43,6 +43,14 @@
 
 
 
+<details>
+  <summary>Lab 5: Build Your DB Server and Interact With Your DB Using an App</summary>
+  <img width="1777" height="707" alt="image" src="https://github.com/user-attachments/assets/46bb5647-09dc-45f7-83e7-ec695a79d7e6" />
+<img width="785" height="835" alt="image" src="https://github.com/user-attachments/assets/b6c1f56a-43db-4252-b9ec-de601af3dc57" />
+
+</details>
+
+
 
 
 
