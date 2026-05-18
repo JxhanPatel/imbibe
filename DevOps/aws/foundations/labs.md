@@ -28,3 +28,12 @@
 
 
 
+<details>
+  <summary>Activity: AWS Elastic Beanstalk</summary>
+<img width="1756" height="321" alt="image" src="https://github.com/user-attachments/assets/953131e5-0f01-40d3-8f25-41aa23d87ad5" /> 
+  <img width="1280" height="535" alt="image" src="https://github.com/user-attachments/assets/8154fa1e-ec2d-4af5-83d5-7d0929b2aaa5" />
+</details>
+
+
+
+
