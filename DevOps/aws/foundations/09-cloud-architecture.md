@@ -2,6 +2,7 @@
 
 The core of cloud architecture lies in designing systems that are reliable, efficient, secure, and cost-effective. AWS formalizes these design principles through the **AWS Well-Architected Framework**, which provides a consistent mechanism for organizations to evaluate architectures and implement designs that can scale over time.
 
+<img width="984" height="629" alt="image" src="https://github.com/user-attachments/assets/019cb1bd-7380-4e16-9886-442f544e31f7" />
 
 
 ## 1. Introduction to Cloud Architecture & Design Principles
@@ -26,6 +27,9 @@ Traditional IT architecture often relies on upfront capacity planning, which fre
 ## 2. The AWS Well-Architected Framework
 
 The AWS Well-Architected Framework is structured around **six pillars**. It provides a set of questions and design principles to evaluate whether an architecture aligns with cloud best practices.
+
+<img width="1024" height="496" alt="image" src="https://github.com/user-attachments/assets/b2c72fcd-2b22-4d50-8e55-569cecdbe055" />
+
 
 ### The Six Pillars at a Glance
 
@@ -86,6 +90,8 @@ The Security pillar focuses on protecting data, systems, and assets while taking
 * **AWS Key Management Service (KMS):** Simplifies the creation and control of cryptographic keys used to encrypt data at rest.
 * **AWS WAF (Web Application Firewall):** Protects web applications from common web exploits (e.g., SQL injection, cross-site scripting).
 
+
+
 > **Real-World Use Case:** An e-commerce platform uses **AWS WAF** to block malicious SQL injection attacks targeting its login page. Simultaneously, customer credit card tokens are stored in an Amazon DynamoDB database, with all data encrypted at rest using unique customer-managed keys hosted securely within **AWS KMS**.
 
 
@@ -108,6 +114,7 @@ The Reliability pillar ensures a workload performs its intended function correct
 * **High Availability (HA):** Ensures the system is up and operational for a high percentage of time (e.g., 99.99%), often by quickly failing over to an active standby instance with minimal downtime.
 * **Fault Tolerance:** The ability of a system to continue operating properly without interruption, even if one or more structural components fail completely. This requires full active-active redundancy and results in zero downtime.
 
+<img width="860" height="1116" alt="image" src="https://github.com/user-attachments/assets/718470ed-a626-481d-9040-769abe0c7f3a" />
 
 
 | Traditional IT Concept | AWS Reliable Cloud Equivalent |
