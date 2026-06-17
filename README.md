@@ -10,7 +10,6 @@ I’m a firm believer in the **Build/Learn in Public** thing. This repo isn't me
 Having this public repo will keep me consistent.
 If my notes or mini-projects help even one person understand a concept better, this repo has done its job.
 
----
 
 ## What’s Inside?
 
@@ -21,10 +20,9 @@ I’ve organized my learning into specific domains. Each section contains my per
 | --- | --- | --- |
 | **DSA** | Data Structures & Algorithms implementations and LeetCode patterns. | 🟢 Done |
 | **DBMS** | Database management, SQL deep dives, and schema design notes. | 🟢 Done |
-| **ML** | Mathematics, Scikit-learn, and building models from scratch. | 🟡 In Progress |
+| **DataScience** | Mathematics, Building models, Understanding data. | 🟡 In Progress |
 | **Projects** | Mini-applications that bridge the gap between theory and practice. | ⚪ Planned |
 
----
 
 ### 📬 Connect with me
 [solo.to/jahan](https://solo.to/jahan)
