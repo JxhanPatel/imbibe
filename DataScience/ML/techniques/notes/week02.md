@@ -211,3 +211,98 @@ In seeking to achieve an optimal representation for a particular pattern classif
 The symmetries described above are continuous (translated, rotated, sped up). Other discrete symmetries are relevant, such as flips left-to-right or top-to-bottom. A central technique, when there is insufficient training data, is to incorporate knowledge of the problem domain, such as how the patterns themselves were produced. One method is analysis by synthesis, where one has a model of how each pattern is generated. If this underlying model of production can be determined from the sound or image, we can classify the pattern by how it was produced.
 
 <img width="867" height="576" alt="image" src="https://github.com/user-attachments/assets/da5809ac-ca29-49d1-8cac-e522326fe67f" />
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+# 2.4 Kernel Functions and Kernel PCA
+
+## 1. Introduction to Kernel Methods and the Kernel Trick
+
+A class of pattern recognition techniques exists where the training data points, or a subset of them, are kept and used during the prediction phase. Many linear parametric models can be re-cast into an equivalent dual representation in which the predictions are based on linear combinations of a kernel function evaluated at the training data points. For models based on a fixed nonlinear feature space mapping $\phi(x)$, the kernel function is given by the relation $k(x,x') = \phi(x)^T\phi(x')$.
+
+The concept of a kernel formulated as an inner product in a feature space allows for the construction of extensions to well-known algorithms through the kernel trick, also known as kernel substitution. The general idea is that if an algorithm is formulated such that the input vector $x$ enters only in the form of scalar products, that scalar product can be replaced with another choice of kernel. This technique can be applied to principal component analysis to develop a nonlinear variant known as kernel PCA.
+
+## 2. Construction of Valid Kernels
+
+In order to exploit kernel substitution, it is necessary to construct valid kernel functions. One approach is to choose a feature space mapping $\phi(x)$ and use it to find the corresponding kernel $k(x,x') = \phi(x)^T\phi(x') = \sum_{i=1}^M \phi_i(x)\phi_i(x')$. An alternative is to construct kernel functions directly, ensuring they correspond to a scalar product in some feature space.
+
+### 2.1 Necessary Conditions
+A necessary and sufficient condition for a function $k(x,x')$ to be a valid kernel is that the Gram matrix $K$, with elements $K_{nm} = k(x_n, x_m)$, must be positive semidefinite for all possible choices of the set $\{x_n\}$. A positive semidefinite matrix is one where $w^T Aw \ge 0$ holds for all values of $w$, which is equivalent to all eigenvalues $\lambda_i \ge 0$.
+
+### 2.2 Techniques for Constructing New Kernels
+Given valid kernels $k_1(x, x')$ and $k_2(x, x')$, the following are also valid:
+*   $k(x, x') = c k_1(x, x')$ for $c > 0$.
+*   $k(x, x') = f(x) k_1(x, x') f(x')$ for any function $f(\cdot)$.
+*   $k(x, x') = q(k_1(x, x'))$ where $q(\cdot)$ is a polynomial with nonnegative coefficients.
+*   $k(x, x') = \exp(k_1(x, x'))$.
+*   $k(x, x') = k_1(x, x') + k_2(x, x')$.
+*   $k(x, x') = k_1(x, x') k_2(x, x')$.
+
+### 2.3 Common Kernel Examples
+*   **Linear Kernel:** $\phi(x) = x$, resulting in $k(x, x') = x^T x'$.
+*   **Polynomial Kernel:** $k(x, x') = (x^T x' + c)^M$ with $c > 0$. For example, if $p=2$ and $d=2$, the kernel $K(x,y) = (\langle x,y \rangle + 1)^2$ has $M=6$ eigenfunctions spanning the space of polynomials of total degree 2.
+*   **Gaussian (Radial Basis Function) Kernel:** $k(x, x') = \exp(-\|x - x'\|^2 / 2\sigma^2)$. It is not interpreted as a probability density in this context, and its corresponding feature vector has infinite dimensionality.
+*   **Sigmoidal Kernel:** $k(x, x') = \tanh(ax^T x' + b)$, whose Gram matrix is not generally positive semidefinite but has been used in practice.
+*   **Stationary Kernels:** Functions of the difference between arguments, $k(x, x') = k(x - x')$, which are invariant to translations in input space.
+
+<img width="876" height="539" alt="image" src="https://github.com/user-attachments/assets/a76a8e0e-6e9e-4ff1-896e-ffabb18c205b" />
+
+## 3. Kernel Principal Component Analysis (KPCA)
+
+Kernel PCA is a non-linear version of linear principal components that mimics the result of expanding features by non-linear transformations and applying PCA in the transformed space. 
+
+### 3.1 Mathematical Derivation
+Consider a data set $\{x_n\}$ where the sample mean has been subtracted so that $\sum_n x_n = 0$. If we apply a nonlinear transformation $\phi(x)$ into an $M$-dimensional feature space, we can perform standard PCA there. Assuming the projected data also has zero mean ($\sum_n \phi(x_n) = 0$), the $M \times M$ sample covariance matrix in feature space is:
+$$C = \frac{1}{N} \sum_{n=1}^N \phi(x_n)\phi(x_n)^T$$
+The eigenvector expansion is defined by $C v_i = \lambda_i v_i$ for $i=1,...,M$. Substituting the definition of $C$ shows that $v_i$ is a linear combination of the $\phi(x_n)$:
+$$v_i = \sum_{n=1}^N a_{in} \phi(x_n)$$
+By substituting this expansion back into the eigenvector equation and expressing it in terms of the kernel function $k(x_n, x_m) = \phi(x_n)^T \phi(x_m)$, we obtain the dual eigenvalue problem:
+$$K a_i = \lambda_i N a_i$$
+where $a_i$ is an $N$-dimensional column vector with elements $a_{ni}$.
+
+### 3.2 Normalization and Projection
+The normalization condition for the coefficients $a_i$ requires the eigenvectors in feature space to be normalized, such that:
+$$1 = v_i^T v_i = \lambda_i N a_i^T a_i$$
+The principal component projection of a point $x$ onto eigenvector $i$ is then expressed in terms of the kernel function:
+$$y_i(x) = \phi(x)^T v_i = \sum_{n=1}^N a_{in} k(x, x_n)$$
+
+### 3.3 Centering in Feature Space
+In general, the projected data set $\phi(x_n)$ will not have zero mean. To avoid working directly in feature space, the Gram matrix must be centered using only the kernel function. The elements of the centered Gram matrix $\tilde{K}$ are given by:
+
+$$
+\tilde{K}_{nm} = k(x_n, x_m) - \frac{1}{N} \sum_{l=1}^N k(x_l, x_m) - \frac{1}{N} \sum_{l=1}^N k(x_n, x_l) + \frac{1}{N^2} \sum_{j=1}^N \sum_{l=1}^N k(x_j, x_l)
+$$
+
+In matrix notation, this is $\tilde{K} = K - 1_N K - K 1_N + 1_N K 1_N$, where $1_N$ is an $N \times N$ matrix with elements $1/N$.
+
+<img width="872" height="508" alt="image" src="https://github.com/user-attachments/assets/586e2b78-6f26-4e3d-8703-1a1b2bce5295" />
+
+## 4. Properties and Limitations of Kernel PCA
+
+### 4.1 Dimensionality and Eigenvalues
+In the original $D$-dimensional space, there are at most $D$ linear principal components. In the feature space, the dimensionality $M$ can be much larger or even infinite, allowing for a number of nonlinear principal components that exceeds $D$. However, the number of nonzero eigenvalues cannot exceed the number of data points $N$.
+
+### 4.2 The Pre-image Problem
+In standard linear PCA, a data vector $x_n$ can be approximated by its projection $\tilde{x}_n$ onto a lower-dimensional principal subspace. In kernel PCA, the mapping $\phi(x)$ maps the $D$-dimensional $x$ space to a $D$-dimensional manifold in the $M$-dimensional feature space. The projection of points in feature space onto the linear PCA subspace typically does not lie on this nonlinear manifold. Consequently, such a projection will generally not have a corresponding pre-image in the original data space.
+
+### 4.3 Computational Complexity
+Kernel PCA involves finding the eigenvectors of an $N \times N$ matrix $\tilde{K}$ rather than the $D \times D$ matrix $S$ used in conventional linear PCA. For large data sets, approximations are often necessary due to this computational burden.
+
+### 4.4 Comparison with Spectral Clustering
+There are close connections between kernel PCA and spectral clustering. Spectral clustering uses a Laplacian constructed from a similarity matrix, which is often a localized version of a kernel matrix (e.g., setting similarities to zero for non-neighbors). While kernel PCA finds the eigenvectors corresponding to the largest eigenvalues of a kernel matrix $K$, spectral clustering finds the eigenvectors corresponding to the smallest eigenvalues of the Laplacian.
+
+<img width="887" height="577" alt="image" src="https://github.com/user-attachments/assets/4581f6af-fb04-4182-ae90-b613a6bb268e" />
