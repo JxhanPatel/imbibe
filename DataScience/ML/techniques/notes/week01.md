@@ -52,12 +52,31 @@ For an $M$-dimensional projection space, the optimal linear projection is define
 
 ### 3.2 Minimum Error Formulation
 PCA can also be formulated based on minimizing the distortion introduced by dimensionality reduction. We approximate each data point $x_{n}$ by a representation in an $M$-dimensional subspace:
-$$\tilde{x}_{n} = \sum_{i=1}^{M} z_{ni}u_{i} + \sum_{i=M+1}^{D} b_{i}u_{i}$$
-where $\{u_{i}\}$ is a complete orthonormal set of basis vectors. To minimize the distortion measure $J = \frac{1}{N} \sum_{n=1}^{N} ||x_{n} - \tilde{x}_{n}||^{2}$ with respect to $\{z_{ni}\}$ and $\{b_{i}\}$, we find:
-$$z_{nj} = x_{n}^{T}u_{j} \text{ for } j=1,...,M$$
-$$b_{j} = \overline{x}^{T}u_{j} \text{ for } j=M+1,...,D$$
+
+$$
+\tilde{x}_{n} = \sum_{i=1}^{M} z_{ni}u_{i} + \sum_{i=M+1}^{D} b_{i}u_{i}
+$$
+
+where $\{u_{i}\}$ is a complete orthonormal set of basis vectors. To minimize the distortion measure 
+
+$J = \frac{1}{N} \sum_{n=1}^{N} ||x_{n} - \tilde{x}-{n}||^{2}$ with respect to $\{z_{ni}\}$ and $\{b_{i}\}$
+
+we find:
+
+$$
+z_{nj} = x_{n}^{T}u_{j} \text{ for } j=1,...,M
+$$
+
+$$
+b_{j} = \overline{x}^{T}u_{j} \text{ for } j=M+1,...,D
+$$
+
 The displacement vector $x_{n} - \tilde{x}_{n}$ lies in the space orthogonal to the principal subspace. The distortion measure reduces to:
-$$J = \sum_{i=M+1}^{D} u_{i}^{T}Su_{i}$$
+
+$$
+J = \sum_{i=M+1}^{D} u_{i}^{T}Su_{i}
+$$
+
 The minimum value of $J$ is obtained by selecting the eigenvectors corresponding to the $D - M$ smallest eigenvalues. Thus, the principal subspace is defined by the $M$ eigenvectors with the largest eigenvalues.
 
 <img width="665" height="602" alt="image" src="https://github.com/user-attachments/assets/4f942a3a-6abf-4f69-b394-cdf4b4739ca2" />
