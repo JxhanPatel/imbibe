@@ -142,3 +142,113 @@ K-medoids is far more computationally intensive than K-means, as the update step
 K-means can be viewed as a particular nonprobabilistic limit of the EM algorithm applied to a mixture of Gaussians. Specifically, if we assume K mixture components each has a Gaussian density with a scalar covariance matrix $\sigma^{2}I$, then as $\sigma^{2} \rightarrow 0$, the "soft" assignments (responsibilities) of the EM algorithm become the "hard" assignments of K-means.
 
 
+
+
+
+
+---
+
+
+
+
+# 3.3 Convergence of K-means algorithm
+
+## 1. Assurance of Convergence
+The K-means algorithm is an iterative procedure in which each iteration involves two successive steps corresponding to successive optimizations with respect to the assignments $r_{nk}$ and the prototypes $\mu_{k}$. Because each phase reduces the value of the objective function $J$, convergence of the algorithm is assured. Each of the two steps (the E step and the M step) reduces the value of the criterion, so that convergence is assured.
+
+<img width="682" height="293" alt="image" src="https://github.com/user-attachments/assets/1466cbbc-87bf-4271-a26b-b41be3e86583" />
+
+## 2. Finite Convergence Property
+The K-means algorithm must converge after a finite number of iterations. This is a consequence of there being a finite number of possible assignments for the set of discrete indicator variables $r_{nk}$. Furthermore, for each such assignment, there is a unique optimum for the cluster centers $\{\mu_{k}\}$.
+
+## 3. Local Optima and Global Minima
+While convergence is assured, the algorithm may converge to a local rather than global minimum of the distortion measure $J$. Like hill-climbing procedures in general, these approaches guarantee local but not global optimization. Different starting points can lead to different solutions, and one never knows whether or not the best solution has been found. These algorithms examine only a very small fraction of all possible assignments and converge to local optima which may be highly suboptimal when compared to the global optimum.
+
+<img width="980" height="571" alt="image" src="https://github.com/user-attachments/assets/ee023757-5053-4728-b844-04ca55df2cc9" />
+
+## 4. Sensitivity to Initialization
+The results of the procedure depend on the starting values or initial configuration. The values obtained iteratively depend upon the starting point, and the problem of multiple solutions is always present. 
+
+### 4.1 Saddle Points
+In certain cases, the algorithm can converge to a saddle point. For example, if the initial means are chosen such that $\hat{\mu}_{1}(0) = \hat{\mu}_{2}(0)$, convergence to a saddle point occurs in one step. This happens because for this starting point $P(\omega_{i}|x_{k}, \hat{\mu}(0)) = P(\omega_{i})$, and the update equation yields the mean of all of the samples for both cluster centers for all successive iterations. Such saddle-point solutions can be expected if the starting point does not bias the search away from a symmetric configuration.
+
+## 5. Termination Criteria
+The two phases of re-assigning data points to clusters and re-computing the cluster means are repeated in turn until there is no further change in the assignments or until some maximum number of iterations is exceeded. The algorithm terminates when the prescription is unable to provide an improvement, yielding the current assignments as its solution.
+
+
+
+
+---
+
+
+
+
+
+# 3.4 Nature of clusters produced by K-means
+
+## 1. Geometric Characterization: The Voronoi Tessellation
+
+The K-means algorithm partitions the input space into specific regions based on the proximity to cluster centers. 
+
+### 1.1 Decision Boundaries
+In a two-dimensional Euclidean space, the assignment of each data point to the nearest cluster centre is equivalent to a classification of the data points according to which side they lie of the perpendicular bisector of the two cluster centres. For a multi-cluster system, the input space is divided into regions of constant classification, with piecewise hyperplanar decision boundaries. 
+
+### 1.2 Voronoi Cells
+This partitioning of points, where each sector is the set of points closest to each centroid, is called the Voronoi tessellation. These induced Voronoi cells possess specific geometric properties:
+*   **Convexity:** The Voronoi cells induced by the algorithm must always be convex. That is, for any two points $x_{1}$ and $x_{2}$ in a cell, all points on the line linking $x_{1}$ and $x_{2}$ must also lie in the cell.
+*   **Connectivity:** The decision regions of such a discriminant are always singly connected. 
+
+<img width="753" height="757" alt="image" src="https://github.com/user-attachments/assets/d99b2ee9-3b9c-4c15-a06e-f5fe169dccf9" />
+
+## 2. Cluster Compactness and Shape
+
+K-means is a nonprobabilistic technique for identifying groups or clusters. The nature of the clusters produced is heavily influenced by the choice of the dissimilarity measure.
+
+### 2.1 Metric Dependencies
+The algorithm is intended for situations in which all variables are of the quantitative type, and squared Euclidean distance $d(x_{i}, x_{i'}) = ||x_{i} - x_{i'}||^{2}$ is chosen as the dissimilarity measure. 
+*   **Spherical Bias:** Geometrically, this corresponds to a situation in which the samples fall in equal-size hyperspherical clusters, with the cluster for the $i^{th}$ class being centered about the mean vector $\mu_{i}$.
+*   **Compactness:** The objective function $J_{e}$ (sum-of-squared-error) is an appropriate criterion when the clusters form compact clouds that are rather well separated from one another.
+
+### 2.2 Local Prototyping
+Intuitively, a cluster comprises a group of data points whose inter-point distances are small compared with the distances to points outside of the cluster. Each data point is approximated by its nearest centre $\mu_{k}$.
+
+## 3. Structural Limitations and Sensitivities
+
+The "nature" of clusters produced by K-means can sometimes lead to results that impose structure on the data rather than finding it.
+
+### 3.1 Unbalanced Cluster Sizes
+A problem arises when there are great differences in the number of samples in different clusters. In such cases:
+*   A partition that splits a large cluster may be favored over one that maintains the integrity of the natural clusters.
+*   Splitting a natural group, within which the observations are all quite close to each other, reduces the criterion less than partitioning the union of two well-separated groups into their proper constituents.
+
+
+### 3.2 Sensitivity to Outliers
+Because the algorithm uses squared Euclidean distance, it places the highest influence on the largest distances. This causes the procedure to lack robustness against outliers ("wild shots") that produce very large distances.
+
+### 3.3 Non-Convex and Nested Structures
+The minimum-variance flavor of the within-cluster scatter matrix $S_{W}$ makes the algorithm unsuitable for certain data topologies:
+*   It will not extract a very dense cluster embedded in the center of a diffuse cluster.
+*   It will not separate intertwined line-like clusters.
+*   If the original distributions are multimodal and highly overlapping, the method is unlikely to provide adequate separation.
+
+## 4. Probabilistic Interpretation: Hard vs. Soft Clustering
+
+K-means performs a "hard" assignment of data points to clusters, in which each data point is associated uniquely with one cluster. 
+
+> [!NOTE]
+> K-means can be viewed as a particular nonprobabilistic limit of the EM algorithm applied to a mixture of Gaussians. 
+
+In this limit ($\sigma^{2} \rightarrow 0$):
+*   The "responsibilities" (probabilities of cluster membership) become 0 and 1, and the two methods coincide.
+*   The probabilistic "soft" assignment of points to cluster centers becomes the "hard" deterministic assignment of K-means.
+*   Maximizing the expected complete-data log likelihood is equivalent to minimizing the distortion measure $J$ for the K-means algorithm.
+
+<img width="702" height="641" alt="image" src="https://github.com/user-attachments/assets/3e7b44d3-9645-46f0-a381-7e5aa09b67ba" />
+
+
+
+
+---
+
+
+
