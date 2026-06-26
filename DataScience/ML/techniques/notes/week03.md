@@ -85,7 +85,11 @@ The optimization is performed through an iterative procedure where each iteratio
 
 #### The E Step (Determination of $r_{nk}$)
 Because J is a linear function of $r_{nk}$, the optimization can be performed independently for each n. We choose $r_{nk}$ to be 1 for whichever value of k gives the minimum value of $||x_{n} - \mu_{k}||^{2}$. More formally:
-$$r_{nk} = \begin{cases} 1 & \text{if } k = arg \min_{j} ||x_{n} - \mu_{j}||^{2} \\ 0 & \text{otherwise} \end{cases}$$
+
+$$
+r_{nk} = \begin{cases} 1 & \text{if } k = arg \min_{j} ||x_{n} - \mu_{j}||^{2} \\\ 0 & \text{otherwise} \end{cases}
+$$
+
 In other words, we simply assign the $n^{th}$ data point to the closest cluster centre.
 
 #### The M Step (Optimization of $\mu_{k}$)
@@ -252,3 +256,54 @@ In this limit ($\sigma^{2} \rightarrow 0$):
 
 
 
+
+
+
+
+# 3.5 Initialization of Centroids, K-means++ and Choice of K
+
+## 1. Initialization of Cluster Prototypes
+
+The K-means clustering algorithm is an iterative procedure that begins by choosing some initial values for the cluster prototypes $\{\mu_{k}\}$. The results of the procedure depend on the starting values or initial configuration. Because the values obtained iteratively depend upon the starting point, the problem of multiple solutions is always present.
+
+### 1.1 Initialization Strategies
+*   **Random Selection:** A common approach is to choose the cluster centres $\mu_{k}$ to be equal to a random subset of K data points.
+*   **Forward Stepwise Assignment:** A deliberate strategy can be defined by choosing a new center $i_{k}$ at each step to minimize the criterion [e.g., $J = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_{n} - \mu_{k}||^{2}$] given the centers $i_{1},...,i_{k-1}$ chosen at previous steps.
+*   **Hierarchical Pre-processing:** Hierarchical clustering procedures are simple methods that can provide very good starting points for iterative optimization. One approach is to find the c-cluster starting point from the solutions to the $(c-1)$-cluster problem.
+*   **K-means as Initialization:** The K-means algorithm itself is often used to initialize the parameters in a Gaussian mixture model before applying the EM algorithm.
+
+> [!CAUTION]
+> Deliberately poor initial values for the cluster centres can cause the algorithm to take many steps before convergence. Like hill-climbing procedures in general, iterative optimization guarantees local but not global optimization, and different starting points can lead to different solutions.
+
+## 2. Choosing the Number of Clusters K
+
+Deciding just how many clusters are present is a recurring problem in cluster analysis when interest is focused on whether observations fall into natural distinct groupings. The number of such groups $K★$ is often unknown and must be estimated from the data.
+
+### 2.1 The Kink (Elbow) Method
+One approach is to repeat the clustering procedure for $K=1, K=2, K=3,$ etc., and examine the within-cluster dissimilarity $W_{K}$ (or sum-of-squared-error criterion $J_{e}$) as a function of the number of clusters K.
+*   The criterion value $W_{K}$ must decrease monotonically with increasing K.
+*   If there are actually $K★$ distinct groupings, the criterion value will tend to decrease substantially for $K < K★$ as natural groups are successively assigned to separate clusters.
+*   For $K > K★$, splitting a natural group reduces the criterion less than partitioning the union of well-separated groups, leading to a smaller decrease.
+*   An estimate $\hat{K}★$ for $K★$ is obtained by identifying a "kink" in the plot where the successive differences $W_{K} - W_{K+1}$ change from being large to small.
+
+<img width="702" height="420" alt="image" src="https://github.com/user-attachments/assets/b03cd795-933c-4924-9aa1-a0cc85acc63e" />
+
+### 2.2 The Gap Statistic
+The Gap statistic is an automatic way of locating the "kink" in the within-cluster dissimilarity curve. 
+*   It compares the curve $\log W_{K}$ to a curve obtained from data uniformly distributed over a rectangle containing the data.
+*   The Gap estimate $K★$ is the smallest K producing a gap within one standard deviation of the gap at $K+1$.
+*   Formally, the rule is $K★ = argmin_{K}\{K|G(K) \ge G(K+1) - s_{K+1}'\}$, where $G(K)$ is the gap curve.
+
+<img width="726" height="563" alt="image" src="https://github.com/user-attachments/assets/1b845d80-190d-4d65-bd29-7dd17ceb7700" />
+
+### 2.3 Probabilistic and Bayesian Approaches
+*   **Variational Inference:** A Bayesian treatment using variational inference allows the number of components in a mixture to be inferred automatically from the data. 
+*   **Automatic Relevance Determination:** Treatments of the mixing coefficients as parameters can drive the coefficients of surplus components to zero during optimization, effectively pruning them from the model.
+*   **Model Comparison:** The variational lower bound can be used to determine a posterior distribution over the number K of components.
+
+### 2.4 Performance and Validity Metrics
+*   **Null Hypothesis Testing:** A formal approach involves the null hypothesis that there are exactly c clusters present and computing the sampling distribution for $J(c+1)$. The null hypothesis is accepted if the improvement in $J(c+1)$ falls within limits corresponding to an acceptable probability of false rejection.
+*   **Cophenetic Correlation:** The degree to which a hierarchical structure represents the data can be judged by the correlation between pairwise observation dissimilarities and cophenetic dissimilarities derived from a dendrogram.
+
+> [!NOTE]
+> Cross-validation techniques cannot be utilized in this context because a large number of cluster centers will always be close to all data points, causing the criterion to decrease even on independent test sets.
