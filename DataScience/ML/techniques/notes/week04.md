@@ -458,3 +458,57 @@ If one of the components of the mixture model has its mean $\mu_{j}$ exactly equ
 This problem does not arise in the case of a single Gaussian distribution. If a single Gaussian collapses onto a point, the multiplicative factors from other data points go to zero exponentially fast, causing the overall likelihood to go to zero. In a mixture, however, other components can provide finite probability to all data points while one component shrinks onto a specific point to provide an increasing additive value to the log-likelihood.
 
 <img width="807" height="272" alt="image" src="https://github.com/user-attachments/assets/7906afd5-9814-4b06-9873-0773fdd12a5e" />
+
+
+
+
+---
+
+
+
+
+
+# 4.6 Convex Functions & Jensen's Inequality | Convexity, Concavity & Logarithm Properties
+
+## 1. Definition and Geometrical Interpretation of Convexity
+
+A function $f(x)$ is said to be convex if it has the property that every chord lies on or above the function. Any value of x in the interval from $x=a$ to $x=b$ can be written in the form $\lambda a+(1-\lambda)b$ where $0\le\lambda\le1$. The corresponding point on the chord is given by $\lambda f(a)+(1-\lambda)f(b)$, and the corresponding value of the function is $f(\lambda a+(1-\lambda)b)$.
+
+<img width="815" height="321" alt="image" src="https://github.com/user-attachments/assets/76dbf221-8ccf-4ed7-849d-63b6761c58c4" />
+
+Convexity implies the following relationship:
+$$f(\lambda a+(1-\lambda)b)\le\lambda f(a)+(1-\lambda)f(b)$$.
+This is equivalent to the requirement that the second derivative of the function be everywhere positive. A strictly convex function is defined as one for which every chord lies above the function, meaning the equality is satisfied only for $\lambda=0$ and $\lambda=1$.
+
+### 1.1 Concave Functions
+If a function has the opposite property, namely that every chord lies on or below the function, it is called concave, with a corresponding definition for strictly concave. If a function $f(x)$ is convex, then $-f(x)$ will be concave.
+
+<img width="1060" height="444" alt="image" src="https://github.com/user-attachments/assets/bb1e5571-ff5b-4a1e-9679-3e80447f9266" />
+
+## 2. Jensen's Inequality
+
+Jensen's inequality is a fundamental result derived from the properties of convex functions. Using the technique of proof by induction, it can be shown that a convex function $f(x)$ satisfies:
+$$f(\sum_{i=1}^{M}\lambda_{i}x_{i})\le\sum_{i=1}^{M}\lambda_{i}f(x_{i})$$
+where $\lambda_{i}\ge0$ and $\sum_{i}\lambda_{i}=1$ for any set of points $\{x_{i}\}$.
+
+### 2.1 Discrete and Continuous Formulations
+If the $\lambda_{i}$ are interpreted as the probability distribution over a discrete variable x taking the values $\{x_{i}\}$, Jensen's inequality can be expressed in terms of expectations:
+$$f(\mathbb{E}[x])\le\mathbb{E}[f(x)]$$.
+For continuous variables, the inequality takes the form:
+$$f(\int xp(x)dx)\le\int f(x)p(x)dx$$.
+
+> [!NOTE]
+> Jensen's inequality is a key observation used to show that the quantity $\mathcal{L}(q, \theta)$ is a lower bound on the log likelihood function $\ln p(X|\theta)$.
+
+## 3. Logarithm Properties and Examples
+
+The properties of the logarithm function are central to many applications of convexity and concavity in pattern recognition.
+
+*   **Concavity of Logarithms:** The function $f(x)=\ln(x)$ is concave for $0<x<\infty$. This property can be verified by computing its second derivative.
+*   **Convexity of x ln x:** Examples of convex functions include $x \ln x$ (for $x>0$) and $x^{2}$.
+*   **Negative Logarithm:** The function $-\ln x$ is a strictly convex function.
+*   **Log Logistic Function:** The log logistic function $f(x)=-\ln(1+e^{-x})$ is concave.
+*   **Log-Sum-Exp Forms:** The function $f(x)=-\ln(e^{x/2}+e^{-x/2})$ is a concave function of x, but it is a convex function of $x^{2}$.
+
+### 3.1 Application: Information Theory
+The convexity of the negative logarithm, together with the normalization condition $\int q(x)dx=1$, can be applied to the Kullback-Leibler divergence $KL(p||q)$ using Jensen's inequality. This demonstrates that $KL(p||q)\ge0$ with equality if, and only if, $p(x)=q(x)$. By applying Jensen's inequality with $f(x)=\ln x$, it can also be shown that the arithmetic mean of a set of real numbers is never less than their geometrical mean.
