@@ -388,3 +388,73 @@ $$\gamma(z_{k}) = \frac{\pi_{k} \mathcal{N}(x|\mu_{k}, \Sigma_{k})}{\sum_{j=1}^{
 
 
 
+
+
+
+# 4.5 Likelihood of Gaussian Mixture Models (GMM) | Mixing Proportions & Convexity
+
+## 1. The Gaussian Mixture Likelihood Function
+
+A mixture of Gaussians is a linear superposition of Gaussian components. The probability density for a single observation $x$ is given by:
+
+$$
+p(x) = \sum_{k=1}^{K} \pi_{k} \mathcal{N}(x|\mu_{k}, \Sigma_{k})
+$$
+
+where each Gaussian density $\mathcal{N}(x|\mu_{k}, \Sigma_{k})$ is called a component of the mixture and has its own mean $\mu_{k}$ and covariance $\Sigma_{k}$. 
+
+For a data set of $N$ observations $X = \{x_{1}, ..., x_{N}\}$ assumed to be drawn independently from the distribution, the likelihood function is given by the joint density:
+
+$$
+p(X|\pi, \mu, \Sigma) = \prod_{n=1}^{N} \sum_{k=1}^{K} \pi_{k} \mathcal{N}(x_{n}|\mu_{k}, \Sigma_{k})
+$$
+
+
+The log of the likelihood function is:
+
+$$
+\ln p(X|\pi, \mu, \Sigma) = \sum_{n=1}^{N} \ln { \sum_{k=1}^{K} \pi_{k} \mathcal{N}(x_{n}|\mu_{k}, \Sigma_{k})}
+$$
+
+
+## 2. Mixing Proportions (Mixing Coefficients)
+
+The parameters $\pi_{k}$ are called mixing coefficients or mixing parameters. They represent the prior probability of picking the $k^{th}$ component.
+
+### 2.1 Requirements for Mixing Proportions
+To be valid probabilities, the mixing coefficients must satisfy the following constraints:
+*   $0 \le \pi_{k} \le 1$ for all $k$.
+*   $\sum_{k=1}^{K} \pi_{k} = 1$.
+
+### 2.2 Maximum Likelihood Solution for $\pi_{k}$
+The maximum likelihood estimate $\hat{P}(\omega_{i})$ (or $\pi_{k}$) must satisfy the condition that it is the average over the entire data set of the estimate derived from each sample. To maximize the log-likelihood with respect to $\pi_{k}$ while enforcing the summation constraint, a Lagrange multiplier $\lambda$ is used to maximize the quantity:
+$$\ln p(X|\pi, \mu, \Sigma) + \lambda \left( \sum_{k=1}^{K} \pi_{k} - 1 \right)$$.
+Setting the derivative to zero yields:
+$$0 = \sum_{n=1}^{N} \frac{\mathcal{N}(x_{n}|\mu_{k}, \Sigma_{k})}{\sum_{j} \pi_{j} \mathcal{N}(x_{n}|\mu_{j}, \Sigma_{j})} + \lambda$$.
+Multiplying by $\pi_{k}$ and summing over $k$ shows that $\lambda = -N$. Rearranging gives the M-step re-estimation equation:
+$$\pi_{k} = \frac{N_{k}}{N}$$
+where $N_{k} = \sum_{n=1}^{N} \gamma(z_{nk})$ is the effective number of points assigned to cluster $k$.
+
+## 3. Issues of Convexity and Logarithms
+
+Maximizing the log-likelihood for a Gaussian mixture is a more complex problem than for a single Gaussian.
+
+### 3.1 Non-Convexity and Local Maxima
+The difficulty arises from the presence of the summation over $k$ that appears inside the logarithm. Because the logarithm function no longer acts directly on the Gaussian, setting the derivatives to zero does not obtain a closed-form solution. The nonlinearity of the mixture function causes the error/likelihood function to be non-convex. Consequently, the likelihood function can have multiple local maxima, and optimization algorithms like EM are not guaranteed to find the largest of these maxima. 
+
+### 3.2 Identifiability
+A density $p(x|\theta)$ is said to be identifiable if $\theta \ne \theta'$ implies that there exists an $x$ such that $p(x|\theta) \ne p(x|\theta')$. For a $K$-component mixture, there are a total of $K!$ equivalent solutions corresponding to the $K!$ ways of assigning $K$ sets of parameters to $K$ components. This means that for any given point in parameter space, there are $K! - 1$ additional points giving rise to the same distribution, which represents a form of nonidentifiability.
+
+<img width="765" height="778" alt="image" src="https://github.com/user-attachments/assets/f26c826d-4ee2-428e-9327-bb3fb474f78b" />
+
+## 4. Singularities in the Likelihood Function
+
+The maximization of the log-likelihood function for GMMs is not a well-posed problem due to the presence of singularities. 
+
+### 4.1 Component Collapse
+If one of the components of the mixture model has its mean $\mu_{j}$ exactly equal to one of the data points $x_{n}$, that point contributes a term of the form $\mathcal{N}(x_{n}|x_{n}, \sigma_{j}^{2}I) = \frac{1}{(2\pi)^{1/2}}\frac{1}{\sigma_{j}}$. In the limit $\sigma_{j} \to 0$, this term goes to infinity, and thus the log-likelihood also goes to infinity. 
+
+### 4.2 Comparison with Single Gaussians
+This problem does not arise in the case of a single Gaussian distribution. If a single Gaussian collapses onto a point, the multiplicative factors from other data points go to zero exponentially fast, causing the overall likelihood to go to zero. In a mixture, however, other components can provide finite probability to all data points while one component shrinks onto a specific point to provide an increasing additive value to the log-likelihood.
+
+<img width="807" height="272" alt="image" src="https://github.com/user-attachments/assets/7906afd5-9814-4b06-9873-0773fdd12a5e" />
