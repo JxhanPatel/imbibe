@@ -89,5 +89,122 @@ In virtually every case, maximum likelihood and Bayes solutions are equivalent i
 | **Uncertainty** | Views parameters as fixed but unknown. | Reflects the remaining uncertainty in possible models. |
 
 > [!IMPORTANT] A maximum likelihood estimator is a MAP estimator for the uniform or "flat" prior. As such, a MAP estimator finds the peak (mode) of a posterior density. The drawback of MAP estimators is that if we choose an arbitrary nonlinear transformation of the parameter space, the density changes, and the MAP solution may no longer be appropriate.
->
->
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+# 4.2 Maximum Likelihood Estimation
+
+## 1. General Principles of Maximum Likelihood
+
+Maximum likelihood estimation (MLE) is a widely used frequentist approach to parameter estimation where parameters are viewed as quantities whose values are fixed but unknown. The best estimate of their value is defined to be the one that maximizes the probability of obtaining the samples actually observed.
+
+### 1.1 Attributes of Maximum Likelihood
+*   **Convergence:** MLE methods nearly always have good convergence properties as the number of training samples increases.
+*   **Simplicity:** MLE often can be simpler than alternate methods, such as Bayesian techniques.
+*   **Invariance:** If $\hat{\theta}$ is the maximum likelihood estimate of $\theta$, then for any differentiable function $\tau(\cdot)$ the maximum likelihood estimate of $\tau(\theta)$ is $\tau(\hat{\theta})$.
+
+### 1.2 Mathematical Formulation
+Suppose that we have a set $\mathcal{D} = \{x_{1},...,x_{n}\}$ of n training samples drawn independently from the probability density $p(x|\theta)$. Since the samples were drawn independently and identically distributed (i.i.d.), the joint density is the product of the individual densities:
+$$p(\mathcal{D}|\theta) = \prod_{k=1}^{n} p(x_{k}|\theta)$$
+
+Viewed as a function of $\theta$, $p(\mathcal{D}|\theta)$ is called the likelihood of $\theta$ with respect to the set of samples. The maximum likelihood estimate $\hat{\theta}$ is, by definition, the value that maximizes $p(\mathcal{D}|\theta)$.
+
+#### The Log-Likelihood Function
+For analytical purposes, it is usually easier to work with the logarithm of the likelihood because it is a monotonically increasing function. Maximizing the log-likelihood is equivalent to maximizing the likelihood itself. We define the log-likelihood function $l(\theta)$ as:
+$$l(\theta) = \ln p(\mathcal{D}|\theta) = \sum_{k=1}^{n} \ln p(x_{k}|\theta)$$
+
+#### Necessary Conditions for a Maximum
+If $p(\mathcal{D}|\theta)$ is a well-behaved, differentiable function, $\hat{\theta}$ can be found using differential calculus. The set of necessary conditions for the maximum likelihood estimate can be obtained from the set of p equations where the gradient is zero:
+$$\nabla_{\theta}l = \sum_{k=1}^{n} \nabla_{\theta} \ln p(x_{k}|\theta) = 0$$
+
+## 2. Maximum Likelihood for the Gaussian Distribution
+
+The multivariate normal or Gaussian density is a common choice for class-conditional densities due to its analytical tractability.
+
+### 2.1 Univariate Case
+For a single real-valued variable x, the Gaussian distribution is governed by the mean $\mu$ and variance $\sigma^{2}$. The log-likelihood function is:
+$$\ln p(\mathfrak{x}|\mu, \sigma^{2}) = -\frac{1}{2\sigma^{2}} \sum_{n=1}^{N} (x_{n} - \mu)^{2} - \frac{N}{2} \ln \sigma^{2} - \frac{N}{2} \ln(2\pi)$$
+
+#### Maximum Likelihood Solutions
+1.  **Estimate for the Mean:** Maximizing with respect to $\mu$ yields the sample mean, which is the arithmetic average of the observed values:
+    $$\mu_{ML} = \frac{1}{N} \sum_{n=1}^{N} x_{n}$$
+2.  **Estimate for the Variance:** Maximizing with respect to $\sigma^{2}$ yields the sample variance measured with respect to the sample mean $\mu_{ML}$:
+    $$\sigma_{ML}^{2} = \frac{1}{N} \sum_{n=1}^{N} (x_{n} - \mu_{ML})^{2}$$
+
+### 2.2 Multivariate Case
+For a D-dimensional vector x, the log-likelihood for a multivariate Gaussian distribution is:
+$$\ln p(X|\mu, \Sigma) = -\frac{ND}{2} \ln(2\pi) - \frac{N}{2} \ln|\Sigma| - \frac{1}{2} \sum_{n=1}^{N} (x_{n} - \mu)^{T} \Sigma^{-1} (x_{n} - \mu)$$
+
+The maximum likelihood solutions are:
+*   **Mean Vector:** $\hat{\mu} = \frac{1}{n} \sum_{k=1}^{n} x_{k}$.
+*   **Covariance Matrix:** $\hat{\Sigma} = \frac{1}{n} \sum_{k=1}^{n} (x_{k} - \hat{\mu})(x_{k} - \hat{\mu})^{t}$.
+
+## 3. Bias in Maximum Likelihood Estimates
+
+A significant limitation of the maximum likelihood approach is that it can yield biased estimates.
+
+### 3.1 Bias in Variance Estimation
+The maximum likelihood estimate for the variance $\sigma^{2}$ systematically underestimates the true variance of the distribution. This occurs because the variance is measured relative to the sample mean $\mu_{ML}$ and not relative to the true mean $\mu$.
+$$\mathbb{E}[\sigma_{ML}^{2}] = \left(\frac{N-1}{N}\right) \sigma^{2}$$
+
+### 3.2 Unbiased Estimator
+An unbiased estimate for the variance parameter is given by:
+$$\tilde{\sigma}^{2} = \frac{N}{N-1} \sigma_{ML}^{2} = \frac{1}{N-1} \sum_{n=1}^{N} (x_{n} - \mu_{ML})^{2}$$
+Note that the bias of the maximum likelihood solution becomes less significant as the number N of data points increases. In the limit $N \rightarrow \infty$, the MLE for variance equals the true variance.
+
+<img width="818" height="350" alt="image" src="https://github.com/user-attachments/assets/fe9ec043-0862-48ea-b6ff-f114cf7e8431" />
+
+## 4. MLE for Discrete Distributions
+
+### 4.1 Bernoulli Distribution
+For a binary variable x where $p(x=1|\mu) = \mu$, the log-likelihood function is:
+$$\ln p(\mathcal{D}|\mu) = \sum_{n=1}^{N} \{x_{n} \ln \mu + (1-x_{n}) \ln(1-\mu)\}$$
+The maximum likelihood estimator is the fraction of observations of heads in the data set:
+$$\mu_{ML} = \frac{m}{N}$$
+where m is the number of observations of $x=1$.
+
+### 4.2 Multinomial Distribution
+For a variable taking K states with probabilities $\mu_{k}$, the maximum likelihood solution for $\mu_{k}$ is:
+$$\mu_{k}^{ML} = \frac{m_{k}}{N}$$
+where $m_{k}$ is the number of observations for which $x_{k} = 1$.
+
+## 5. Limitations and Practical Issues
+
+### 5.1 Sensitivity to Model Error
+If the assumed model is very poor, the maximum likelihood classifier is not guaranteed to be the best, even among the assumed model set. If the noise in the data is large compared to the signal separating categories, MLE will find directions of noise rather than signal [ESL Page 67 Figure 3.9].
+
+### 5.2 Singularities
+In mixture models such as Gaussian Mixture Models (GMMs), MLE can suffer from singularities where a component 'collapses' onto a specific data point, causing the likelihood to go to infinity.
+
+### 5.3 Robustness
+MLE estimation of a Gaussian is not robust to outliers because the sum-of-squares criterion places high influence on large distances. BASE-ing a model on a heavy-tailed distribution like Student's t-distribution provides a more robust model.
+
+### 5.4 Computational Complexity
+*   **Sample Mean:** $O(nd)$ calculations.
+*   **Sample Covariance Matrix:** $O(d^{2}n)$ calculations.
+*   **Matrix Inversion:** $O(d^{3})$ calculations.
+*   **Missing Data:** When features are missing, the Expectation-Maximization (EM) algorithm is used to iteratively find maximum likelihood estimates.
+
+> [!IMPORTANT]
+> In the asymptotic limit of infinite training data, maximum likelihood and Bayes solutions are equivalent. However, for finite data sets, MLE may lead to severe over-fitting.
+
+
+
+---
+
+
