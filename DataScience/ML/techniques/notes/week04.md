@@ -602,3 +602,114 @@ $$Err(x_{0}) = \mathbb{E}[(Y - \hat{f}(x_{0}))^{2}|X=x_{0}] = \sigma_{\epsilon}^
 Flexible models (many parameters) generally have low bias but high variance, while rigid models have high bias but low variance. The model with the optimal predictive capability is the one that leads to the best balance between the two.
 
 <img width="847" height="683" alt="image" src="https://github.com/user-attachments/assets/0eca5e90-3d1a-41f4-98e5-24168d74cbef" />
+
+
+
+
+
+---
+
+
+
+
+
+# 4.8 Expectation-Maximization (EM) Algorithm, Soft Clustering & Latent Variables
+
+## 1. Introduction to Latent Variables and EM
+
+A general technique for finding maximum likelihood estimators in latent variable models is the expectation-maximization (EM) algorithm. If we define a joint distribution over observed and latent variables, the corresponding distribution of the observed variables alone is obtained by marginalization. This allows relatively complex marginal distributions over observed variables to be expressed in terms of more tractable joint distributions over the expanded space of observed and latent variables. The introduction of latent variables, also called hidden variables or unobserved variables, allows complicated distributions to be formed from simpler components. 
+
+The EM algorithm is a popular tool for simplifying difficult maximum likelihood problems. It is most useful when the optimization of the expected complete-data log-likelihood is simpler than that of the incomplete-data log-likelihood. This algorithm represents an iterative scheme to maximize model parameters, even when some data are missing.
+
+## 2. The General EM Algorithm
+
+Consider a probabilistic model in which we collectively denote all of the observed variables by $X$ and all of the hidden variables by $Z$. The joint distribution $p(X,Z|\theta)$ is governed by a set of parameters denoted $\theta$. Our goal is to maximize the likelihood function that is given by:
+$$p(X|\theta) = \sum_{Z} p(X,Z|\theta)$$.
+
+### 2.1 The Log-Likelihood Decomposition
+For any choice of a distribution $q(Z)$ defined over the latent variables, the following decomposition holds:
+
+$$
+\ln p(X|\theta) = \mathcal{L}(q, \theta) + KL(q||p)
+$$
+
+In this decomposition, we have defined:
+
+$$
+\mathcal{L}(q,\theta) = \sum_{Z} q(Z) \ln { \frac{p(X,Z|\theta)}{q(Z)}}
+$$
+
+$$
+KL(q||p) = -\sum_{Z} q(Z) \ln { \frac{p(Z|X,\theta)}{q(Z)}}
+$$
+
+> [!NOTE]
+> Because the Kullback-Leibler divergence satisfies $KL(q||p) \ge 0$, it follows that $\mathcal{L}(q, \theta) \le \ln p(X|\theta)$, meaning that $\mathcal{L}(q, \theta)$ is a lower bound on the log likelihood function.
+
+<img width="802" height="269" alt="image" src="https://github.com/user-attachments/assets/bc7e6df3-d633-443a-a09f-fdd862343005" />
+
+### 2.2 The Two-Stage Iterative Procedure
+The EM algorithm is a two-stage iterative optimization technique for finding maximum likelihood solutions.
+
+1.  **Expectation Step (E step):** The current value of the parameter vector is $\theta^{old}$. The lower bound $\mathcal{L}(q, \theta^{old})$ is maximized with respect to $q(Z)$ while holding $\theta^{old}$ fixed. The solution occurs when the Kullback-Leibler divergence vanishes, which happens when $q(Z)$ is equal to the posterior distribution $p(Z|X, \theta^{old})$. In this case, the lower bound will equal the log likelihood.
+2.  **Maximization Step (M step):** The distribution $q(Z)$ is held fixed and the lower bound $\mathcal{L}(q, \theta)$ is maximized with respect to the parameter vector $\theta$ to give a revised value $\theta^{new}$. Because the KL divergence is non-negative, this causes the log likelihood $\ln p(X|\theta)$ to increase by at least as much as the lower bound does.
+
+<img width="806" height="275" alt="image" src="https://github.com/user-attachments/assets/71b558b4-2bc0-42ab-9c4d-bc47a12edda6" />
+
+<img width="806" height="352" alt="image" src="https://github.com/user-attachments/assets/631b984f-40a1-49ff-98b6-c14c4156c2a1" />
+
+### 2.3 The $\mathcal{Q}$ Function
+In the M step, the quantity that is being maximized is the expectation of the complete-data log likelihood. This expectation, denoted $\mathcal{Q}(\theta, \theta^{old})$, is given by:
+$$\mathcal{Q}(\theta, \theta^{old}) = \sum_{Z} p(Z|X, \theta^{old}) \ln p(X,Z|\theta)$$.
+Maximizing the posterior distribution is equivalent to minimizing the regularized sum-of-squares error function.
+
+<img width="786" height="308" alt="image" src="https://github.com/user-attachments/assets/c885eff5-3938-446c-9ffd-d6d893289c49" />
+
+## 3. Data Augmentation and Complete Data
+
+The HMM (Hidden Markov Model) is a full model where we have access only to the visible states, while the $\omega_{i}$ (hidden states) are unobservable. In many problems, the latent data are actual data that should have been observed but are missing. 
+
+*   **Incomplete Data:** We refer to the actual observed data $X$ as incomplete.
+*   **Complete Data:** We call $\{X, Z\}$ the complete data set.
+*   **Likelihood:** The likelihood function for the complete data set takes the form $\ln p(X, Z|\theta)$.
+
+Maximization of the complete-data log likelihood function is assumed to be straightforward. The Presence of the sum over latent variables inside the logarithm in the incomplete-data likelihood prevents the logarithm from acting directly on the joint distribution, resulting in complicated expressions.
+
+## 4. Soft Clustering vs. Hard Clustering
+
+### 4.1 Gaussian Mixtures as Soft Clustering
+The Gaussian mixture model can be thought of as a prototype method, similar in spirit to K-means. It is often referred to as a soft clustering method, while K-means is hard. In the E step, each observation is assigned a responsibility or weight for each cluster, based on the likelihood of each of the corresponding Gaussians. 
+
+### 4.2 Responsibilities
+The conditional probability of $z$ given $x$, denoted as $\gamma(z_{k}) \equiv p(z_{k}=1|x)$, represents the posterior probability once we have observed $x$. This $\gamma(z_{k})$ is the responsibility that component $k$ takes for explaining the observation $x$.
+
+### 4.3 Relation to K-means
+We can derive the K-means algorithm as a particular limit of EM for Gaussian mixtures. Consider a Gaussian mixture model in which the covariance matrices of the mixture components are given by $\epsilon I$. In the limit $\epsilon \to 0$:
+*   The responsibilities $\gamma(z_{nk})$ for the data point $x_{n}$ all go to zero except for the term $j$ for which the distance $||x_{n} - \mu_{j}||^{2}$ is smallest, where the responsibility goes to unity.
+*   We obtain a hard assignment of data points to clusters, just as in the K-means algorithm.
+*   Maximizing the expected complete-data log likelihood is equivalent to minimizing the distortion measure $J$ for the K-means algorithm.
+
+<img width="647" height="649" alt="image" src="https://github.com/user-attachments/assets/cd4f62f7-6030-4f19-a7fc-e68d00d2e489" />
+
+## 5. Algorithmic Properties and Convergence
+
+### 5.1 Monotonic Increase
+The EM algorithm guarantees that the log-likelihood of the good data (with the bad data marginalized) will increase monotonically. Each update to the parameters resulting from an E step followed by an M step is guaranteed to increase the log likelihood function.
+
+### 5.2 Local Optima
+The EM algorithm will eventually find a parameter value that is a global maximum of the log likelihood if it converges to the global maximum of the lower bound. However, there will generally be multiple local maxima of the log likelihood function, and EM is not guaranteed to find the largest of these maxima. 
+
+### 5.3 Generalized EM (GEM)
+Generalized Expectation-Maximization or GEM algorithms are a bit more lax and require merely that an improved $\theta^{i+1}$ be set in the M step, not necessarily the optimal one. The ECM (expectation conditional maximization) algorithm involves making several constrained optimizations within each M step.
+
+## 6. Summary Table: EM vs. K-means
+
+| Feature | K-means Clustering | Gaussian Mixture (EM) |
+| :--- | :--- | :--- |
+| **Assignment Type** | Hard (Deterministic) | Soft (Probabilistic) |
+| **Cluster Representation** | Centroids/Prototypes | Mean and Covariance |
+| **Objective Function** | Distortion Measure $J$ | Log-likelihood |
+| **Update Step** | Means of assigned points | Weighted means/covariances |
+| **Noise Model** | None (Euclidean distance) | Gaussian Noise |
+
+<img width="549" height="840" alt="image" src="https://github.com/user-attachments/assets/133f149d-4d33-4790-9740-91f3df8da561" />
