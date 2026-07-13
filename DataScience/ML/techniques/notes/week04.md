@@ -512,3 +512,93 @@ The properties of the logarithm function are central to many applications of con
 
 ### 3.1 Application: Information Theory
 The convexity of the negative logarithm, together with the normalization condition $\int q(x)dx=1$, can be applied to the Kullback-Leibler divergence $KL(p||q)$ using Jensen's inequality. This demonstrates that $KL(p||q)\ge0$ with equality if, and only if, $p(x)=q(x)$. By applying Jensen's inequality with $f(x)=\ln x$, it can also be shown that the arithmetic mean of a set of real numbers is never less than their geometrical mean.
+
+
+
+
+
+---
+
+
+
+
+
+# 4.7 Estimating the Parameters | Introduction to Supervised Learning & Regression
+
+## 1. Introduction to Supervised Learning
+
+Supervised learning, also referred to as "learning with a teacher," is a category of machine learning where the goal is to predict the value of an outcome measure based on a number of input measures. In this paradigm, a "teacher" provides either the correct answer or an error associated with the "student's" response. 
+
+*   **Learning by Example:** The system observes inputs and outputs and assembles a training set $\mathcal{T} = \{(x_{i}, y_{i})\}_{i=1}^{N}$.
+*   **Predictive Task:** The goal is to build a prediction model, or learner, that accurately predicts the outcome for new, unseen objects.
+*   **Generalization:** The ability of a trained model to correctly categorize new examples that differ from the training data is called generalization.
+
+<img width="634" height="715" alt="image" src="https://github.com/user-attachments/assets/403956c6-5711-465f-9ae0-9190110bf8bb" />
+
+## 2. Introduction to Regression
+
+Regression is a specific type of supervised learning task where the desired output consists of one or more continuous variables.
+
+*   **Objective:** The goal is to predict the value of continuous target variables $t$ given the value of a $D$-dimensional vector $x$ of input variables. 
+*   **Regression Function:** In the framework of statistical decision theory, the best prediction of $Y$ at any point $X=x$ is the conditional expectation $f(x) = \mathbb{E}[Y|X=x]$, known as the regression function.
+*   **Linear Models:** A common approach assumes that the regression function $\mathbb{E}[Y|X]$ is linear in the inputs $X_{1}, ..., X_{p}$.
+
+## 3. The Parametric Approach to Estimation
+
+Estimating unknown probabilities and densities is a fundamental approach to supervised learning. When the number of parameters is known in advance and the general form of the density is specified, the complexity of the problem is significantly reduced.
+
+*   **Adaptive Parameters:** Parametric distributions are governed by a small number of adaptive parameters, such as the mean and variance in a Gaussian model [Duda Intro].
+*   **The Goal:** Use information provided by training samples to obtain good estimates for the unknown parameter vector $\theta$.
+
+## 4. The Method of Least Squares
+
+Least squares is the most popular estimation method for linear models. It finds the "best" linear fit to the data by measuring the average lack of fit.
+
+### 4.1 Residual Sum of Squares (RSS)
+The coefficients $\beta = (\beta_{0}, \beta_{1}, ..., \beta_{p})^{T}$ are chosen to minimize the sum of the squares of the errors between the predictions $f(x_{i})$ and the target values $y_{i}$:
+$$RSS(\beta) = \sum_{i=1}^{N} (y_{i} - f(x_{i}))^{2} = \sum_{i=1}^{N} (y_{i} - \beta_{0} - \sum_{j=1}^{p} x_{ij}\beta_{j})^{2}$$.
+
+### 4.2 Matrix Formulation and Solution
+In matrix notation, the RSS is written as:
+$$RSS(\beta) = (y - X\beta)^{T}(y - X\beta)$$.
+The solution is found by differentiating with respect to $\beta$ and setting the derivative to zero, yielding the normal equations:
+$$X^{T}(y - X\beta) = 0$$.
+If $X^{T}X$ is nonsingular, the unique least squares estimate $\hat{\beta}$ is:
+$$\hat{\beta} = (X^{T}X)^{-1}X^{T}y$$.
+
+<img width="847" height="522" alt="image" src="https://github.com/user-attachments/assets/e8119245-e67c-4d13-a2e2-fe1fceb309a9" />
+
+## 5. Maximum Likelihood Estimation (MLE)
+
+Maximum likelihood estimation views parameters as quantities whose values are fixed but unknown. The best estimate is defined as the one that maximizes the probability of obtaining the samples actually observed.
+
+### 5.1 Connection to Least Squares
+Maximizing the likelihood function under an assumed Gaussian noise model is equivalent to minimizing the sum-of-squares error function. 
+*   **Model:** $t = y(x, w) + \epsilon$, where $\epsilon \sim \mathcal{N}(0, \beta^{-1})$.
+*   **Likelihood:** The probability of the target values $t$ given input $X$ and parameters $w, \beta$ is:
+$$p(t|X, w, \beta) = \prod_{n=1}^{N} \mathcal{N}(t_{n}|w^{T}\phi(x_{n}), \beta^{-1})$$.
+*   **Log-Likelihood:** Taking the logarithm results in a criterion where maximizing with respect to $w$ is equivalent to minimizing the squared error $E_{D}(w)$.
+
+## 6. Bayesian Estimation
+
+In contrast to MLE, Bayesian methods view parameters as random variables with a known a priori distribution $p(\theta)$.
+
+*   **Bayesian Learning:** Observation of samples converts the prior into a posterior density $p(\theta|\mathcal{D})$, revising our opinion about the true parameter values.
+*   **Class-Conditional Density:** The desired density $p(x|\mathcal{D})$ is found by integrating $p(x|\theta)$ over all possible parameter values, weighted by the posterior:
+$$p(x|\mathcal{D}) = \int p(x|\theta)p(\theta|\mathcal{D}) d\theta$$.
+
+## 7. Model Assessment: The Bias-Variance Tradeoff
+
+Estimation error arises because parameters are estimated from a finite sample. A central challenge is adjusting model complexity to balance bias and variance.
+
+### 7.1 Bias-Variance Decomposition
+For a regression fit $\hat{f}(X)$ at an input $x_{0}$ under squared-error loss, the expected prediction error (Err) is decomposed as follows:
+$$Err(x_{0}) = \mathbb{E}[(Y - \hat{f}(x_{0}))^{2}|X=x_{0}] = \sigma_{\epsilon}^{2} + Bias^{2}(\hat{f}(x_{0})) + Var(\hat{f}(x_{0}))$$.
+*   **$\sigma_{\epsilon}^{2}$ (Irreducible Error):** The variance of the target around its true mean.
+*   **$Bias^{2}$:** The squared difference between the true mean and the average of our estimate.
+*   **Variance:** The expected squared deviation of $\hat{f}(x_{0})$ around its own mean.
+
+### 7.2 The Tradeoff
+Flexible models (many parameters) generally have low bias but high variance, while rigid models have high bias but low variance. The model with the optimal predictive capability is the one that leads to the best balance between the two.
+
+<img width="847" height="683" alt="image" src="https://github.com/user-attachments/assets/0eca5e90-3d1a-41f4-98e5-24168d74cbef" />
