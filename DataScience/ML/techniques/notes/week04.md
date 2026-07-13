@@ -208,3 +208,94 @@ MLE estimation of a Gaussian is not robust to outliers because the sum-of-square
 ---
 
 
+
+
+
+
+
+# 4.3 Bayesian Estimation
+
+## 1. General Principles of Bayesian Estimation
+
+Bayesian methods view the parameters as random variables having some known a priori distribution. Observation of the samples converts this to a posterior density, thereby revising our opinion about the true values of the parameters. In the Bayesian case, a typical effect of observing additional samples is to sharpen the a posteriori density function, causing it to peak near the true values of the parameters. This phenomenon is known as Bayesian learning.
+
+### 1.1 Comparison with Maximum Likelihood
+In a frequentist setting, $w$ is considered to be a fixed parameter, whose value is determined by some form of "estimator", and error bars on this estimate are obtained by considering the distribution of possible data sets $\mathcal{D}$. By contrast, from the Bayesian viewpoint there is only a single data set $\mathcal{D}$ (namely the one that is actually observed), and the uncertainty in the parameters is expressed through a probability distribution over $w$.
+
+> [!NOTE]
+> In the limit of an infinitely large number of training points, we can expect that our estimate will equal to the true value of the generating function.
+
+## 2. Priors, Posteriors, and Bayes' Theorem
+
+### 2.1 Definitions
+*   **Prior Probability ($p(w)$):** We capture our assumptions about $w$, before observing the data, in the form of a prior probability distribution $p(w)$. Any information we might have about $\theta$ prior to observing the samples is assumed to be contained in a known prior density $p(\theta)$.
+*   **Likelihood Function ($p(\mathcal{D}|w)$):** The effect of the observed data $\mathcal{D} = \{t_1, \dots, t_N\}$ is expressed through the conditional probability $p(\mathcal{D}|w)$. It expresses how probable the observed data set is for different settings of the parameter vector $w$. Note that the likelihood is not a probability distribution over $w$, and its integral with respect to $w$ does not (necessarily) equal one.
+*   **Posterior Probability ($p(w|\mathcal{D})$):** Bayes' theorem then allows us to evaluate the uncertainty in $w$ after we have observed $\mathcal{D}$ in the form of the posterior probability $p(w|\mathcal{D})$. This represents our updated knowledge about $\theta$ after we see the data.
+*   **Evidence ($p(\mathcal{D})$):** The denominator in Bayes' theorem is the normalization constant, which ensures that the posterior distribution on the left-hand side is a valid probability density and integrates to one. It can be expressed in terms of the prior distribution and the likelihood function: $p(\mathcal{D}) = \int p(\mathcal{D}|w)p(w) dw$.
+
+### 2.2 Bayes' Theorem in Words
+Bayes' formula can be expressed informally in English by saying that:
+$$posterior = \frac{likelihood \times prior}{evidence}$$.
+
+Alternatively, given the definition of likelihood:
+$$posterior \propto likelihood \times prior$$.
+
+### 2.3 Formal Solution
+The posterior density for the unknown parameter vector is given by:
+$$p(\theta|\mathcal{D}) = \frac{p(\mathcal{D}|\theta)p(\theta)}{\int p(\mathcal{D}|\theta)p(\theta) d\theta}$$.
+By the independence assumption for samples drawn independently according to the unknown probability density $p(x)$:
+$$p(\mathcal{D}|\theta) = \prod_{k=1}^{n} p(x_k|\theta)$$.
+
+<img width="792" height="774" alt="image" src="https://github.com/user-attachments/assets/0ee393d3-9fac-48f3-8f46-74fbf2eadcfd" />
+
+## 3. The Class-Conditional Density
+
+The key equation links the desired class-conditional density $p(x|\mathcal{D})$ to the posterior density $p(\theta|\mathcal{D})$ for the unknown parameter vector:
+$$p(x|\mathcal{D}) = \int p(x|\theta)p(\theta|\mathcal{D}) d\theta$$.
+This equation directs us to average $p(x|\theta)$ over the possible values of $\theta$. If $p(\theta|\mathcal{D})$ peaks very sharply about some value $\hat{\theta}$, we obtain $p(x|\mathcal{D}) \simeq p(x|\hat{\theta})$, i.e., the result we would obtain by substituting the estimate $\hat{\theta}$ for the true parameter vector.
+
+## 4. Bayesian Parameter Estimation: Gaussian Case
+
+### 4.1 The Univariate Case: $p(\mu|\mathcal{D})$
+Consider the case where $\mu$ is the only unknown parameter: $p(x|\mu) \sim \mathcal{N}(\mu, \sigma^2)$. We assume the prior knowledge about $\mu$ is expressed by a known prior density: $p(\mu) \sim \mathcal{N}(\mu_0, \sigma_0^2)$.
+
+#### Derivation of the Posterior
+The a posteriori density $p(\mu|\mathcal{D})$ is found using Bayes' formula:
+$$p(\mu|\mathcal{D}) = \alpha \prod_{k=1}^{n} p(x_k|\mu)p(\mu)$$.
+Since the product of two exponentials of quadratic functions is another exponential of a quadratic function, $p(\mu|\mathcal{D})$ is again a normal density. If we write $p(\mu|\mathcal{D}) \sim \mathcal{N}(\mu_n, \sigma_n^2)$, the parameters are:
+$$\mu_n = \left(\frac{n\sigma_0^2}{n\sigma_0^2 + \sigma^2}\right)\overline{x}_n + \frac{\sigma^2}{n\sigma_0^2 + \sigma^2}\mu_0$$.
+$$\sigma_n^2 = \frac{\sigma_0^2\sigma^2}{n\sigma_0^2 + \sigma^2}$$.
+where $\overline{x}_n$ is the sample mean.
+
+> [!IMPORTANT]
+> $\mu_n$ always lies somewhere between $\overline{x}_n$ and $\mu_0$. As $n \to \infty$, $\mu_n$ approaches the sample mean and $\sigma_n^2$ approaches $\sigma^2/n$.
+
+### 4.2 The Univariate Case: $p(x|\mathcal{D})$
+To obtain the "class-conditional" density $p(x|\mathcal{D})$, we integrate:
+$$p(x|\mathcal{D}) = \int p(x|\mu)p(\mu|\mathcal{D}) d\mu$$.
+Performing the integration shows that $p(x|\mathcal{D})$ is normally distributed with mean $\mu_n$ and variance $\sigma^2 + \sigma_n^2$:
+$$p(x|\mathcal{D}) \sim \mathcal{N}(\mu_n, \sigma^2 + \sigma_n^2)$$.
+In effect, the conditional mean $\mu_n$ is treated as if it were the true mean, and the known variance is increased to account for the additional uncertainty in $\mu$.
+
+### 4.3 The Multivariate Case
+For the multivariate Gaussian $p(x|\mu) \sim \mathcal{N}(\mu, \Sigma)$ and $p(\mu) \sim \mathcal{N}(\mu_0, \Sigma_0)$, where $\Sigma$, $\Sigma_0$, and $\mu_0$ are assumed to be known. After observing $n$ samples, $p(\mu|\mathcal{D}) \sim \mathcal{N}(\mu_n, \Sigma_n)$ where:
+$$\Sigma_n^{-1} = n\Sigma^{-1} + \Sigma_0^{-1}$$.
+$$\Sigma_n^{-1}\mu_n = n\Sigma^{-1}\hat{\mu}_n + \Sigma_0^{-1}\mu_0$$.
+The final result for the class-conditional density is:
+$$p(x|\mathcal{D}) \sim \mathcal{N}(\mu_n, \Sigma + \Sigma_n)$$.
+
+## 5. Recursive Bayes Learning
+
+The posterior density satisfies the recursion relation:
+$$p(\theta|\mathcal{D}^n) = \frac{p(x_n|\theta)p(\theta|\mathcal{D}^{n-1})}{\int p(x_n|\theta)p(\theta|\mathcal{D}^{n-1}) d\theta}$$.
+This is an incremental or on-line learning method, where learning goes on as the data is collected. Repeated use of this equation produces the sequence of densities $p(\theta), p(\theta|x_1), p(\theta|x_1, x_2)$, and so forth. The Bayesian paradigm leads very naturally to a sequential view of the inference problem.
+
+<img width="739" height="425" alt="image" src="https://github.com/user-attachments/assets/ad5bc105-91ca-4681-bcca-d6818943c1cc" />
+
+## 6. Non-informative Priors
+
+In some applications, we may have little idea of what form the distribution should take. We may then seek a form of prior distribution, called a noninformative prior, which is intended to have as little influence on the posterior distribution as possible. This is sometimes referred to as "letting the data speak for themselves".
+
+*   **Location Parameters:** If a density takes the form $p(x|\mu) = f(x - \mu)$, then $\mu$ is a location parameter. Reflecting translation invariance implies that $p(\mu)$ is constant.
+*   **Scale Parameters:** If a density takes the form $p(x|\sigma) = \frac{1}{\sigma} f(\frac{x}{\sigma})$, then $\sigma$ is a scale parameter. Reflecting scale invariance implies $p(\sigma) \propto 1/\sigma$.
+*   **Improper Priors:** If the domain of $\lambda$ is unbounded, a constant prior distribution cannot be correctly normalized; such priors are called improper. Improper priors can often be used provided the corresponding posterior distribution is proper.
