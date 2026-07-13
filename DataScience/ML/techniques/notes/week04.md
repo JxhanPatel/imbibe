@@ -299,3 +299,92 @@ In some applications, we may have little idea of what form the distribution shou
 *   **Location Parameters:** If a density takes the form $p(x|\mu) = f(x - \mu)$, then $\mu$ is a location parameter. Reflecting translation invariance implies that $p(\mu)$ is constant.
 *   **Scale Parameters:** If a density takes the form $p(x|\sigma) = \frac{1}{\sigma} f(\frac{x}{\sigma})$, then $\sigma$ is a scale parameter. Reflecting scale invariance implies $p(\sigma) \propto 1/\sigma$.
 *   **Improper Priors:** If the domain of $\lambda$ is unbounded, a constant prior distribution cannot be correctly normalized; such priors are called improper. Improper priors can often be used provided the corresponding posterior distribution is proper.
+
+
+
+
+
+---
+
+
+
+
+
+# 4.4 Gaussian Mixture Models
+
+## 1. Motivation: Multimodal Data and Limitations of Single Gaussians
+
+While the Gaussian distribution has some important analytical properties, it suffers from significant limitations when it comes to modelling real data sets. A single Gaussian distribution is intrinsically unimodal (i.e., has a single maximum) and so is unable to provide a good approximation to multimodal distributions. 
+
+### 1.1 The "Old Faithful" Example
+Consider the "Old Faithful" data set, which comprises 272 measurements of the eruption of the geyser at Yellowstone National Park. The data set forms two dominant clumps, and a simple Gaussian distribution is unable to capture this structure. However, a linear superposition of two Gaussians gives a better characterization of the data set. 
+
+<img width="865" height="396" alt="image" src="https://github.com/user-attachments/assets/60e009a7-df1a-4f91-a3a2-f010480fe767" />
+
+### 1.2 Approximating Complex Densities
+By using a sufficient number of Gaussians, and by adjusting their means and covariances as well as the coefficients in the linear combination, almost any continuous density can be approximated to arbitrary accuracy. Such superpositions, formed by taking linear combinations of more basic distributions, are known as mixture distributions.
+
+## 2. Mathematical Formulation of the GMM
+
+A superposition of K Gaussian densities is called a mixture of Gaussians and takes the form:
+$$p(x) = \sum_{k=1}^{K} \pi_{k} \mathcal{N}(x|\mu_{k}, \Sigma_{k})$$.
+
+### 2.1 Mixing Coefficients
+The parameters $\pi_{k}$ are called mixing coefficients. They must satisfy the following requirements to be valid probabilities:
+*   $0 \le \pi_{k} \le 1$.
+*   $\sum_{k=1}^{K} \pi_{k} = 1$.
+
+Each Gaussian density $\mathcal{N}(x|\mu_{k}, \Sigma_{k})$ is called a component of the mixture and has its own mean $\mu_{k}$ and covariance $\Sigma_{k}$.
+
+<img width="873" height="390" alt="image" src="https://github.com/user-attachments/assets/af172872-7fab-41a5-a341-5fef1a51a2ac" />
+
+## 3. The Generative Story
+
+A mixture of Gaussians is best described in terms of its generative model. The process of generating an observation $x$ consists of two steps:
+1.  First, generate a discrete variable that determines which of the component Gaussians to use. This is done by choosing one of the components at random with probability given by the mixing coefficients $\pi_{k}$.
+2.  Then, generate an observation vector $x$ from the chosen Gaussian density.
+
+This technique of generating random samples distributed according to the model is known as ancestral sampling.
+
+## 4. Latent Variable Framework
+
+The Gaussian mixture model can be formulated in terms of discrete latent variables. This provides deeper insight into the distribution and motivates the Expectation-Maximization (EM) algorithm.
+
+### 4.1 The Latent Variable $z$
+We introduce a $K$-dimensional binary random variable $z$ having a 1-of-K representation in which a particular element $z_{k}$ is equal to 1 and all other elements are equal to 0. The values of $z_{k}$ therefore satisfy $z_{k} \in \{0,1\}$ and $\sum_{k} z_{k} = 1$. There are $K$ possible states for the vector $z$ according to which element is nonzero.
+
+### 4.2 Joint and Marginal Distributions
+The marginal distribution over $z$ is specified in terms of the mixing coefficients $\pi_{k}$:
+$$p(z_{k}=1) = \pi_{k}$$.
+Because $z$ uses a 1-of-K representation, this can be written as:
+$$p(z) = \prod_{k=1}^{K} \pi_{k}^{z_{k}}$$.
+
+The conditional distribution of $x$ given a particular value for $z$ is a Gaussian:
+$$p(x|z_{k}=1) = \mathcal{N}(x|\mu_{k}, \Sigma_{k})$$.
+This can also be written in the form:
+$$p(x|z) = \prod_{k=1}^{K} \mathcal{N}(x|\mu_{k}, \Sigma_{k})^{z_{k}}$$.
+
+The joint distribution is given by $p(z)p(x|z)$, and the marginal distribution of $x$ is obtained by summing the joint distribution over all possible states of $z$:
+$$p(x) = \sum_{z} p(z)p(x|z) = \sum_{k=1}^{K} \pi_{k} \mathcal{N}(x|\mu_{k}, \Sigma_{k})$$.
+
+<img width="763" height="171" alt="image" src="https://github.com/user-attachments/assets/1f8476fd-9991-49a6-807b-e63aa3072134" />
+
+## 5. Responsibilities
+
+An important quantity is the conditional probability of $z$ given $x$, which we denote as $\gamma(z_{k}) \equiv p(z_{k}=1|x)$. This can be found using Bayes' theorem:
+$$\gamma(z_{k}) = \frac{\pi_{k} \mathcal{N}(x|\mu_{k}, \Sigma_{k})}{\sum_{j=1}^{K} \pi_{j} \mathcal{N}(x|\mu_{j}, \Sigma_{j})}$$.
+
+### 5.1 Interpretation
+*   $\pi_{k}$ is the prior probability of $z_{k} = 1$.
+*   $\gamma(z_{k})$ is the corresponding posterior probability once we have observed $x$.
+*   $\gamma(z_{k})$ can be viewed as the responsibility that component $k$ takes for "explaining" the observation $x$.
+
+<img width="881" height="433" alt="image" src="https://github.com/user-attachments/assets/de2c9b56-bb91-4223-a8bb-214697960fb8" />
+
+
+
+
+---
+
+
+
