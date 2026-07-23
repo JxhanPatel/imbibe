@@ -53,7 +53,7 @@ The goal of running a machine learning algorithm is to achieve good generalizati
 
 #### Root-Mean-Square (RMS) Error
 Generalization performance can be measured using the root-mean-square (RMS) error:
-$$E_{RMS} = \sqrt{2E(w★)/N}$$.
+$$E_{RMS} = \sqrt{2E(w^★)/N}$$.
 The division by $N$ allows for the comparison of different sizes of data sets, and the square root ensures $E_{RMS}$ is measured on the same scale as the target variable $t$.
 
 #### Training Error vs. Test Error
@@ -219,7 +219,7 @@ In the context of the two-category linearly-separable case, the weight vector $a
 The multiple least squares estimates are best understood in terms of successive orthogonalization of the inputs.
 
 ### 4.1 Regression by Successive Orthogonalization
-The $j^{th}$ multiple regression coefficient $\hat{\beta}_{j}$ represents the additional contribution of $x_{j}$ on $y$, after $x_{j}$ has been adjusted for all other predictors $x_{0}, x_{1}, ..., x_{j-1}, x_{j+1}, ..., x_{p}$.
+The $j^{th}$ multiple regression coefficient $\hat{\beta}{j}$ represents the additional contribution of $x_{j}$ on $y$, after $x_{j}$ has been adjusted for all other predictors $x_{0}, x_{1}, ..., x_{j-1}, x_{j+1}, ..., x_{p}$.
 *   **Adjustment:** "Regressing $b$ on $a$" produces a residual vector $b - \hat{\gamma}a$ that is "orthogonalized" with respect to $a$.
 *   **Correlation Effect:** If $x_{p}$ is highly correlated with other $x_{k}$, the residual vector $z_{p}$ after orthogonalization will be close to zero, and the coefficient $\hat{\beta}_{p}$ will be very unstable.
 
@@ -228,3 +228,111 @@ The process of successive orthogonalization can be represented in matrix form as
 *   **$Q$:** An $N \times (p+1)$ orthogonal matrix ($Q^{T}Q = I$).
 *   **$R$:** A $(p+1) \times (p+1)$ upper triangular matrix.
 The least squares fit is then $\hat{y} = QQ^{T}y$.
+
+
+
+
+---
+
+
+
+
+
+# 5.4: Gradient descent | Optimization & Stochastic Gradient Descent (SGD)
+
+## 1. Parameter Optimization
+
+The task of network training involves finding a weight vector $w$ which minimizes a chosen function $E(w)$. Geometrically, the error function can be viewed as a surface sitting over weight space.
+
+### 1.1 Stationary Points
+If we make a small step in weight space from $w$ to $w + \delta w$ then the change in the error function is $\delta E \simeq \delta w^{T} \nabla E(w)$, where the vector $\nabla E(w)$ points in the direction of greatest rate of increase of the error function. Because the error $E(w)$ is a smooth continuous function of $w$, its smallest value will occur at a point in weight space such that the gradient of the error function vanishes, so that:
+$$\nabla E(w) = 0$$
+as otherwise we could make a small step in the direction of $-\nabla E(w)$ and thereby further reduce the error. Points at which the gradient vanishes are called stationary points, and may be further classified into minima, maxima, and saddle points.
+
+### 1.2 Local and Global Minima
+The error function typically has a highly nonlinear dependence on the weights and bias parameters, and so there will be many points in weight space at which the gradient vanishes. A minimum that corresponds to the smallest value of the error function for any weight vector is said to be a global minimum. Any other minima corresponding to higher values of the error function are said to be local minima.
+
+### 1.3 Iterative Numerical Procedures
+Because there is clearly no hope of finding an analytical solution to the equation $\nabla E(w) = 0$ we resort to iterative numerical procedures. Most techniques involve choosing some initial value $w^{(0)}$ for the weight vector and then moving through weight space in a succession of steps of the form:
+$$w^{(\tau+1)} = w^{(\tau)} + \Delta w^{(\tau)}$$
+where $\tau$ labels the iteration step. Many algorithms make use of gradient information and therefore require that, after each update, the value of $\nabla E(w)$ is evaluated at the new weight vector $w^{(\tau+1)}$.
+
+## 2. Basic Gradient Descent
+
+The approach taken to finding a solution to the set of linear inequalities $a^{t}y_{i} > 0$ will be to define a criterion function $J(a)$ that is minimized if $a$ is a solution vector. This reduces the problem to one of minimizing a scalar function, a problem that can often be solved by a gradient descent procedure. Basic gradient descent is very simple. We start with some arbitrarily chosen weight vector $a(1)$ and compute the gradient vector $\nabla J(a(1))$. The next value $a(2)$ is obtained by moving some distance from $a(1)$ in the direction of steepest descent, i.e., along the negative of the gradient. In general, $a(k+1)$ is obtained from $a(k)$ by the equation:
+$$a(k+1) = a(k) - \eta(k) \nabla J(a(k))$$
+where $\eta$ is a positive scale factor or learning rate that sets the step size.
+
+### 2.1 Algorithm: Basic Gradient Descent
+1. **begin** initialize $a$, criterion $\theta$, $\eta(\cdot)$, $k=0$
+2. **do** $k \leftarrow k+1$
+3. $a \leftarrow a - \eta(k) \nabla J(a)$
+4. **until** $\eta(k) \nabla J(a) < \theta$
+5. **return** $a$
+6. **end**
+
+> [!CAUTION]
+> If $\eta(k)$ is too small, convergence is needlessly slow, whereas if $\eta(k)$ is too large, the correction process will overshoot and can even diverge.
+
+## 3. Local Quadratic Approximation
+
+Insight into the optimization problem, and into the various techniques for solving it, can be obtained by considering a local quadratic approximation to the error function. Consider the Taylor expansion of $E(w)$ around some point $\hat{w}$ in weight space:
+$$E(w) \simeq E(\hat{w}) + (w - \hat{w})^{T}b + \frac{1}{2}(w - \hat{w})^{T}H(w - \hat{w})$$
+where cubic and higher terms have been omitted. Here $b$ is defined to be the gradient of $E$ evaluated at $\hat{w}$:
+$$b \equiv \nabla E|{w=\hat{w}}$$
+and the Hessian matrix $H = \nabla \nabla E$ has elements:
+$$(H){ij} \equiv \frac{\partial E}{\partial w_{i}\partial w_{j}}|_{w=\hat{w}}$$.
+From the expansion, the corresponding local approximation to the gradient is given by:
+$$\nabla E \simeq b + H(w - \hat{w})$$.
+
+### 3.1 Approximation at a Minimum
+Consider the particular case of a local quadratic approximation around a point $w★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w★$, and the expansion becomes:
+$$E(w) = E(w★) + \frac{1}{2}(w - w★)^{T}H(w - w★)$$.
+In the coordinate system whose basis vectors are given by the eigenvectors $\{u_{i}\}$ of the Hessian matrix, the contours of constant $E$ are ellipses centred on the origin.
+
+
+## 4. Newton's Algorithm
+
+An alternative approach is choosing $a(k + 1)$ to minimize the second-order expansion, which is Newton’s algorithm. The weight update is:
+$$a(k+1) = a(k) - H^{-1} \nabla J$$.
+
+### 4.1 Algorithm: Newton Descent
+1. **begin** initialize $a$, criterion
+2. **do**
+3. $a \leftarrow a - H^{-1} \nabla J(a)$
+4. **until** $H^{-1} \nabla J(a) < \theta$
+5. **return** $a$
+6. **end**
+
+Generally speaking, Newton’s algorithm will usually give a greater improvement per step than the simple gradient descent algorithm, even with the optimal value of $\eta(k)$. However, Newton’s algorithm is not applicable if the Hessian matrix $H$ is singular.
+
+<img width="963" height="623" alt="image" src="https://github.com/user-attachments/assets/5d0a508d-c9db-4ed4-ad13-52e59d64bc1f" />
+
+## 5. Batch Gradient Descent
+
+The simplest approach to using gradient information is to choose the weight update to comprise a small step in the direction of the negative gradient, so that:
+$$w^{(\tau+1)} = w^{(\tau)} - \eta \nabla E(w^{(\tau)})$$
+where the parameter $\eta > 0$ is known as the learning rate. After each such update, the gradient is re-evaluated for the new weight vector and the process repeated. The error function is defined with respect to a training set, and so each step requires that the entire training set be processed in order to evaluate $\nabla E$. Techniques that use the whole data set at once are called batch methods. At each step the weight vector is moved in the direction of the greatest rate of decrease of the error function, and so this approach is known as gradient descent or steepest descent.
+
+## 6. On-line (Stochastic) Gradient Descent (SGD)
+
+Error functions based on maximum likelihood for a set of independent observations comprise a sum of terms, one for each data point:
+$$E(w) = \sum_{n=1}^{N} E_{n}(w)$$.
+On-line gradient descent, also known as sequential gradient descent or stochastic gradient descent, makes an update to the weight vector based on one data point at a time, so that:
+$$w^{(\tau+1)} = w^{(\tau)} - \eta \nabla E_{n}(w^{(\tau)})$$.
+This update is repeated by cycling through the data either in sequence or by selecting points at random with replacement.
+
+### 6.1 Advantages of On-line Methods
+*   **Efficiency with Redundancy:** On-line methods handle redundancy in the data much more efficiently than batch methods. If a data set is doubled by duplicating every data point, batch methods will require double the computational effort to evaluate the gradient, whereas on-line methods will be unaffected.
+*   **Escaping Local Minima:** On-line gradient descent offers the possibility of escaping from local minima, since a stationary point with respect to the error function for the whole data set will generally not be a stationary point for each data point individually.
+
+### 6.2 Convergence and Learning Rate
+The learning rate $\gamma_{r}$ for batch learning is usually taken to be a constant, and can also be optimized by a line search that minimizes the error function at each update. With online learning $\gamma_{r}$ should decrease to zero as the iteration $r \rightarrow \infty$. This learning is a form of stochastic approximation; results in this field ensure convergence if $\gamma_{r} \rightarrow 0, \sum_{r} \gamma_{r} = \infty$ and $\sum_{r} \gamma_{r}^{2} < \infty$ (satisfied, for example, by $\gamma_{r} = 1/r$).
+
+## 7. Comparison Summary
+
+| Method | Data Usage | Update Frequency | Complexity per Update |
+| :--- | :--- | :--- | :--- |
+| **Batch Gradient Descent** | Entire training set | Once per epoch | $O(W)$ where $W$ is total weights |
+| **Stochastic Gradient Descent** | Single data point | For every observation | $O(1)$ relative to training set size |
+| **Newton's Method** | Entire training set | Once per epoch | $O(W^3)$ due to Hessian inversion |
