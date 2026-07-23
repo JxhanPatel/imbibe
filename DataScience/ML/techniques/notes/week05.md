@@ -336,3 +336,99 @@ The learning rate $\gamma_{r}$ for batch learning is usually taken to be a const
 | **Batch Gradient Descent** | Entire training set | Once per epoch | $O(W)$ where $W$ is total weights |
 | **Stochastic Gradient Descent** | Single data point | For every observation | $O(1)$ relative to training set size |
 | **Newton's Method** | Entire training set | Once per epoch | $O(W^3)$ due to Hessian inversion |
+
+
+
+
+
+
+---
+
+
+
+
+
+# 5.5: Kernel regression | non-linear regression with the kernel trick
+
+## 1. Introduction to Kernel Smoothing and Localization
+
+Kernel methods achieve flexibility in estimating the regression function $f(X)$ over the domain $\mathbb{R}^{p}$ by fitting a different but simple model separately at each query point $x_{0}$. This is done by using only those observations close to the target point $x_{0}$ to fit the simple model, and in such a way that the resulting estimated function $\hat{f}(X)$ is smooth in $\mathbb{R}^{p}$. This localization is achieved via a weighting function or kernel $K_{\lambda}(x_{0},x_{i})$, which assigns a weight to $x_{i}$ based on its distance from $x_{0}$. The kernels $K_{\lambda}$ are typically indexed by a parameter $\lambda$ that dictates the width of the neighborhood. These memory-based methods require in principle little or no training; all the work gets done at evaluation time.
+
+<img width="790" height="601" alt="image" src="https://github.com/user-attachments/assets/253a8e8c-b357-49b0-bd5f-b5310d65e6be" />
+
+## 2. The Nadaraya-Watson Model
+
+The kernel regression model can be motivated starting with kernel density estimation. Suppose we have a training set $\{x_{n},t_{n}\}$ and we use a Parzen density estimator to model the joint distribution $p(x,t)$, so that:
+$$p(x,t)=\frac{1}{N}\sum_{n=1}^{N}f(x-x_{n},t-t_{n})$$
+where $f(x,t)$ is the component density function, and there is one such component centred on each data point. We now find an expression for the regression function $y(x)$, corresponding to the conditional average of the target variable conditioned on the input variable, which is given by:
+$$y(x) = \mathbb{E}[t|x] = \int_{-\infty}^{\infty} tp(t|x) dt = \frac{\int tp(x,t)dt}{\int p(x,t)dt} = \frac{\sum_{n} \int tf(x-x_{n},t-t_{n})dt}{\sum_{m} \int f(x-x_{m},t-t_{m})dt}$$.
+
+Assuming for simplicity that the component density functions have zero mean, so that $\int_{-\infty}^{\infty} f(x,t)t dt = 0$ for all values of $x$, we obtain:
+$$y(x) = \frac{\sum_{n}g(x-x_{n})t_{n}}{\sum_{m}g(x-x_{m})} = \sum_{n}k(x,x_{n})t_{n}$$.
+The kernel function $k(x,x_{n})$ is given by:
+$$k(x,x_{n}) = \frac{g(x-x_{n})}{\sum_{m}g(x-x_{m})}$$
+where $g(x) = \int_{-\infty}^{\infty} f(x,t)dt$. 
+
+This result is known as the Nadaraya-Watson model, or kernel regression. For a localized kernel function, it has the property of giving more weight to the data points $x_{n}$ that are close to $x$. The kernel $k(x,x_{n})$ satisfies the summation constraint $\sum_{n=1}^{N} k(x,x_{n}) = 1$.
+
+<img width="1104" height="406" alt="image" src="https://github.com/user-attachments/assets/c86f749c-9a77-49f0-9ee5-4ad8ffcc7bca" />
+
+## 3. Dual Representations and the Kernel Trick
+
+Many linear models for regression can be reformulated in terms of a dual representation in which the kernel function arises naturally. Consider a linear regression model whose parameters are determined by minimizing a regularized sum-of-squares error function given by:
+$$J(w) = \frac{1}{2}\sum_{n=1}^{N}\{w^{T}\phi(x_{n})-t_{n}\}^{2}+\frac{\lambda}{2}w^{T}w$$
+where $\lambda \ge 0$. Setting the gradient of $J(w)$ with respect to $w$ equal to zero shows that the solution for $w$ takes the form of a linear combination of the vectors $\phi(x_{n})$:
+$$w = \sum_{n=1}^{N}a_{n}\phi(x_{n}) = \Phi^{T}a$$.
+
+### 3.1 The Gram Matrix
+Instead of working with the parameter vector $w$, we can reformulate the algorithm in terms of the parameter vector $a$, giving rise to a dual representation. We define the Gram matrix $K = \Phi\Phi^{T}$, which is an $N \times N$ symmetric matrix with elements:
+$$K_{nm} = \phi(x_{n})^{T}\phi(x_{m}) = k(x_{n},x_{m})$$
+where $k(x,x')$ is the kernel function. The solution for $a$ is:
+$$a = (K + \lambda I_{N})^{-1}t$$.
+Substituting this back into the linear regression model, we obtain the prediction for a new input $x$:
+$$y(x) = w^{T}\phi(x) = a^{T}\Phi\phi(x) = k(x)^{T}(K + \lambda I_{N})^{-1}\mathfrak{t}$$
+where $k(x)$ has elements $k_{n}(x) = k(x_{n},x)$.
+
+> [!NOTE]
+> The advantage of the dual formulation is that it is expressed entirely in terms of the kernel function $k(x,x')$. We can therefore work directly in terms of kernels and avoid the explicit introduction of the feature vector $\phi(x)$, which allows us implicitly to use feature spaces of high, even infinite, dimensionality. This is known as the kernel trick or kernel substitution.
+
+## 4. Radial Basis Functions (RBF) and Kernels
+
+Radial basis functions combine the ideas of basis expansions and kernel methods by treating the kernel functions $K_{\lambda}(\xi, x)$ as basis functions. This leads to the model:
+$$f(x) = \sum_{j=1}^{M} K_{\lambda_{j}}(\xi_{j},x)\beta_{j} = \sum_{j=1}^{M} D\left(\frac{||x-\xi_{j}||}{\lambda_{j}}\right)\beta_{j}$$
+where each basis element is indexed by a location parameter $\xi_{j}$ and a scale parameter $\lambda_{j}$. 
+
+The Nadaraya-Watson kernel regression estimator can be viewed as an expansion in renormalized radial basis functions:
+$$\hat{f}(x_{0}) = \sum_{i=1}^{N} y_{i} \frac{K_{\lambda}(x_{0},x_{i})}{\sum_{n=1}^{N} K_{\lambda}(x_{0},x_{n})} = \sum_{i=1}^{N} y_{i} h_{i}(x_{0})$$
+with a basis function $h_{i}$ located at every observation and coefficients $y_{i}$.
+
+<img width="820" height="467" alt="image" src="https://github.com/user-attachments/assets/bd088860-cd14-4b67-ae66-564b297544b2" />
+
+## 5. Kernel Properties for Regression
+
+Suppose we consider approximation of the regression function in terms of a set of basis functions $\{h_{m}(x)\}$, $m=1,2,...,M$:
+$$f(x) = \sum_{m=1}^{M}\beta_{m}h_{m}(x)+\beta_{0}$$.
+To estimate $\beta$ and $\beta_{0}$ we minimize:
+$$H(\beta,\beta_{0}) = \sum_{i=1}^{N}V(y_{i}-f(x_{i}))+\frac{\lambda}{2}\sum \beta_{m}^{2}$$
+for some general error measure $V(r)$. For any choice of $V(r)$ the solution has the form:
+$$\hat{f}(x) = \sum_{i=1}^{N}\hat{a}_{i}K(x,x_{i})$$
+with $K(x,y) = \sum_{m=1}^{M}h_{m}(x)h_{m}(y)$. 
+
+### 5.1 Penalized Least Squares Case
+For concreteness, in the case $V(r) = r^{2}$ (penalized least squares), the predicted values at an arbitrary $x$ satisfy:
+$$\hat{f}(x) = h(x)^{T}\hat{\beta} = \sum_{i=1}^{N}\hat{\alpha}{i}K(x,x_{i})$$
+where $\hat{\alpha} = (HH^{T} + \lambda I)^{-1}y$. Only the inner product kernel $K(x_{i},x_{i'})$ need be evaluated, at the $N$ training points for each $i, i'$ and at points for predictions there.
+
+## 6. Summary of Kernel Regression Methods
+
+| Method | Characteristics |
+| :--- | :--- |
+| **Nadaraya-Watson** | Weighted average of $y_i$ using a kernel; weights sum to 1. |
+| **Local Linear Regression** | Fits a straight line locally to remove boundary bias; automatically modifies the kernel. |
+| **Dual Linear Regression** | Expresses the solution for $w$ as a linear combination of training inputs $\phi(x_n)$. |
+| **RBF Networks** | Uses Gaussian kernels as basis functions; parameters learned via least squares or clustering. |
+| **Kernelized Ridge Regression** | Minimizes penalized RSS entirely in terms of the Gram matrix $K$. |
+| **Gaussian Processes** | Bayesian framework where the kernel defines the prior covariance between function values. |
+
+> [!IMPORTANT]
+> A necessary and sufficient condition for a function $k(x,x')$ to be a valid kernel is that the Gram matrix $K$, whose elements are given by $k(x_{n},x_{m})$, should be positive semidefinite for all possible choices of the set $\{x_{n}\}$.
