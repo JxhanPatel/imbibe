@@ -69,3 +69,83 @@ $$\tilde{E}(w) = \frac{1}{2} \sum_{n=1}^{N} \{y(x_{n},w) - t_{n}\}^{2} + \frac{\
 where $||w||^{2} \equiv w^{T}w = w_{0}^{2} + w_{1}^{2} + ... + w_{M}^{2}$. The coefficient $\lambda$ governs the relative importance of the regularization term compared with the sum-of-squares error term. In statistics, this particular case is called ridge regression. In neural networks, it is known as weight decay.
 
 <img width="881" height="392" alt="image" src="https://github.com/user-attachments/assets/3520cd48-1f91-42d1-b181-0aeeddb2e4cf" />
+
+
+
+
+---
+
+
+
+
+
+
+# 5.2 Optimizing the Error Function
+
+## 1. Parameter Optimization
+
+The task of network training involves finding a weight vector $w$ which minimizes a chosen error function $E(w)$. Geometrically, the error function can be viewed as a surface sitting over weight space.
+
+<img width="792" height="333" alt="image" src="https://github.com/user-attachments/assets/7c8dee99-5acd-48b5-9d42-526769a6b545" />
+
+### 1.1 Stationary Points
+If we make a small step in weight space from $w$ to $w + \delta w$, the change in the error function is $\delta E \simeq \delta w^{T} \nabla E(w)$. The vector $\nabla E(w)$ points in the direction of the greatest rate of increase of the error function. Because the error $E(w)$ is a smooth continuous function of $w$, its smallest value will occur at a point in weight space such that the gradient of the error function vanishes:
+$$\nabla E(w) = 0$$
+as otherwise we could make a small step in the direction of $-\nabla E(w)$ and thereby further reduce the error. Points at which the gradient vanishes are called stationary points, and may be further classified into minima, maxima, and saddle points.
+
+### 1.2 Local and Global Minima
+The error function typically has a highly nonlinear dependence on the weights and bias parameters, and so there will be many points in weight space at which the gradient vanishes.
+*   **Equivalent Minima:** For any point $w$ that is a local minimum, there will be other points in weight space that are equivalent minima due to weight-space symmetries. In a two-layer network with $M$ hidden units, each point in weight space is a member of a family of $M!2^{M}$ equivalent points.
+*   **Inequivalent Minima:** There will typically be multiple inequivalent stationary points. A minimum that corresponds to the smallest value of the error function for any weight vector is a global minimum. Any other minima corresponding to higher values of the error function are local minima. 
+
+### 1.3 Iterative Numerical Procedures
+Because there is no hope of finding an analytical solution to $\nabla E(w) = 0$, we resort to iterative numerical procedures. These involve choosing some initial value $w^{(0)}$ for the weight vector and moving through weight space in a succession of steps of the form:
+$$w^{(\tau+1)} = w^{(\tau)} + \Delta w^{(\tau)}$$
+where $\tau$ labels the iteration step. Many algorithms make use of gradient information and require that, after each update, the value of $\nabla E(w)$ is evaluated at the new weight vector $w^{(\tau+1)}$.
+
+## 2. Local Quadratic Approximation
+
+Insight into the optimization problem can be obtained by considering a local quadratic approximation to the error function based on a Taylor expansion around some point $\hat{w}$:
+$$E(w) \simeq E(\hat{w}) + (w - \hat{w})^{T}b + \frac{1}{2}(w - \hat{w})^{T}H(w - \hat{w})$$
+where cubic and higher terms have been omitted. Here $b$ is the gradient of $E$ evaluated at $\hat{w}$:
+$$b \equiv \nabla E|{w=\hat{w}}$$
+and the Hessian matrix $H = \nabla \nabla E$ has elements:
+$$(H){ij} \equiv \frac{\partial^{2}E}{\partial w_{i}\partial w_{j}}|_{w=\hat{w}}$$
+The corresponding local approximation to the gradient is:
+$$\nabla E \simeq b + H(w - \hat{w})$$
+For points $w$ that are sufficiently close to $\hat{w}$, these expressions give reasonable approximations for the error and its gradient.
+
+### 2.1 Approximation at a Minimum
+Consider the particular case of a local quadratic approximation around a point $w★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w★$, and the expansion becomes:
+$$E(w) = E(w★) + \frac{1}{2}(w - w★)^{T}H(w - w★)$$
+where the Hessian $H$ is evaluated at $w★$. Consider the eigenvalue equation for the Hessian matrix:
+$$Hu_{i} = \lambda_{i}u_{i}$$
+where the eigenvectors $u_{i}$ form a complete orthonormal set. We expand $(w - w★)$ as a linear combination of the eigenvectors:
+$$w - w★ = \sum_{i} \alpha_{i} u_{i}$$
+The error function can then be written in the form:
+$$E(w) = E(w★) + \frac{1}{2} \sum_{i} \lambda_{i} \alpha_{i}^{2}$$
+A matrix $H$ is positive definite if, and only if, $v^{T}Hv > 0$ for all $v$. This holds if, and only if, all of its eigenvalues are positive. In the coordinate system defined by the eigenvectors $u_{i}$, the contours of constant $E$ are ellipses centered on $w★$.
+
+<img width="801" height="277" alt="image" src="https://github.com/user-attachments/assets/55fa1739-1ca0-4230-8c65-70e10b407744" />
+
+## 3. Use of Gradient Information
+
+The use of gradient information can lead to significant improvements in the speed with which the minima can be located. 
+*   **Without Gradient Information:** In a quadratic approximation, the error surface is specified by $W(W + 3)/2$ independent elements where $W$ is the dimensionality of $w$. Without gradient information, we would expect to perform $O(W^{2})$ function evaluations, each requiring $O(W)$ steps, leading to a computational effort of $O(W^{3})$.
+*   **With Gradient Information:** Because each evaluation of $\nabla E$ brings $W$ items of information, we might find the minimum in $O(W)$ gradient evaluations. Using error backpropagation, each evaluation takes only $O(W)$ steps, and thus the minimum can be found in $O(W^{2})$ steps.
+
+## 4. Gradient Descent Optimization
+
+The simplest approach to using gradient information is to choose the weight update to comprise a small step in the direction of the negative gradient:
+$$w^{(\tau+1)} = w^{(\tau)} - \eta \nabla E(w^{(\tau)})$$
+where the parameter $\eta > 0$ is the learning rate. 
+
+### 4.1 Batch Methods
+Techniques that use the whole data set at once to evaluate $\nabla E$ are called batch methods. At each step, the weight vector is moved in the direction of the greatest rate of decrease of the error function, an approach known as gradient descent or steepest descent. For batch optimization, more efficient methods exist, such as conjugate gradients and quasi-Newton methods, which are faster and ensure the error function decreases at each iteration.
+
+### 4.2 On-line (Stochastic) Gradient Descent
+Error functions based on maximum likelihood for independent observations comprise a sum of terms $E(w) = \sum_{n=1}^{N} E_{n}(w)$. On-line gradient descent (also known as sequential or stochastic gradient descent) makes an update based on one data point at a time:
+$$w^{(\tau+1)} = w^{(\tau)} - \eta \nabla E_{n}(w^{(\tau)})$$
+This update is repeated by cycling through the data in sequence or selecting points at random with replacement. 
+*   **Redundancy:** On-line methods handle redundancy in data much more efficiently than batch methods.
+*   **Local Minima:** On-line gradient descent has the possibility of escaping from local minima, as a stationary point for the whole data set will generally not be a stationary point for each individual data point.
