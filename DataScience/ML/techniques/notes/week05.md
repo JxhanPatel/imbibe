@@ -149,3 +149,82 @@ $$w^{(\tau+1)} = w^{(\tau)} - \eta \nabla E_{n}(w^{(\tau)})$$
 This update is repeated by cycling through the data in sequence or selecting points at random with replacement. 
 *   **Redundancy:** On-line methods handle redundancy in data much more efficiently than batch methods.
 *   **Local Minima:** On-line gradient descent has the possibility of escaping from local minima, as a stationary point for the whole data set will generally not be a stationary point for each individual data point.
+
+
+
+
+---
+
+
+
+
+
+# 5.3: Geometric Interpretation of Linear Regression | Projections, Subspaces & Least Squares
+
+## 1. $N$-Dimensional Geometry of Least Squares
+
+The least squares estimate can be represented geometrically in an $N$-dimensional space where the axes are the values of the observations $t_{1}, ..., t_{N}$. In this formulation, the target values are collected into a vector $\mathfrak{t} = (t_{1}, ..., t_{N})^{T}$ (or $y$ in some notations) which exists as a single point in this $N$-dimensional space.
+
+### 1.1 The Column Subspace
+Each basis function $\phi_{j}(x_{n})$, when evaluated at the $N$ data points, can be represented as a vector in the same $N$-dimensional space, denoted by $\varphi_{j}$. 
+*   **Basis Vectors:** $\varphi_{j}$ corresponds to the $j^{th}$ column of the design matrix $\Phi$.
+*   **Input Vectors:** In an alternate notation, the column vectors of the model matrix $X$ are denoted by $x_{0}, x_{1}, ..., x_{p}$.
+*   **The Subspace $S$:** If the number $M$ of basis functions is smaller than the number $N$ of data points, then the $M$ vectors $\varphi_{j}$ will span a linear subspace $S$ of dimensionality $M$. This is also referred to as the column space of $X$.
+
+<img width="772" height="510" alt="image" src="https://github.com/user-attachments/assets/5c4f5d6d-fc83-46da-a46d-afb627123c08" />
+
+### 1.2 The Fitted Vector and Residuals
+We define $y$ (or $\hat{y}$) to be an $N$-dimensional vector whose $n^{th}$ element is given by the model prediction $y(x_{n}, w)$.
+*   **Subspace Location:** Because $y$ is a linear combination of the vectors $\varphi_{j}$, it can live anywhere in the $M$-dimensional subspace $S$.
+*   **Sum-of-Squares Error:** The sum-of-squares error $E(w) = \frac{1}{2}\sum_{n=1}^{N}\{y(x_{n}, w) - t_{n}\}^{2}$ is equal (up to a factor of $1/2$) to the squared Euclidean distance between $y$ and $\mathfrak{t}$.
+
+<img width="802" height="223" alt="image" src="https://github.com/user-attachments/assets/ed7da8ad-258b-4fc0-86e6-b87e77c52611" />
+
+## 2. Orthogonal Projection and the Hat Matrix
+
+The least-squares solution for $w$ corresponds to the choice of $y$ that lies in the subspace $S$ and is closest to $\mathfrak{t}$.
+
+### 2.1 Orthogonality Condition
+The minimum distance solution corresponds to the orthogonal projection of $\mathfrak{t}$ onto the subspace $S$. 
+*   **The Residual Vector:** We minimize $RSS(\beta) = ||y - X\beta||^{2}$ by choosing $\hat{\beta}$ so that the residual vector $y - \hat{y}$ is orthogonal to the column space of $X$.
+*   **Mathematical Expression:** This orthogonality is expressed as:
+$$X^{T}(y - X\beta) = 0$$.
+
+### 2.2 The Hat Matrix ($H$)
+The fitted values at the training inputs are given by $\hat{y} = X\hat{\beta} = X(X^{T}X)^{-1}X^{T}y$.
+*   **Definition:** The matrix $H = X(X^{T}X)^{-1}X^{T}$ is called the "hat" matrix because it "puts the hat" on $y$.
+*   **Projection Operator:** $H$ is also known as a projection matrix because it computes the orthogonal projection of the target vector onto the subspace spanned by the inputs.
+
+> [!NOTE]
+> If the columns of $X$ are not linearly independent (e.g., two inputs are perfectly correlated), $X^{T}X$ is singular and the least squares coefficients are not uniquely defined. However, the fitted values $\hat{y}$ are still the unique projection of $y$ onto the column space of $X$.
+
+## 3. Geometry of Weight Space
+
+In contrast to the $N$-dimensional observation space, the parameters can be viewed in a $p$-dimensional (or $(d+1)$-dimensional) weight space.
+
+### 3.1 Stationary Points
+The error function $E(w)$ can be viewed as a surface sitting over the weight space.
+*   **Gradient:** The vector $\nabla E(w)$ points in the direction of the greatest rate of increase of the error function.
+*   **Minima:** The smallest value of the error will occur at a point where the gradient vanishes, $\nabla E(w) = 0$.
+
+### 3.2 Solution Region for Separable Data
+In the context of the two-category linearly-separable case, the weight vector $a$ specifies a point in weight space.
+*   **Constraints:** Each sample $y_{i}$ places a constraint on the location of a solution vector; the equation $a^{T}y_{i} = 0$ defines a hyperplane through the origin of weight space.
+*   **Intersection of Halfspaces:** A solution vector $a$ such that $a^{T}y_{i} > 0$ for all samples must lie in the intersection of $n$ halfspaces, a region called the solution region.
+
+<img width="933" height="516" alt="image" src="https://github.com/user-attachments/assets/2692544f-557c-4210-96ce-936f4dd10391" />
+
+## 4. Derived Directions and Orthogonalization
+
+The multiple least squares estimates are best understood in terms of successive orthogonalization of the inputs.
+
+### 4.1 Regression by Successive Orthogonalization
+The $j^{th}$ multiple regression coefficient $\hat{\beta}_{j}$ represents the additional contribution of $x_{j}$ on $y$, after $x_{j}$ has been adjusted for all other predictors $x_{0}, x_{1}, ..., x_{j-1}, x_{j+1}, ..., x_{p}$.
+*   **Adjustment:** "Regressing $b$ on $a$" produces a residual vector $b - \hat{\gamma}a$ that is "orthogonalized" with respect to $a$.
+*   **Correlation Effect:** If $x_{p}$ is highly correlated with other $x_{k}$, the residual vector $z_{p}$ after orthogonalization will be close to zero, and the coefficient $\hat{\beta}_{p}$ will be very unstable.
+
+### 4.2 QR Decomposition
+The process of successive orthogonalization can be represented in matrix form as $X = QR$, where:
+*   **$Q$:** An $N \times (p+1)$ orthogonal matrix ($Q^{T}Q = I$).
+*   **$R$:** A $(p+1) \times (p+1)$ upper triangular matrix.
+The least squares fit is then $\hat{y} = QQ^{T}y$.
