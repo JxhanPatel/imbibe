@@ -432,3 +432,89 @@ where $\hat{\alpha} = (HH^{T} + \lambda I)^{-1}y$. Only the inner product kernel
 
 > [!IMPORTANT]
 > A necessary and sufficient condition for a function $k(x,x')$ to be a valid kernel is that the Gram matrix $K$, whose elements are given by $k(x_{n},x_{m})$, should be positive semidefinite for all possible choices of the set $\{x_{n}\}$.
+
+
+
+
+---
+
+
+
+
+
+# 5.6: Probabilistic View of Linear Regression | Error Functions
+
+## 1. A Statistical Model for the Joint Distribution
+
+The additive error model is a useful approximation to the truth. For most systems, the input-output pairs $(X, Y)$ will not have a deterministic relationship $Y = f(X)$. Generally, there will be other unmeasured variables that also contribute to $Y$, including measurement error. The additive model assumes that we can capture all these departures from a deterministic relationship via the error $\epsilon$:
+$$Y = f(X) + \epsilon$$
+where the random error $\epsilon$ has $E(\epsilon) = 0$ and is independent of $X$. Note that for this model, $f(x) = E(Y|X=x)$, and in fact the conditional distribution $Pr(Y|X)$ depends on $X$ only through the conditional mean $f(x)$.
+
+<img width="890" height="335" alt="image" src="https://github.com/user-attachments/assets/8f3f48dc-ea34-4bc0-8184-45b308175986" />
+
+## 2. Maximum Likelihood and Least Squares
+
+The sum-of-squares error function can be motivated as the maximum likelihood solution under an assumed Gaussian noise model. We assume that the target variable $t$ is given by a deterministic function $y(x, w)$ with additive Gaussian noise so that:
+$$t = y(x, w) + \epsilon$$
+where $\epsilon$ is a zero mean Gaussian random variable with precision (inverse variance) $\beta$. Thus we can write:
+$$p(t|x, w, \beta) = \mathcal{N}(t|y(x, w), \beta^{-1})$$
+where the precision parameter $\beta$ is related to the variance by $\beta^{-1} = \sigma^{2}$.
+
+### 2.1 The Likelihood Function
+Consider a data set of inputs $X = \{x_1, \dots, x_N\}$ with corresponding target values $t_1, \dots, t_N$. Making the assumption that these data points are drawn independently from the distribution, we obtain the expression for the likelihood function as a function of the adjustable parameters $w$ and $\beta$:
+$$p(t|X, w, \beta) = \prod_{n=1}^{N} \mathcal{N}(t_{n}|w^{T}\phi(x_{n}), \beta^{-1})$$
+
+### 2.2 Derivation of the Log Likelihood
+Taking the logarithm of the likelihood function, and making use of the standard form for the univariate Gaussian, we have:
+$$\ln p(t|w, \beta) = \sum_{n=1}^N \ln \mathcal{N}(t_n|w^T\phi(x_n), \beta^{-1})$$
+$$\ln p(t|w, \beta) = \frac{N}{2} \ln \beta - \frac{N}{2} \ln(2\pi) - \beta E_D(w)$$
+where the sum-of-squares error function is defined by:
+$$E_D(w) = \frac{1}{2} \sum_{n=1}^N \{t_n - w^T\phi(x_n)\}^2$$
+
+> [!IMPORTANT]
+> Maximizing likelihood is equivalent, so far as determining $w$ is concerned, to minimizing the sum-of-squares error function defined by $E_D(w)$. The sum-of-squares error function has arisen as a consequence of maximizing likelihood under the assumption of a Gaussian noise distribution.
+
+### 2.3 Maximum Likelihood Solutions
+*   **Solution for $w$:** The gradient of the log likelihood function with respect to $w$ takes the form:
+    $$\nabla \ln p(t|w, \beta) = \sum_{n=1}^N \{t_n - w^T\phi(x_n)\}\phi(x_n)^T$$
+    Setting this gradient to zero and solving for $w$ yields the normal equations for the least squares problem:
+    $$w_{ML} = (\Phi^T\Phi)^{-1}\Phi^T t$$
+*   **Solution for $\beta$:** Maximizing with respect to the noise precision parameter $\beta$ gives:
+    $$\frac{1}{\beta_{ML}} = \frac{1}{N} \sum_{n=1}^N \{t_n - w_{ML}^T\phi(x_n)\}^2$$
+    The inverse of the noise precision is given by the residual variance of the target values around the regression function.
+
+## 3. Generalized Loss Functions (Minkowski Loss)
+
+The squared loss is not the only possible choice of loss function for regression. A generalization of the squared loss is the Minkowski loss, whose expectation is given by:
+$$E[L_q] = \iint |y(x) - t|^q p(x, t) dx dt$$
+This reduces to the expected squared loss for $q = 2$. The minimum of $E[L_q]$ is given by:
+*   **$q = 2$:** The conditional mean.
+*   **$q = 1$:** The conditional median.
+*   **$q \rightarrow 0$:** The conditional mode.
+
+<img width="842" height="636" alt="image" src="https://github.com/user-attachments/assets/d705e8a0-ee76-4059-90eb-4811b2917786" />
+
+## 4. Regularization and the Maximum Posterior (MAP) View
+
+To control the over-fitting phenomenon, regularization adds a penalty term to the error function. The simplest penalty term takes the form of a sum of squares of all the coefficients:
+
+$$
+\tilde{E}(w) = \frac{1}{2} \sum_{n=1}^N \{y(x_n, w) - t_n\}^2 + \frac{\lambda}{2} \|w\|^2
+$$
+
+where $\|w\|^2 \equiv w^T w = w_0^2 + w_1^2 + \dots + w_M^2$.
+
+### 4.1 Probabilistic Interpretation
+We introduce a prior distribution over the coefficients $w$. Consider a Gaussian distribution of the form:
+$$p(w|\alpha) = \mathcal{N}(w|0, \alpha^{-1}I) = \left(\frac{\alpha}{2\pi}\right)^{(M+1)/2} \exp\{-\frac{\alpha}{2}w^T w\}$$
+Using Bayes' theorem, the posterior distribution for $w$ is proportional to the product of the prior and the likelihood:
+$$p(w|x, t, \alpha, \beta) \propto p(t|x, w, \beta)p(w|\alpha)$$
+Maximizing the posterior (MAP) is equivalent to minimizing the negative logarithm of this product. Combining the Gaussian likelihood and prior, the maximum of the posterior is given by the minimum of:
+$$\frac{\beta}{2} \sum_{n=1}^N \{y(x_n, w) - t_n\}^2 + \frac{\alpha}{2} w^T w$$
+This is equivalent to minimizing the regularized sum-of-squares error function with a regularization parameter given by $\lambda = \alpha/\beta$.
+
+## 5. Geometry of Least Squares
+
+In an $N$-dimensional space whose axes are given by $t_n$, the target values $\mathfrak{t} = (t_1, \dots, t_N)^T$ is a vector. Each basis function $\phi_j(x_n)$ evaluated at the $N$ data points is represented as a vector $\varphi_j$. If $M < N$, the vectors $\varphi_j$ span a linear subspace $S$ of dimensionality $M$. The sum-of-squares error is equal (up to a factor of $1/2$) to the squared Euclidean distance between the fitted vector $y$ and $\mathfrak{t}$. The least-squares solution for $w$ corresponds to the orthogonal projection of $\mathfrak{t}$ onto the subspace $S$.
+
+<img width="1229" height="358" alt="image" src="https://github.com/user-attachments/assets/63842639-2864-4c9f-bd4b-c80e77721b32" />
