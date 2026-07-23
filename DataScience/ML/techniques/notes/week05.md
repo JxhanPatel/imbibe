@@ -44,7 +44,7 @@ $$RSS(\beta) = (y - X\beta)^{T}(y - X\beta)$$.
 ### 2.2 Overfitting and Model Complexity
 The problem of choosing the order $M$ of a polynomial is an example of model selection. 
 *   **Under-fitting:** Constant ($M=0$) and first order ($M=1$) polynomials give poor fits to the data and capabilitiesCaping the oscillations of the underlying function.
-*   **Over-fitting:** When a much higher order polynomial (such as $M=9$) is used, we obtain an excellent fit to the training data, and the polynomial may pass exactly through each data point so that $E(w★) = 0$. However, the fitted curve oscillates wildly and gives a very poor representation of the generating function. This behavior is known as over-fitting.
+*   **Over-fitting:** When a much higher order polynomial (such as $M=9$) is used, we obtain an excellent fit to the training data, and the polynomial may pass exactly through each data point so that $E(w^★) = 0$. However, the fitted curve oscillates wildly and gives a very poor representation of the generating function. This behavior is known as over-fitting.
 
 <img width="847" height="674" alt="image" src="https://github.com/user-attachments/assets/bef201ae-3c25-40a9-a61b-58bbdca91528" />
 
@@ -116,15 +116,15 @@ $$\nabla E \simeq b + H(w - \hat{w})$$
 For points $w$ that are sufficiently close to $\hat{w}$, these expressions give reasonable approximations for the error and its gradient.
 
 ### 2.1 Approximation at a Minimum
-Consider the particular case of a local quadratic approximation around a point $w★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w★$, and the expansion becomes:
-$$E(w) = E(w★) + \frac{1}{2}(w - w★)^{T}H(w - w★)$$
-where the Hessian $H$ is evaluated at $w★$. Consider the eigenvalue equation for the Hessian matrix:
+Consider the particular case of a local quadratic approximation around a point $w^★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w^★$, and the expansion becomes:
+$$E(w) = E(w^★) + \frac{1}{2}(w - w^★)^{T}H(w - w^★)$$
+where the Hessian $H$ is evaluated at $w^★$. Consider the eigenvalue equation for the Hessian matrix:
 $$Hu_{i} = \lambda_{i}u_{i}$$
-where the eigenvectors $u_{i}$ form a complete orthonormal set. We expand $(w - w★)$ as a linear combination of the eigenvectors:
-$$w - w★ = \sum_{i} \alpha_{i} u_{i}$$
+where the eigenvectors $u_{i}$ form a complete orthonormal set. We expand $(w - w^★)$ as a linear combination of the eigenvectors:
+$$w - w^★ = \sum_{i} \alpha_{i} u_{i}$$
 The error function can then be written in the form:
-$$E(w) = E(w★) + \frac{1}{2} \sum_{i} \lambda_{i} \alpha_{i}^{2}$$
-A matrix $H$ is positive definite if, and only if, $v^{T}Hv > 0$ for all $v$. This holds if, and only if, all of its eigenvalues are positive. In the coordinate system defined by the eigenvectors $u_{i}$, the contours of constant $E$ are ellipses centered on $w★$.
+$$E(w) = E(w^★) + \frac{1}{2} \sum_{i} \lambda_{i} \alpha_{i}^{2}$$
+A matrix $H$ is positive definite if, and only if, $v^{T}Hv > 0$ for all $v$. This holds if, and only if, all of its eigenvalues are positive. In the coordinate system defined by the eigenvectors $u_{i}$, the contours of constant $E$ are ellipses centered on $w^★$.
 
 <img width="801" height="277" alt="image" src="https://github.com/user-attachments/assets/55fa1739-1ca0-4230-8c65-70e10b407744" />
 
@@ -286,8 +286,8 @@ From the expansion, the corresponding local approximation to the gradient is giv
 $$\nabla E \simeq b + H(w - \hat{w})$$.
 
 ### 3.1 Approximation at a Minimum
-Consider the particular case of a local quadratic approximation around a point $w★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w★$, and the expansion becomes:
-$$E(w) = E(w★) + \frac{1}{2}(w - w★)^{T}H(w - w★)$$.
+Consider the particular case of a local quadratic approximation around a point $w^★$ that is a minimum of the error function. In this case there is no linear term, because $\nabla E = 0$ at $w^★$, and the expansion becomes:
+$$E(w) = E(w^★) + \frac{1}{2}(w - w^★)^{T}H(w - w^★)$$.
 In the coordinate system whose basis vectors are given by the eigenvectors $\{u_{i}\}$ of the Hessian matrix, the contours of constant $E$ are ellipses centred on the origin.
 
 
