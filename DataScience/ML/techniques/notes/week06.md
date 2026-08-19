@@ -170,3 +170,188 @@ A common pitfall occurs when predictors are screened using the entire dataset be
 ### 6.2 Computational Drawbacks
 
 One major drawback of cross-validation is that the number of training runs is increased by a factor of $K$. This can be problematic for models where the training process is itself computationally expensive. Furthermore, exploring combinations of settings for multiple complexity parameters could require an exponential number of training runs.
+
+
+
+---
+
+
+
+
+# 6.3: Regularization and Shrinkage Methods (Ridge & Lasso)
+
+By retaining a subset of the predictors and discarding the rest, subset selection produces a model that is interpretable and has possibly lower prediction error than the full model. However, because it is a discrete process (variables are either retained or discarded), it often exhibits high variance, and so doesn't reduce the prediction error of the full model. Shrinkage methods are more continuous and don't suffer as much from high variability. One technique that is often used to control the over-fitting phenomenon is that of regularization, which involves adding a penalty term to the error function in order to discourage the coefficients from reaching large values. Regularization allows complex models to be trained on data sets of limited size without severe over-fitting, essentially by limiting the effective model complexity.
+
+## 6.3.1 Ridge Regression
+
+Ridge regression shrinks the regression coefficients by imposing a penalty on their size. The ridge coefficients minimize a penalized residual sum of squares. The particular case of a quadratic regularizer is called ridge regression.
+
+### 1. Objective Function
+
+The ridge coefficients minimize:
+
+$$
+\hat{\beta}^{ridge}=
+\arg\min_{\beta}
+\sum_{i=1}^{N}
+\left(
+y_i - \beta_0 - \sum_{j=1}^{p} x_{ij}\beta_j
+\right)^2 +
+\lambda \sum_{j=1}^{p} \beta_j^2
+$$
+
+where $\lambda \ge 0$ is a complexity parameter that controls the amount of shrinkage: the larger the value of $\lambda$, the greater the amount of shrinkage. The coefficients are shrunk toward zero (and each other).
+
+An equivalent way to write the ridge problem is:
+
+$$
+\hat{\beta}^{ridge}=
+\arg\min
+\sum_{i=1}^{N}
+\left(
+y_i - \beta_0 - \sum_{j=1}^{p} x_{ij}\beta_j
+\right)^2
+$$
+
+subject to:
+
+$$
+\sum_{j=1}^{p} \beta_j^2 \le t
+$$
+
+which makes explicit the size constraint on the parameters. There is a one-to-one correspondence between the parameters $\lambda$ and $t$.
+
+### 2. Matrix Solution
+
+Writing the criterion in matrix form:
+
+$$
+RSS(\lambda)=
+(y - X\beta)^T(y - X\beta)
++
+\lambda\beta^T\beta
+$$
+
+the ridge regression solutions are easily seen to be:
+
+$$
+\hat{\beta}^{ridge}=
+(X^T X + \lambda I)^{-1}X^T y
+$$
+
+where $I$ is the $p \times p$ identity matrix. The solution adds a positive constant to the diagonal of $X^T X$ before inversion, which makes the problem nonsingular even if $X^T X$ is not of full rank.
+
+### 3. Effective Degrees of Freedom
+
+The effective degrees of freedom of the ridge regression fit is defined as:
+
+$$
+df(\lambda)=
+tr[X(X^T X + \lambda I)^{-1}X^T]
+\sum_{j=1}^{p}
+\frac{d_j^2}{d_j^2 + \lambda}
+$$
+
+where $d_j$ are the singular values of $X$. This is a monotone decreasing function of $\lambda$. Note that $df(\lambda) = p$ when $\lambda = 0$ and $df(\lambda) \rightarrow 0$ as $\lambda \rightarrow \infty$.
+
+<img width="711" height="765" alt="image" src="https://github.com/user-attachments/assets/327234b9-6815-4d7b-9743-f5cdbc4d472a" />
+
+## 6.3.2 Relation Between Solution of Linear Regression and Ridge Regression
+
+### 1. Scaling Behavior
+
+In the case of orthonormal inputs, the ridge estimates are just a scaled version of the least squares estimates, that is:
+
+$$
+\hat{\beta}^{ridge}=
+\frac{\hat{\beta}}{1 + \lambda}
+$$
+
+### 2. Singular Value Decomposition (SVD) Interpretation
+
+Using the SVD of the centered input matrix $X = UDV^T$, the least squares fitted vector is $X\hat{\beta}^{ls} = UU^T y$. The ridge solutions are:
+
+$$
+X\hat{\beta}^{ridge}=
+\sum_{j=1}^{p}
+u_j
+\frac{d_j^2}{d_j^2 + \lambda}
+u_j^T y
+$$
+
+where $u_j$ are the columns of $U$. Ridge regression shrinks the coordinates of $y$ with respect to the orthonormal basis $U$ by factors $d_j^2 / (d_j^2 + \lambda)$. This means that a greater amount of shrinkage is applied to the coordinates of basis vectors with smaller $d_j^2$.
+
+### 3. Low-Variance Directions
+
+The small singular values $d_j$ correspond to directions in the column space of $X$ having small variance, and ridge regression shrinks these directions the most. Ridge regression protects against the potentially high variance of gradients estimated in the short directions (low-variance components).
+
+### 4. Bias-Variance Tradeoff
+
+The linear decision boundary from least squares is very smooth and stable to fit; it has low variance and potentially high bias. Ridge regression shrinks coefficients of strongly correlated variables toward each other. By doing so, we sacrifice a little bit of bias to reduce the variance of the predicted values, and hence may improve the overall prediction accuracy.
+
+## 6.3.3 Relation Between Solution of Linear Regression and Lasso Regression
+
+### 1. Soft Thresholding
+
+In the case of an orthonormal input matrix $X$, the lasso applies a "soft thresholding" transformation to the least squares estimate $\hat{\beta}_j$:
+
+$$
+\hat{\beta}_j^{lasso}=
+sign(\hat{\beta}_j)
+\left(
+|\hat{\beta}*j| - \lambda
+\right)*+
+$$
+
+where $x_+$ denotes the positive part. This translates each coefficient by a constant factor $\lambda$, truncating at zero.
+
+### 2. Geometry of the Solution
+
+The residual sum of squares has elliptical contours centered at the full least squares estimate. The constraint region for ridge regression is a disk, while that for lasso is a diamond (or rhomboid for $p > 2$). Unlike the disk, the diamond has corners; if the solution occurs at a corner, then it has one parameter $\beta_j$ equal to zero.
+
+<img width="723" height="740" alt="image" src="https://github.com/user-attachments/assets/1a3c968e-0bba-427a-a64b-968dee46669e" />
+
+### 3. Comparison with Forward Stepwise
+
+Behavior of LAR (Least Angle Regression) and lasso is similar to that of forward stagewise regression. LAR/lasso techniques are adaptive in a smoother way than best subset selection.
+
+## 6.3.4 Characteristics of Lasso Regression
+
+The lasso is a shrinkage method like ridge, with subtle but important differences. It is also known as basis pursuit in the signal processing literature.
+
+### 1. Objective Function
+
+The lasso estimate is defined by:
+
+$$
+\hat{\beta}^{lasso} =
+\arg\min_{\beta}
+\sum_{i=1}^{N}
+\left(
+y_i - \beta_0 - \sum_{j=1}^{p} x_{ij}\beta_j
+\right)^2
+$$
+
+subject to:
+
+$$
+\sum_{j=1}^{p} |\beta_j| \le t
+$$
+
+### 2. Variable Selection (Sparsity)
+
+Because of the nature of the $L_1$ penalty $\sum_{j=1}^{p} |\beta_j|$, making $t$ sufficiently small will cause some of the coefficients to be exactly zero. Thus the lasso does a kind of continuous subset selection. In high-dimensional problems ($p > N$), the number of non-zero coefficients is at most $N$ for all values of $\lambda$.
+
+### 3. Nonlinearity and Convexity
+
+The $L_1$ constraint makes the solutions nonlinear in the $y_i$, and there is no closed form expression as in ridge regression. The case $q = 1$ (lasso) is the smallest $q$ such that the constraint region is convex; non-convex constraint regions ($q < 1$) make the optimization problem more difficult.
+
+### 4. Bayesian Interpretation
+
+The lasso can be viewed as a Bayes estimate where the prior is an independent double exponential (or Laplace) distribution for each input, with density $(1/2\tau)exp(-|\beta|/\tau)$ and $\tau = 1/\lambda$. The lasso is derived as a posterior mode (maximizer of the posterior).
+
+### 5. Limitations
+
+* **Bias:** Lasso shrinkage causes the estimates of the non-zero coefficients to be biased towards zero, and in general they are not consistent.
+* **Correlation:** The lasso penalty is somewhat indifferent to the choice among a set of strong but correlated variables.
+* **Group Dropout:** If several predictors are highly correlated, the lasso tends to pick one of them at random and ignore the others.
