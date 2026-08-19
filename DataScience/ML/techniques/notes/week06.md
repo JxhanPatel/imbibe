@@ -78,3 +78,95 @@ In a fully Bayesian approach, we make predictions by integrating over the whole 
 
 > [!NOTE]
 > For a finite data set, the posterior mean for $\mu$ always lies between the prior mean and the maximum likelihood estimate. In the limit of an infinitely large data set, the Bayesian and maximum likelihood results will agree.
+
+
+
+
+
+
+---
+
+
+
+
+
+
+# 6.2 Cross-validation for minimizing MSE
+
+## 1. Principles of Cross-Validation
+
+Probably the simplest and most widely used method for estimating prediction error is cross-validation. This method directly estimates the expected extra-sample error $Err = E[L(Y, \hat{f}(X))]$, which represents the average generalization error when the mapping $\hat{f}(X)$ is applied to an independent test sample drawn from the joint distribution of $X$ and $Y$. Cross-validation is an empirical approach that evaluates the performance of a classifier or regression model experimentally. Unlike methods that rely only on the training data, cross-validation seeks a measure of performance that does not suffer from bias due to over-fitting.
+
+## 2. K-Fold Cross-Validation
+
+Ideally, if enough data were available, a validation set would be set aside to assess the performance of a prediction model. When data are scarce, K-fold cross-validation finesses this problem by using part of the available data to fit the model and a different part to test it.
+
+### 2.1 The Partitioning Process
+
+The data is split into $K$ roughly equal-sized parts. For each part $k$, the model is fit to the other $K-1$ parts of the data, and the prediction error of the fitted model is calculated when predicting the $k^{th}$ part of the data. This procedure is repeated for $k = 1, 2, \dots, K$, and the $K$ resulting estimates of prediction error are combined.
+
+<img width="1204" height="334" alt="image" src="https://github.com/user-attachments/assets/53373ade-3f5a-44dc-a720-bc5541b6e046" />
+
+### 2.2 Mathematical Formulation
+
+Let $\kappa: {1, \dots, N} \mapsto {1, \dots, K}$ be an indexing function that indicates the partition to which observation $i$ is allocated by the randomization. Denote by $\hat{f}^{-k}(x)$ the fitted function computed with the $k^{th}$ part of the data removed. The cross-validation estimate of prediction error is defined as:
+
+$$
+CV(\hat{f}) = \frac{1}{N} \sum_{i=1}^{N} L(y_i, \hat{f}^{-\kappa(i)}(x_i))
+$$
+
+## 3. Minimizing Mean Squared Error (MSE) via Cross-Validation
+
+In regression problems, the common choice for the loss function $L$ is the squared error $(Y - \hat{f}(X))^2$. In this context, the cross-validation estimate becomes the cross-validated Mean Squared Error (MSE).
+
+### 3.1 Model Selection and Tuning Parameters
+
+Cross-validation is used for model selection by estimating the performance of different models to choose the best one. Typically, a model has a tuning parameter (or parameters) $\alpha$ that varies the model's complexity. Denote by $\hat{f}^{-k}(x, \alpha)$ the $\alpha^{th}$ model fit with the $k^{th}$ part of the data removed. The cross-validation error curve as a function of $\alpha$ is:
+
+$$
+CV(\hat{f}, \alpha) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{f}^{-\kappa(i)}(x_i, \alpha))^2
+$$
+
+The goal is to find the tuning parameter $\hat{\alpha}$ that minimizes this $CV(\hat{f}, \alpha)$. This $\hat{\alpha}$ corresponds to the minimum of the average test error curve. Once $\hat{\alpha}$ is chosen, the final model $f(x, \hat{\alpha})$ is fit to all available data.
+
+
+### 3.2 The One-Standard-Error Rule
+
+Because the tradeoff curve is estimated with error, a conservative approach known as the "one-standard-error" rule is often used. Under this rule, one picks the most parsimonious model (the simplest model) whose error is within one standard error of the minimum of the cross-validation error curve.
+
+## 4. Specific Types of Cross-Validation
+
+### 4.1 Leave-One-Out Cross-Validation (LOOCV)
+
+The limit where $K = N$ is known as leave-one-out cross-validation. In this case, $\kappa(i) = i$, and for each observation $i$, the fit is computed using all data except the $i^{th}$. LOOCV is approximately unbiased for the true expected prediction error but can have high variance because the $N$ training sets used are very similar to one another.
+
+### 4.2 Generalized Cross-Validation (GCV)
+
+For linear fitting methods where the predictions can be written as $\hat{y} = Sy$, generalized cross-validation provides a convenient approximation to leave-one-out cross-validation under squared-error loss. The GCV approximation is given by:
+
+$$
+GCV(\hat{f}) = \frac{1}{N} \sum_{i=1}^{N} \left[ \frac{y_i - \hat{f}(x_i)}{1 - trace(S)/N} \right]^2
+$$
+
+The quantity $trace(S)$ is the effective number of parameters in the model. GCV is computationally advantageous when $trace(S)$ is easier to compute than the individual diagonal elements $S_{ii}$ of the smoother matrix.
+
+## 5. Bias and Variance Considerations
+
+The choice of $K$ involves a tradeoff between bias and variance.
+
+* **High K (e.g., K=N):** The cross-validation estimator has low bias as an estimate of expected error, but its variance can be high.
+* **Low K (e.g., K=5 or 10):** The estimator has lower variance but may be biased upward if the "learning curve" for the model has a steep slope at the given training set size. In such cases, cross-validation will overestimate the true prediction error.
+
+Five-fold or tenfold cross-validation are generally recommended as a good compromise.
+
+## 6. Methodological Requirements
+
+### 6.1 The "Right Way" to Perform Cross-Validation
+
+A common pitfall occurs when predictors are screened using the entire dataset before applying cross-validation. If the top predictors are chosen based on their correlation with class labels over all samples, they have an "unfair advantage" because they have "already seen" the samples that will be left out in the cross-validation folds.
+
+**Correct Procedure:** Cross-validation must be applied to the entire sequence of modeling steps. Samples must be "left out" before any selection or filtering steps are applied.
+
+### 6.2 Computational Drawbacks
+
+One major drawback of cross-validation is that the number of training runs is increased by a factor of $K$. This can be problematic for models where the training process is itself computationally expensive. Furthermore, exploring combinations of settings for multiple complexity parameters could require an exponential number of training runs.
