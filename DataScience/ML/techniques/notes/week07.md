@@ -180,3 +180,222 @@ Formally, the two-sided tangent distance allows both the stored prototype $x'$ a
 $$
 D_{\text{2tan}}(x', x) = \min_{a,b}\left[ \Vert{} (x' + Ta) - (x + Sb) \Vert{} \right]
 $$
+
+
+
+
+
+---
+
+
+
+
+
+
+
+# 7.2: Decision Tree Algorithms & Structure
+
+## 1. Fundamental Structure of Decision Trees
+
+A directed decision tree, or simply tree, consists of a first or root node displayed at the top, connected by successive directional links or branches to other nodes. These nodes are similarly connected until terminal or leaf nodes are reached, which have no further links.
+
+The classification of a particular pattern begins at the root node, which asks for the value of a particular attribute of the pattern. The different links from the root node correspond to the different possible values of the attribute. Based on the answer, we follow the appropriate link to a subsequent or descendent node. In any valid decision tree, the links must be mutually distinct and exhaustive; that is, one and only one link will be followed. Each leaf node bears a category label, and the test pattern is assigned the category of the leaf node reached.
+
+<img width="762" height="578" alt="image" src="https://github.com/user-attachments/assets/d5efe1bb-fc0b-40e1-bbce-1926be1d8619" />
+
+### 1.1 Dimensionality and Splitting
+
+* **Binary Trees:** Every decision, and hence every tree, can be represented using just binary decisions. Because of the universal expressive power of binary trees and the comparative simplicity in training, tree algorithms often concentrate on such trees.
+* **Branching Factor:** The number of links descending from a node is called the node's branching factor or branching ratio, denoted $B$.
+* **Hyperplane Decision Boundaries:** For numerical data, the test at each node has the form "is $X_j \le s$?". This partition of the feature space is made by lines that are parallel to the coordinate axes. This leads to hyperplane decision boundaries that are perpendicular to the coordinate axes, dividing the space into decision regions.
+* **Monothetic vs. Polythetic:** Trees in which each test is based on a single property are called monothetic. If the query at any of the nodes involves two or more properties, the tree is called polythetic.
+
+<img width="769" height="590" alt="image" src="https://github.com/user-attachments/assets/fdd59b9e-6396-4659-a5a9-fc37a49a477c" />
+
+<img width="801" height="452" alt="image" src="https://github.com/user-attachments/assets/484c92b7-3f7c-4d61-b98f-864364f21626" />
+
+> [!NOTE]
+> A multi-way split can fragment the data too quickly, leaving insufficient data at the next level down. Since multiway splits can always be achieved by a series of binary splits, the latter are generally preferred.
+
+# 7.2.1 Introduction to Decision Trees
+
+### 1. Conceptual Framework
+
+It is natural and intuitive to classify a pattern through a sequence of questions, in which the next question asked depends on the answer to the current question. This "20-questions" approach is particularly useful for nominal, non-metric data, since all of the questions can be asked in a "yes/no" or "true/false" or $\text{value(property)} \in \text{set of values}$ style that does not require any notion of metric.
+
+In some cases, patterns should be represented as vectors of real-valued numbers, in others ordered lists of attributes, and in others descriptions of parts and their relations. We seek a representation in which the patterns that lead to the same action are somehow "close" to one another, yet "far" from those that demand a different action. The extent to which we create or learn a proper representation and how we quantify near and far apart determines the success of the pattern classifier.
+
+### 2. Advantages of Decision Trees
+
+* **Human Interpretability:** The partition is fully described by a single tree, making it readily interpretable by humans because it corresponds to a sequence of binary decisions applied to individual variables.
+* **Logical Rules:** The information in a tree can be rendered as logical expressions. We can interpret the decision for any particular test pattern as the conjunction of decisions along the path to its corresponding leaf node.
+* **Example:** The pattern $\mathbf{x} = \{\text{sweet, yellow, thin, medium}\}$ is classified as Banana because it is $(\text{color} = \text{yellow}) \text{ AND } (\text{shape} = \text{thin})$.
+* **Example:** We can obtain clear interpretations of the categories themselves by creating logical descriptions using conjunctions and disjunctions, such as:
+
+$$\text{Apple} = (\text{green AND medium}) \text{ OR } (\text{red AND medium})$$
+
+
+
+
+* **Computational Efficiency:** Trees lead to rapid classification, employing a sequence of typically simple queries.
+* **Prior Knowledge:** Trees provide a natural way to incorporate prior knowledge from human experts, which is of greatest use when the classification problem is fairly simple and the training set is small.
+* **Mixed Data Types:** They naturally incorporate mixtures of numeric and categorical predictor variables and missing values.
+* **Invariance:** They are invariant under strictly monotone transformations of the individual predictors; as a result, scaling or general transformations are not issues, and they are immune to the effects of predictor outliers.
+* **Feature Selection:** They perform internal feature selection as an integral part of the procedure, rendering them resistant to the inclusion of many irrelevant predictor variables.
+
+### 3. Structural Limitations
+
+* **Instability (High Variance):** Often a small change in the data can result in a very different series of splits, making interpretation precarious. The major reason for this instability is the hierarchical nature of the process: the effect of an error in the top split is propagated down to all of the splits below it. The alteration of even a single training point can lead to radically different decisions overall due to the discrete and greedy nature of tree creation.
+* **Lack of Smoothness:** The tree model produces piecewise-constant predictions with discontinuities at the split boundaries, which can degrade performance in the regression setting where we would normally expect the underlying function to be smooth.
+* **Difficulty in Capturing Additive Structure:** If the underlying target is additive, e.g., $Y = c_1 I(X_1 < t_1) + c_2 I(X_2 < t_2) + \epsilon$, a binary tree must make its first split on $X_1$ near $t_1$, and then at the next level split both resulting nodes on $X_2$ at $t_2$. If there were ten rather than two additive effects, it would take many fortuitous splits to recreate the structure, and the data analyst would be hard pressed to recognize it in the estimated tree.
+
+# 7.2.2 Decision Tree Algorithm
+
+### 1. CART Recursive Binary Splitting (Regression)
+
+Our training data consists of $p$ inputs and a response, for each of $N$ observations: $(x_i, y_i)$ for $i=1,2,\dots,N$ with $x_i=(x_{i1}, x_{i2}, \dots, x_{ip})$. The algorithm must automatically decide on the splitting variables and split points.
+
+Suppose we have a partition into $M$ regions $R_1, R_2, \dots, R_M$ and we model the response as a constant $c_m$ in each region:
+
+$$f(x) = \sum_{m=1}^{M} c_m I(x \in R_m)$$
+
+If we minimize the sum of squares $\sum (y_i - f(x_i))^2$, the optimal $\hat{c}_m$ is the average of $y_i$ in region $R_m$:
+
+$$\hat{c}_m = \text{ave}(y_i \mid x_i \in R_m)$$
+
+#### 1.1 Greedy Split Search
+
+We proceed with a greedy algorithm. Starting with all of the data, consider a splitting variable $j$ and split point $s$, and define the pair of half-planes:
+
+$$R_1(j,s) = \{X \mid X_j \le s\} \quad \text{and} \quad R_2(j,s) = \{X \mid X_j > s\}$$
+
+We seek the splitting variable $j$ and split point $s$ that solve:
+
+$$\min_{j,s} \left[ \min_{c_1} \sum_{x_i \in R_1(j,s)} (y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2(j,s)} (y_i - c_2)^2 \right]$$
+
+For any choice of $j$ and $s$, the inner minimization is solved by:
+
+$$\hat{c}_1 = \text{ave}(y_i \mid x_i \in R_1(j,s)) \quad \text{and} \quad \hat{c}_2 = \text{ave}(y_i \mid x_i \in R_2(j,s))$$
+
+Having found the best split, we partition the data into the two resulting regions and repeat the splitting process on each of the two regions, continuing recursively.
+
+### 2. Classification Trees and Node Impurity Measures
+
+For classification, the target is a outcome taking values $1, 2, \dots, K$. In a node $m$, representing a region $R_m$ with $N_m$ observations, the proportion of class $k$ observations in node $m$ is defined as:
+
+$$\hat{p}_{mk} = \frac{1}{N_m} \sum_{x_i \in R_m} I(y_i = k)$$
+
+We classify the observations in node $m$ to class $k(m) = \arg\max_k \hat{p}_{mk}$, which is the majority class in node $m$.
+
+<img width="825" height="493" alt="image" src="https://github.com/user-attachments/assets/bb8529e7-07f4-47f0-8cfa-c94b1942d259" />
+
+The node impurity measure $Q_m(T)$ can be computed in three common ways:
+
+#### 2.1 Misclassification Error
+
+$$1 - \hat{p}_{mk(m)}$$
+
+#### 2.2 Gini Index
+
+$$\sum_{k \ne k'} \hat{p}_{mk} \hat{p}_{mk'} = \sum_{k=1}^{K} \hat{p}_{mk} (1 - \hat{p}_{mk})$$
+
+Alternatively, in regions $\mathcal{R}_{\tau}$, it is formulated as:
+
+$$Q_{\tau}(T) = \sum_{k=1}^{K} p_{\tau k}(1 - p_{\tau k})$$
+
+#### 2.3 Cross-Entropy or Deviance
+
+$$-\sum_{k=1}^{K} \hat{p}_{mk} \ln \hat{p}_{mk}$$
+
+Alternatively, in regions $\mathcal{R}_{\tau}$, it is formulated as:
+
+$$Q_{\tau}(T) = \sum_{k=1}^{K} p_{\tau k} \ln p_{\tau k}$$
+
+These both vanish for $p_{\tau k} = 0$ and $p_{\tau k} = 1$ and have a maximum at $p_{\tau k} = 0.5$.
+
+> [!IMPORTANT]
+> Cross-entropy and the Gini index are more sensitive to changes in the node probabilities than the misclassification rate. Both Gini and cross-entropy should be used when growing the tree, while misclassification rate is typically used to guide cost-complexity pruning.
+
+### 3. Stopping Criteria
+
+Growing the tree fully until each leaf node corresponds to the lowest impurity typically overfits the data. To prevent this, several stopping rules can be implemented:
+
+* **Impurities Reduction Threshold:** Stop splitting if the best candidate split at a node reduces the impurity by less than some pre-set threshold $\beta$, i.e., if $\max \Delta i(s) \le \beta$.
+* **Node Size Threshold:** Stop when a node represents fewer than some threshold number of points (e.g., 10), or some fixed percentage of the total training set (e.g., 5%).
+* **Global Complexity Penalty:** Split until a minimum in a global criterion function is reached:
+
+$$\alpha \cdot \text{size} + \sum_{\text{leaf nodes}} i(N)$$
+
+
+
+where $\text{size}$ represents the number of nodes or links, and $\alpha$ is a positive complexity penalty.
+* **Statistical Significance:** Stop splitting if a candidate split does not reduce the impurity significantly according to a statistical test, such as a chi-squared test comparing the split to the null hypothesis of a random split.
+
+### 4. Cost-Complexity Pruning
+
+The preferred strategy is to grow a large tree $T_0$, stopping the splitting process only when some minimum node size (such as 5) is reached, and then prune $T_0$ back using cost-complexity pruning.
+
+We define a subtree $T \subset T_0$ to be any tree obtained by collapsing any number of non-terminal nodes of $T_0$. We index terminal nodes by $m$, representing region $R_m$. Let $\vert{}T\vert{}$ denote the number of terminal nodes in $T$. The cost-complexity criterion is:
+
+$$C_{\alpha}(T) = \sum_{m=1}^{\vert{}T\vert{}} N_m Q_m(T) + \alpha \vert{}T\vert{}$$
+
+Here, $N_m = \{x_i \in R_m\}$.
+$Q_m(T)$ is the node impurity.
+The tuning parameter $\alpha \ge 0$ governs the tradeoff between tree size and its goodness of fit to the data.
+
+#### 4.1 Weakest Link Pruning
+
+To find $T_{\alpha}$, we use weakest link pruning: we successively collapse the internal node that produces the smallest per-node increase in $\sum_{m} N_m Q_m(T)$, and continue until we produce the single-node (root) tree. This yields a finite sequence of subtrees that must contain the optimal $T_{\alpha}$. We choose the optimal parameter value $\hat{\alpha}$ via five- or tenfold cross-validation to minimize the cross-validated sum of squares. Our final tree is $T_{\hat{\alpha}}$.
+
+### 5. Alternative Tree-Building Algorithms
+
+#### 5.1 ID3
+
+ID3 is intended for use with nominal (unordered) inputs only. If the problem involves real-valued variables, they are binned into intervals, each interval being treated as an unordered nominal attribute. Every split has a branching factor $B_j$, where $B_j$ is the number of discrete attribute bins of the chosen variable $j$. The algorithm continues until all nodes are pure or there are no more variables to split on.
+
+#### 5.2 C4.5
+
+C4.5 is the successor and refinement of ID3. Real-valued variables are treated the same as in CART, while multi-way ($B > 2$) splits are used with nominal data. It uses pruning heuristics based on the statistical significance of splits.
+
+##### Rule Pruning (C4.5Rules)
+
+C4.5 has a provision for pruning based on rules derived from the learned tree. Each leaf node has an associated rule consisting of the conjunction of the decisions leading from the root node to that leaf. A technique called C4.5Rules deletes redundant antecedents in these rules, which can simplify the description and prune information corresponding to nodes near the root.
+
+### 6. Algorithmic Complexity
+
+Suppose we have $n$ training patterns in $d$ dimensions in a two-category problem, and we construct a binary tree based on splits parallel to the feature axes.
+
+#### 6.1 Training Phase Complexity
+
+* **Sorting:** At the root node (level 0), we must first sort the training data, taking $\mathcal{O}(n \ln n)$ operations for each of the $d$ features.
+* **Impurity Calculations:** The impurity calculation takes $\mathcal{O}(n) + (n-1)\mathcal{O}(d)$ since we examine $n-1$ possible splitting points.
+* **Root Node Total:** The root node split has a time complexity of $\mathcal{O}(d n \ln n)$.
+* **Subsequent Levels:** Assuming on average that half the training points are sent to each of the two branches, splitting the two nodes in level 1 takes $\mathcal{O}\left(d \cdot \frac{n}{2} \ln\left(\frac{n}{2}\right)\right) \times 2 = \mathcal{O}\left(d n \ln\left(\frac{n}{2}\right)\right)$.
+* **Total Average Complexity:** For $\mathcal{O}(\ln n)$ levels, the total average time complexity of training is:
+
+$$\mathcal{O}(d n (\ln n)^2)$$
+
+
+
+#### 6.2 Recall Phase Complexity
+
+The time complexity for recall is simply the depth of the tree, which is:
+
+$$\mathcal{O}(\ln n)$$
+
+The space complexity, representing the number of nodes (assuming a single training point per leaf node), is:
+
+$$1 + 2 + 4 + \dots + \frac{n}{2} \approx n \implies \mathcal{O}(n)$$
+
+#### 6.3 Summary Table of Tree Algorithms
+
+| Feature | CART | ID3 | C4.5 |
+| --- | --- | --- | --- |
+| **Splitting Type** | Binary splits ($B = 2$) | Multi-way splits based on bins ($B_j$) | Multi-way splits ($B > 2$) for nominal data; binary for real |
+| **Data Types** | Mixed: continuous and categorical | Nominal (unordered) inputs only | Mixed: continuous and categorical |
+| **Impurity Criteria** | Gini index, cross-entropy, deviance, MSE | Gain ratio impurity | Gain ratio impurity |
+| **Pruning Method** | Cost-complexity weakest link pruning | None in standard implementation | Pruning based on statistical significance and rule-based simplification |
+| **Missing Values** | Surrogate splits | Omitted/Not standard | Weights sub-models by probability of decisions |
+
+> [!CAUTION]
+> The greedy partitioning algorithm tends to favor categorical predictors with many levels $q$, because the number of partitions grows exponentially in $q$. This can lead to severe overfitting if $q$ is large, and such variables should be avoided.
