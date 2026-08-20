@@ -399,3 +399,211 @@ $$1 + 2 + 4 + \dots + \frac{n}{2} \approx n \implies \mathcal{O}(n)$$
 
 > [!CAUTION]
 > The greedy partitioning algorithm tends to favor categorical predictors with many levels $q$, because the number of partitions grows exponentially in $q$. This can lead to severe overfitting if $q$ is large, and such variables should be avoided.
+
+
+
+
+---
+
+
+
+
+
+# 7.3 Generative and Discriminative Models
+
+## 1. Three Approaches to Classification
+
+In supervised pattern classification, the goal is to take an input vector $\mathbf{x}$ and assign it to one of $K$ discrete classes $\mathcal{C}_k$. There are three distinct conceptual approaches to solving this classification problem, ranging in their reliance on probability distributions and decision boundaries:
+
+### Approach (a): Generative Modeling
+
+* **Definition:** This approach explicitly or implicitly models the joint distribution of the inputs and the classes, $p(\mathbf{x}, \mathcal{C}_k)$. Alternatively, it models the class-conditional densities $p(\mathbf{x}\vert{}\mathcal{C}_k)$ along with the prior class probabilities $p(\mathcal{C}_k)$.
+* **Posterior Calculation:** Using these modeled distributions, the posterior class probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$ are computed using Bayes' theorem:
+$$p(\mathcal{C}_k\vert{}\mathbf{x}) = \frac{p(\mathbf{x}\vert{}\mathcal{C}_k)p(\mathcal{C}_k)}{p(\mathbf{x})}$$
+
+
+where the denominator (normalization constant) is expressed as:
+$$p(\mathbf{x}) = \sum_{k} p(\mathbf{x}\vert{}\mathcal{C}_k)p(\mathcal{C}_k)$$
+
+
+* **Generative Nature:** These are called generative models because by sampling from the joint distribution, it is possible to generate synthetic data points in the input space.
+
+### Approach (b): Discriminative Modeling
+
+* **Definition:** This approach directly models the conditional class probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$ during the inference stage, bypassing the estimation of the joint distribution $p(\mathbf{x}, \mathcal{C}_k)$.
+* **Decision Stage:** Once the posterior probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$ are determined, decision theory is applied to assign each new input $\mathbf{x}$ to one of the classes.
+
+### Approach (c): Discriminant Functions (Non-probabilistic)
+
+* **Definition:** This approach completely bypasses probability estimation. It uses the training data to find a discriminant function $f(\mathbf{x})$ that maps each input $\mathbf{x}$ directly onto a class label.
+* **Probability-Free:** In this scenario, probabilities play no role. For instance, in a two-class problem, $f(\cdot)$ may be binary-valued, where $f=0$ represents class $\mathcal{C}_1$ and $f=1$ represents class $\mathcal{C}_2$.
+* **Combined Stages:** This approach combines the inference and decision stages into a single learning problem.
+
+
+
+<img width="1110" height="642" alt="image" src="https://github.com/user-attachments/assets/ae52a563-cc1e-4e72-84d9-25d61f6deafb" />
+
+
+
+## 2. Relative Merits and Demands of the Approaches
+
+The choice between generative, discriminative, and discriminant-based approaches involves significant trade-offs in terms of data requirements, computational complexity, and application flexibility:
+
+### 2.1 Demands and Resource Waste
+
+* **Data and Dimensionality:** Generative modeling (Approach a) is the most demanding because it requires finding the joint distribution over both the high-dimensional input space and the classes. To determine class-conditional densities to reasonable accuracy, a very large training set may be required.
+* **Wasted Computation:** If the ultimate goal is only to make classification decisions, finding the joint distribution $p(\mathbf{x}, \mathcal{C}_k)$ can be wasteful of computational resources and excessively demanding of data. The class-conditional densities often contain substantial complex structure that has little or no effect on the final posterior probabilities.
+
+### 2.2 Parameter Scaling (Dimensionality Benefit)
+
+* **Fewer Parameters:** Discriminative models (Approach b) typically require fewer adaptive parameters to be determined.
+* **Example (Logistic Regression vs. Gaussian Class-Conditionals):** Consider an $M$-dimensional feature space.
+* Logistic regression (discriminative) has exactly $M$ adjustable parameters.
+* Gaussian class-conditional densities with a shared covariance matrix (generative) require $2M$ parameters for the means, $M(M+1)/2$ parameters for the shared covariance matrix, and $1$ parameter for the class prior.
+* This results in a total of $M(M+5)/2 + 1$ parameters, which grows quadratically with $M$, compared to the linear dependence of logistic regression.
+
+
+
+### 2.3 Robustness and Predictive Performance
+
+* **Model Misspecification:** Discriminative training can lead to improved predictive performance, especially when the assumed parametric forms of the class-conditional densities in a generative model provide a poor approximation to the true underlying distributions.
+* **Task Alignment:** Discriminative models generally perform better on discriminative tasks than generative models.
+
+### 2.4 Advantages Unique to Generative Models
+
+Despite their high data demands, generative models offer several key advantages:
+
+* **Outlier and Novelty Detection:** By determining the marginal density of the data $p(\mathbf{x}) = \sum_k p(\mathbf{x}\vert{}\mathcal{C}_k)p(\mathcal{C}_k)$, generative models can detect new data points that have low probability under the model, indicating where predictions may be of low accuracy.
+* **Handling Missing Data:** Generative models can deal naturally with missing data.
+* **Varying Sequence Lengths:** In sequential models like Hidden Markov Models, they can naturally handle sequences of varying length.
+* **Unlabeled Data:** They allow unsupervised or semi-supervised learning because the marginal $p(\mathbf{x})$ can be modeled directly.
+
+
+
+## 3. The Power of Posterior Probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$
+
+If one uses Approach (c) (direct discriminant functions), the posterior probabilities are completely lost. Retaining posterior probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$ via Approach (a) or (b) is highly advantageous for several reasons:
+
+### 3.1 The Reject Option
+
+* Classification errors primarily occur in regions of the input space where the largest posterior probability is significantly less than unity.
+* To avoid making decisions on difficult or ambiguous cases, a threshold $\theta$ can be introduced to reject inputs for which the largest posterior probability is less than or equal to $\theta$.
+* This controls the fraction of examples rejected to ensure a lower error rate on those classified.
+
+
+<img width="1026" height="406" alt="image" src="https://github.com/user-attachments/assets/da7db5fa-d0d2-40da-874d-047ca5cf46e5" />
+
+
+
+### 3.2 Minimizing Expected Loss
+
+If there is a general loss matrix $L_{kj}$ (describing the cost of classifying class $\mathcal{C}_k$ as class $\mathcal{C}_j$), the expected loss is minimized by assigning a new input $\mathbf{x}$ to the class $j$ that minimizes the quantity:
+
+$$\sum_{k} L_{kj}p(\mathcal{C}_k\vert{}\mathbf{x})$$
+
+Posterior probabilities are necessary to compute this expected loss.
+
+### 3.3 Model Combination (Data Fusion)
+
+For complex applications, a large problem can be broken down into smaller, heterogeneous subproblems tackled by separate modules (e.g., blood tests $\mathbf{x}_B$ and X-ray images $\mathbf{x}_I$ for medical diagnosis).
+
+If the separate modules provide posterior probabilities, they can be combined systematically using the rules of probability. Under the assumption of conditional independence for each class separately:
+
+$$p(\mathbf{x}_I, \mathbf{x}_B\vert{}\mathcal{C}_k) = p(\mathbf{x}_I\vert{}\mathcal{C}_k)p(\mathbf{x}_B\vert{}\mathcal{C}_k)$$
+
+The combined posterior probability is:
+
+$$p(\mathcal{C}_k\vert{}\mathbf{x}_I, \mathbf{x}_B) \propto \frac{p(\mathcal{C}_k\vert{}\mathbf{x}_I)p(\mathcal{C}_k\vert{}\mathbf{x}_B)}{p(\mathcal{C}_k)}$$
+
+> [!NOTE]
+> This conditional independence assumption conditioned on the class label is the core foundation of the Naive Bayes model.
+
+
+
+## 4. Hybrid Paradigms: Generative Models in Discriminative Settings
+
+To exploit the strengths of both paradigms (the flexibility of discriminative models and the capacity of generative models to handle missing data or variable sequences), hybrid systems can be constructed:
+
+### 4.1 Generative Kernels (The Fisher Kernel)
+
+A parametric generative model $p(\mathbf{x}\vert{}\theta)$ (where $\theta$ is the parameter vector) can be used to define a kernel function for use in a discriminative classifier like a Support Vector Machine.
+
+The gradient with respect to $\theta$ defines a vector in a "feature" space, known as the Fisher score:
+
+$$\mathbf{g}(\theta, \mathbf{x}) = \nabla_{\theta} \ln p(\mathbf{x}\vert{}\theta)$$
+
+The Fisher kernel is then formulated as:
+
+$$k(\mathbf{x}, \mathbf{x}') = \mathbf{g}(\theta, \mathbf{x})^T \mathbf{F}^{-1} \mathbf{g}(\theta, \mathbf{x}')$$
+
+where $\mathbf{F}$ is the Fisher information matrix:
+
+$$\mathbf{F} = \mathbb{E}_{\mathbf{x}} [\mathbf{g}(\theta, \mathbf{x})\mathbf{g}(\theta, \mathbf{x})^T]$$
+
+* **Invariance:** The inclusion of the Fisher information matrix ensures the kernel remains invariant under a nonlinear re-parameterization of the density model $\theta \to \psi(\theta)$.
+
+### 4.2 Tong and Koller Hybrid Classification
+
+* In this framework, the distribution over input vectors $\mathbf{x}$ for each class is modeled using a Parzen density estimator with Gaussian kernels having a common parameter $\sigma^2$.
+* The best hyperplane is then determined by minimizing the probability of error relative to this learned density model.
+* In the limit $\sigma^2 \to 0$, the optimal hyperplane corresponds to the maximum margin solution of a Support Vector Machine, becoming independent of data points that are not support vectors.
+
+
+
+## 5. Comparative Summary of Paradigms
+
+| Metric/Feature | Generative Models (Approach a) | Discriminative Models (Approach b) | Discriminant Functions (Approach c) |
+| --- | --- | --- | --- |
+| **Core Modeling Target** | Joint distribution $p(\mathbf{x}, \mathcal{C}_k)$ or $p(\mathbf{x}\vert{}\mathcal{C}_k)p(\mathcal{C}_k)$ | Posterior probabilities $p(\mathcal{C}_k\vert{}\mathbf{x})$ | Direct mapping function $f(\mathbf{x}) \to \mathcal{C}_k$ |
+| **Parameter Complexity** | High; typically scales quadratically with dimensionality $M$ | Low; scales linearly with dimensionality $M$ | Extremely low; combines inference and decision |
+| **Data Requirements** | Very large training sets required to model input space accurately | Moderate training sets; focused only on class boundaries | Smallest training sets; completely bypasses density |
+| **Outlier Detection** | Natural; utilizes computed marginal $p(\mathbf{x})$ | Poor; marginal $p(\mathbf{x})$ is not modeled | Impossible; no probabilistic framework exists |
+| **Reject Option** | Easy; uses posterior probabilities | Easy; uses posterior probabilities | Impossible; no access to class probabilities |
+| **Missing Features** | Natural; marginalizes over "bad" features | Difficult; requires explicit imputation | Highly difficult; lacks joint density |
+
+> [!IMPORTANT]
+> If a generative model uses the maximum likelihood classifier, it is only guaranteed to be optimal if the assumed parametric model matches the true distribution. If the model is wrong (model error is large), the resulting classifier is not guaranteed to be the best, even among the assumed model set.
+
+## 6. Parametric Generative and Discriminative Classifiers in High Dimensions
+
+When the features are high-dimensional ($p \gg N$), estimation of complete dependencies is mathematically impossible due to the limited number of training observations.
+
+### 6.1 Diagonal Linear Discriminant Analysis (Diagonal LDA)
+
+To solve multi-class classification problems under $p \gg N$, diagonal covariance LDA assumes that the features are independent within each class.
+
+The within-class covariance matrix is diagonal:
+
+$$
+\mathbf{\Sigma}_k = \mathbf{\Sigma} = \text{diag}(s_1^2, s_2^2, \dots, s_p^2)
+$$
+
+The discriminant score for class $k$ evaluated at a test observation $x^*$ is:
+
+$$
+\delta_k(x^*) = -\sum_{j=1}^{p} \frac{(x_j^* - \overline{x}_{kj})^2}{s_j^2} + 2 \ln \pi_k
+$$
+
+where $s_j$ is the pooled within-class standard deviation of feature $j$, and $\overline{x}_{kj}$ is the class $k$ centroid of the training data.
+
+The classification rule is then:
+
+$$
+C(x^*) = l \quad \text{if} \quad \delta_l(x^*) = \max_k \delta_k(x^*)
+$$
+
+Standardizing the class centroids yields the posterior probability estimates:
+
+$$
+\hat{p}_k(x^*) = \frac{e^{\frac{1}{2}\delta_k(x^*)}}{\sum_{l=1}^{K} e^{\frac{1}{2}\delta_l(x^*)}}
+$$
+
+### 6.2 Regularized Discriminant Analysis (RDA)
+
+RDA is a compromise between diagonal LDA and standard QDA. It shrinks the covariance matrix estimate $\hat{\mathbf{\Sigma}}$ towards the diagonal to handle the singularity that occurs when $p \gg N$:
+
+$$
+\hat{\mathbf{\Sigma}}(\gamma) = \gamma \hat{\mathbf{\Sigma}} + (1 - \gamma)\text{diag}(\hat{\mathbf{\Sigma}})
+$$
+
+where $\gamma \in [0, 1]$ is a regularizing parameter.
