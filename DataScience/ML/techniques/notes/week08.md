@@ -322,3 +322,247 @@ Using Bayes' theorem, separate mixture densities in each class lead to highly fl
 
 > [!IMPORTANT]
 > If our model assumption is poor, the maximum likelihood generative classifier we derive is not guaranteed to be the best even among our (poor) model set. If the model is wrong (e.g., does not match the true generating distribution), the classification error rate can approach high values.
+
+
+
+
+---
+
+
+
+
+# 8.2 Naive Bayes Framework & Optimization
+
+## 1. Probabilistic Modeling and the Curse of Dimensionality
+
+In supervised pattern classification, the primary goal is to predict the discrete class label or posterior probability $p(\mathcal{C}_k \mid x)$ for a $D$-dimensional input vector $x = (x_1, \dots, x_D)^T$. Modeling the full joint distribution $p(x, \mathcal{C}_k)$ or class-conditional densities $p(x \mid \mathcal{C}_k)$ in high-dimensional spaces is extremely challenging.
+
+If the input features are discrete and binary-valued ($x_i \in \{0, 1\}$), a fully general class-conditional distribution requires a table of $2^D$ numbers for each class, which translates to $2^D - 1$ independent variables. Because this representation grows exponentially with the number of features $D$, it quickly becomes computationally infeasible. Successful pattern recognition techniques must exploit lower effective dimensionality or local smoothness properties to generalize well from finite datasets.
+
+To resolve this limitation, the Naive Bayes model introduces a highly restrictive conditional independence assumption to simplify the probabilistic structure.
+
+## 2. The Conditional Independence Assumption
+
+The key assumption of the Naive Bayes model is that, conditioned on the class label, the individual input variables are statistically independent. For a $D$-dimensional input vector $x$ and a class variable represented by a $K$-dimensional binary vector $z$ using a 1-of-$K$ encoding scheme, this is expressed mathematically as:
+
+$$
+p(x \mid z) = \prod_{i=1}^D p(x_i \mid z)
+$$
+
+Alternatively, for continuous features $X \in \mathbb{R}^p$ and a qualitative class response $G$ taking values in the set $\{1, \dots, J\}$, the joint class-conditional density $f_j(X)$ is written as:
+
+$$
+f_j(X) = \prod_{k=1}^p f_{jk}(X_k)
+$$
+
+where $f_{jk}$ is the univariate class-conditional density of the predictor $X_k$ in class $G=j$.
+
+## 3. Graphical Representation and d-Separation Properties
+
+The structural independencies of the Naive Bayes framework are naturally described using directed acyclic graphs (probabilistic graphical models).
+
+<img width="1236" height="274" alt="image" src="https://github.com/user-attachments/assets/2212d75a-78b5-4da3-be50-6a2c8fd89f9a" />
+
+
+In the directed graph representing the Naive Bayes model, the node representing the class label $z$ is tail-to-tail with respect to the paths between any two input variables $x_i$ and $x_j$ for $j \neq i$.
+
+- **Observed Class Label ($z$ is shaded/clamped):** Observation of $z$ blocks the path between $x_i$ and $x_j$. By the d-separation criterion, this renders the components conditionally independent given $z$:
+
+$$
+x_i \perp\!\!\!\perp x_j \mid z
+$$
+
+- **Unobserved Class Label ($z$ is marginalized out):** If $z$ is not observed, the tail-to-tail path from $x_i$ to $x_j$ is no longer blocked. Consequently, the joint marginal density $p(x)$ does not factorize with respect to its components:
+
+$$
+p(x) = \sum_{z} p(x \mid z) p(z) \neq \prod_{i=1}^D p(x_i)
+$$
+
+## 4. Application: Medical Data Fusion
+
+The framework of Naive Bayes conditional independence is highly useful for systematically fusing heterogeneous data sources. Suppose we have separate, independent diagnostic models for interpreting X-ray images ($x_I$) and blood test data ($x_B$).
+
+If we assume that, for each class $\mathcal{C}_k$ separately, the distributions of the inputs $x_I$ and $x_B$ are conditionally independent, the joint conditional probability factorizes as:
+
+$$
+p(x_I, x_B \mid \mathcal{C}_k) = p(x_I \mid \mathcal{C}_k) p(x_B \mid \mathcal{C}_k)
+$$
+
+Using Bayes' theorem, the posterior class probability given both the X-ray and blood test measurements is:
+
+$$
+p(\mathcal{C}_k \mid x_I, x_B) \propto p(x_I, x_B \mid \mathcal{C}_k) p(\mathcal{C}_k)
+$$
+
+$$
+p(\mathcal{C}_k \mid x_I, x_B) \propto p(x_I \mid \mathcal{C}_k) p(x_B \mid \mathcal{C}_k) p(\mathcal{C}_k)
+$$
+
+$$
+p(\mathcal{C}_k \mid x_I, x_B) \propto \frac{p(\mathcal{C}_k \mid x_I) p(\mathcal{C}_k \mid x_B)}{p(\mathcal{C}_k)}
+$$
+
+The resulting combined posterior probabilities must then be normalized to ensure they sum to one.
+
+### 8.2.1 Naive Bayes Algorithm
+
+#### 1. Algorithmic Steps and Density Estimation
+
+The Naive Bayes algorithm operates by modeling individual one-dimensional marginal densities separately for each feature, avoiding high-dimensional integration or tabulations.
+
+- **Step 1: Feature Splitting and Distribution Assignment** For each predictor variable $X_k$, we estimate its univariate class-conditional density $f_{jk}(X_k)$ for each class $j$ separately.
+- **Continuous Variables:** The class-conditional marginals $f_{jk}$ can be estimated using nonparametric one-dimensional kernel density estimators. Alternatively, they can be modeled as univariate Gaussians.
+- **Discrete/Categorical Variables:** If a component $X_j$ is discrete, an appropriate histogram or multinomial estimate is used. This allows the seamless mixing of qualitative and quantitative variable types in a single model.
+- **Step 2: Prior Probability Estimation** The class prior probabilities $p(\mathcal{C}_k)$ are estimated directly from the fractions of training data points falling into each class.
+- **Step 3: Posterior Inference** For a new query pattern, we compute the unnormalized class-conditional density products multiplied by the priors, then normalize via Bayes' theorem.
+
+#### 2. Maximum Likelihood Parameter Estimation
+
+Given a labeled training set comprising independent observations $\{x_1, \dots, x_N\}$ and their class labels, we fit the Naive Bayes parameters using maximum likelihood.
+
+Because the features are conditionally independent given the class, the optimization decouples. The maximum likelihood solution is obtained by fitting the parameters of the model for each class separately, utilizing only the correspondingly labeled training data.
+
+##### Special Case: Gaussian Naive Bayes
+
+When the probability density within each class is modeled as a multivariate Gaussian:
+
+$$
+p(x \mid \mathcal{C}_k) = \mathcal{N}(x \mid \mu_k, \Sigma_k)
+$$
+
+the Naive Bayes conditional independence assumption forces the covariance matrix $\Sigma_k$ to be strictly diagonal.
+
+Consequently, the contours of constant density within each class are axis-aligned ellipsoids. The overall marginal density $p(x)$, however, is a superposition of these diagonal Gaussians weighted by class priors, and thus it remains non-diagonal and does not factorize.
+
+##### Connection to Probabilistic PCA
+
+In Probabilistic Principal Component Analysis, the conditional distribution of the observed variable $x$ given the latent variable $z$ is modeled as a Gaussian:
+
+$$
+p(x \mid z) = \mathcal{N}(x \mid Wz + \mu, \sigma^2 I)
+$$
+
+Because the covariance matrix $\sigma^2 I$ is isotropic and diagonal, this conditional distribution factorizes with respect to the individual elements of $x$. It therefore represents a continuous-latent-variable instance of the Naive Bayes framework.
+
+## 8.2.2 Pitfalls of Naive Bayes Algorithm
+
+#### 1. Strong Model Misspecification and Representation Loss
+
+> [!CAUTION] The conditional independence assumption is clearly a strong one that rarely holds in practice, and it can lead to very poor representations of the true class-conditional densities.
+>
+>
+
+If the true underlying class-conditional distributions exhibit strong correlations, the Naive Bayes model will severely misrepresent the joint density. If our assumed model is highly poor, the maximum likelihood parameter estimates we derive are not guaranteed to yield the best possible decision boundary within our model class (this is an instance of severe model error).
+
+#### 2. The Variance-Bias Trade-off Paradox
+
+Despite its highly optimistic and often incorrect independence assumptions, the Naive Bayes classifier frequently outperforms much more sophisticated modeling alternatives in practice. This behavior is explained by the variance-bias trade-off.
+
+- **Bias:** Imposing the Naive Bayes assumption introduces significant systematic bias into the estimated joint density because it ignores correlations.
+- **Variance:** Because the parameters are estimated purely along individual coordinates, the number of parameters to be estimated is drastically reduced, which heavily decreases the variance of our estimates.
+
+<img width="841" height="291" alt="image" src="https://github.com/user-attachments/assets/de2827fd-6548-41e5-ad4a-82d12deec5a7" />
+
+As a result, although the individual class density estimates may be biased, this bias might not hurt the posterior probabilities as much, particularly near the decision regions. The classifier is able to withstand considerable bias because of the major savings in variance earned by the "naive" independence assumption.
+
+#### 3. Decision Boundary Insensitivity
+
+Naive Bayes performs robustly because the resulting decision boundaries are highly insensitive to some of the fine details of the class-conditional densities.
+
+<img width="1108" height="638" alt="image" src="https://github.com/user-attachments/assets/26c78a50-1348-4127-89d1-66eb509c451e" />
+
+
+As shown in Figure 1.27, complex multi-modal structures in the class-conditional densities often lie deep within class-specific regions and have zero effect on the posterior ratio at the decision boundary. Therefore, even if the independence assumption is violated, the boundary itself remains highly accurate.
+
+### 8.2.3 Decision Function of Naive Bayes
+
+#### 1. Softmax Formulation of Posterior Probabilities
+
+For a multiclass classification problem with $K$ classes, the posterior class probability $p(\mathcal{C}_k \mid x)$ under the Naive Bayes model can be written as a softmax transformation of a linear function of $x$:
+
+$$
+p(\mathcal{C}_k \mid x) = \frac{\exp(a_k)}{\sum_j \exp(a_j)}
+$$
+
+If the feature vector has $M$ components, each of which can take $L$ discrete states and is represented by a 1-of-$L$ binary coding scheme, the quantities $a_k$ are linear functions of the components of the input feature vector:
+
+$$
+a_k = \ln \left( p(x \mid \mathcal{C}_k) p(\mathcal{C}_k) \right) = \sum_{i=1}^D x_i \ln \left( \frac{\mu_{ki}}{1 - \mu_{ki}} \right) + \sum_{i=1}^D \ln(1 - \mu_{ki}) + \ln p(\mathcal{C}_k)
+$$
+
+#### 2. Duda's Formulation of Independent Binary Features
+
+Consider a two-category classification problem where the components of the feature vector $x = (x_1, \dots, x_d)^T$ are binary-valued (taking values 0 or 1) and conditionally independent given the class $\omega_j$.
+
+##### 2.1 Model Parameters
+
+We define the parameter probabilities as:
+
+$$
+p_i = \text{Prob}(x_i = 1 \mid \omega_1)
+$$
+
+$$
+q_i = \text{Prob}(x_i = 1 \mid \omega_2)
+$$
+
+The class-conditional probabilities are written as:
+
+$$
+P(x \mid \omega_1) = \prod_{i=1}^d p_i^{x_i}(1 - p_i)^{1 - x_i}
+$$
+
+$$
+P(x \mid \omega_2) = \prod_{i=1}^d q_i^{x_i}(1 - q_i)^{1 - x_i}
+$$
+
+##### 2.2 Derivation of the Discriminant Function
+
+The minimum-error-rate decision rule is governed by the discriminant function $g(x)$:
+
+$$
+g(x) = \ln \frac{P(x \mid \omega_1)}{P(x \mid \omega_2)} + \ln \frac{P(\omega_1)}{P(\omega_2)}
+$$
+
+Substituting the class-conditional product terms yields:
+
+$$
+g(x) = \sum_{i=1}^d \left[ x_i \ln \frac{p_i}{q_i} + (1 - x_i)\ln\frac{1 - p_i}{1 - q_i} \right] + \ln \frac{P(\omega_1)}{P(\omega_2)}
+$$
+
+By regrouping terms, we see that $g(x)$ is a strictly linear combination of the components $x_i$:
+
+$$
+g(x) = \sum_{i=1}^d w_i x_i + w_0
+$$
+
+where the components of the weight vector $w_i$ are:
+
+$$
+w_i = \ln \frac{p_i(1 - q_i)}{q_i(1 - p_i)} \quad \text{for } i=1, \dots, d
+$$
+
+and the threshold weight $w_0$ (which contains the log-prior ratio) is:
+
+$$
+w_0 = \sum_{i=1}^d \ln \frac{1 - p_i}{1 - q_i} + \ln \frac{P(\omega_1)}{P(\omega_2)}
+$$
+
+The decision rule is to decide $\omega_1$ if $g(x) \gt 0$ and $\omega_2$ if $g(x) \le 0$. Geometrically, the possible values for $x$ appear as the vertices of a $d$-dimensional hypercube, and the decision boundary $g(x) = 0$ is a hyperplane that separates the $\omega_1$ vertices from the $\omega_2$ vertices.
+
+#### 3. Decision Boundary Optimization and Threshold $x^{\star}$
+
+To establish an optimal decision rule, we seek a threshold value that minimizes the probability of misclassification.
+
+<img width="983" height="608" alt="image" src="https://github.com/user-attachments/assets/a1eb6af0-ede5-4cb6-a72c-fd4d44e428e5" />
+
+
+Using a set of labeled training samples, we inspect the univariate histograms of a promising feature (such as lightness $x$). Because no single threshold value can completely separate overlapping distributions without error, we define a threshold $x^{\star}$ that minimizes the expected cost or misclassification rate.
+
+If all classification errors are equally costly (zero-one loss), the optimal threshold $x^{\star}$ occurs at the exact point where the posterior probabilities are equal, which corresponds to the intersection of the joint density curves:
+
+$$
+p(x^{\star}, \omega_1) = p(x^{\star}, \omega_2)
+$$
+
+If we penalize misclassifying $\omega_1$ as $\omega_2$ more than the converse (i.e., we have an asymmetric loss matrix where $\lambda_{21} \gt \lambda_{12}$), the threshold shifts from $x^{\star}$ to a larger value, which systematically reduces the size of the decision region $\mathcal{R}_1$ to minimize the expected risk.
