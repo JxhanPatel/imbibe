@@ -566,3 +566,181 @@ p(x^{\star}, \omega_1) = p(x^{\star}, \omega_2)
 $$
 
 If we penalize misclassifying $\omega_1$ as $\omega_2$ more than the converse (i.e., we have an asymmetric loss matrix where $\lambda_{21} \gt \lambda_{12}$), the threshold shifts from $x^{\star}$ to a larger value, which systematically reduces the size of the decision region $\mathcal{R}_1$ to minimize the expected risk.
+
+
+
+
+
+
+---
+
+
+
+
+
+# 8.3 Gaussian Naive Bayes
+
+## 1. The Naive Bayes Classification Framework
+
+### 1.1 The Conditional Independence Assumption
+
+The naive Bayes model uses conditional independence assumptions to simplify the model structure. Suppose our observed variable consists of a $D$-dimensional (or $p$-dimensional) vector $x = (x_1, \dots, x_D)^T$ and we wish to assign observed values of $x$ to one of $K$ (or $J$) classes. The key assumption of the naive Bayes model is that, conditioned on the class label, the distributions of the individual input variables are statistically independent.
+
+Mathematically, for a class $G = j$ (or $\mathcal{C}_k$), the joint class-conditional density factorizes into a product of one-dimensional marginal densities:
+
+$$
+f_j(x) = \prod_{i=1}^p f_{ji}(x_i)
+$$
+
+or in terms of class $\mathcal{C}_k$:
+
+$$
+p(x \mid \mathcal{C}_k) = \prod_{i=1}^D p(x_i \mid \mathcal{C}_k)
+$$
+
+### 1.2 Avoidance of the Curse of Dimensionality
+
+- **Data Reduction:** If there are $D$ binary inputs, a general distribution would correspond to a table of $2^D$ numbers for each class, containing $2^D - 1$ independent variables. Because this representation grows exponentially with the number of features, density estimation in high-dimensional spaces becomes extremely challenging.
+- **Dimensionality Benefit:** The naive Bayes assumption is highly helpful when the dimensionality $D$ of the input space is high, making density estimation in the full $D$-dimensional space more tractable.
+- **Mixed Variable Support:** It is also useful if the input vector contains both discrete and continuous variables, since each can be represented separately using appropriate models (e.g., Bernoulli distributions for binary observations or Gaussians for real-valued variables).
+
+## 2. Mathematical Formulation of Gaussian Naive Bayes
+
+### 2.1 Class-Conditional Density Model
+
+If the probability density within each class is chosen to be Gaussian:
+
+$$
+p(x_i \mid \mathcal{C}_k) = \mathcal{N}(x_i \mid \mu_{ki}, \sigma_{ki}^2) = \frac{1}{(2\pi \sigma_{ki}^2)^{1/2}} \exp\left( -\frac{1}{2\sigma_{ki}^2} (x_i - \mu_{ki})^2 \right)
+$$
+
+Then, the naive Bayes conditional independence assumption implies that the covariance matrix $\Sigma_k$ for each Gaussian is strictly diagonal:
+
+$$
+\Sigma_k = \text{diag}(\sigma_{k1}^2, \sigma_{k2}^2, \dots, \sigma_{kD}^2)
+$$
+
+### 2.2 Geometrical and Marginal Properties
+
+- **Contours of Constant Density:** Geometrically, because the covariance matrix is diagonal, the contours of constant density within each class are axis-aligned ellipsoids.
+- **The Marginal Density:** The overall marginal density of the observed data $p(x)$ is given by a superposition of these diagonal Gaussians weighted by the class priors:
+
+$$
+p(x) = \sum_{k} p(x \mid \mathcal{C}_k) p(\mathcal{C}_k)
+$$
+
+Because of this summation, the joint marginal distribution $p(x)$ will typically not factorize under this model.
+
+## 3. Special Case: Diagonal Linear Discriminant Analysis (Diagonal LDA)
+
+When the features in each class have independent Gaussian distributions with the same variance (i.e., a shared diagonal covariance matrix across all classes):
+
+$$
+\Sigma_k = \Sigma = \text{diag}(s_1^2, s_2^2, \dots, s_p^2)
+$$
+
+The model simplifies further, leading to linear decision boundaries.
+
+### 3.1 The Discriminant Score Function
+
+The discriminant score for class $k$ evaluated at a test observation $x^{\star} = (x_1^{\star}, x_2^{\star}, \dots, x_p^{\star})^T$ is defined as:
+
+$$
+\delta_k(x^{\star}) = -\sum_{j=1}^{p} \frac{(x_j^{\star} - \overline{x}_{kj})^2}{s_j^2} + 2 \ln \pi_k
+$$
+
+Where:
+
+- $x^{\star} = (x_1^{\star}, x_2^{\star}, \dots, x_p^{\star})^T$ is a vector of feature values for a test observation.
+- $s_j$ is the pooled within-class standard deviation of the $j^{\text{th}}$ feature.
+- $\overline{x}_{kj}$ is the mean of the $N_k$ values for feature $j$ in class $k$:
+
+$$
+\overline{x}_{kj} = \frac{1}{N_k} \sum_{i \in C_k} x_{ij}
+$$
+
+where $C_k$ is the index set of the observations in class $k$. The vector $\overline{x}_k = (\overline{x}_{k1}, \overline{x}_{k2}, \dots, \overline{x}_{kp})^T$ is called the centroid of class $k$.
+
+- $\pi_k$ is the prior probability of class $k$, where $\sum_{k=1}^K \pi_k = 1$.
+
+### 3.2 Decision Rule
+
+The classification rule is:
+
+$$
+C(x^{\star}) = l \quad \text{if} \quad \delta_l(x^{\star}) = \max_k \delta_k(x^{\star})
+$$
+
+Under this formulation, the diagonal LDA classifier is equivalent to a nearest centroid classifier after appropriate standardization. It is also known as the "independence rule".
+
+> **Note**
+>
+> Standardizing the features by $s_j + s_0$, where $s_0$ is a small positive constant (typically chosen to be the median of the $s_j$ values), prevents large discriminant values arising from expression values near zero.
+>
+>
+
+## 4. Probabilistic Formulation & Generalized Additive Log-Odds
+
+For a multiclass classification problem with classes $l = 1, \dots, J$, we can evaluate the log-odds ratio using a base class $J$. Under the Naive Bayes model, the class posterior probabilities can be written as:
+
+$$
+\ln \frac{\Pr(G=l \mid X)}{\Pr(G=J \mid X)} = \ln \frac{\pi_l f_l(X)}{\pi_J f_J(X)} = \ln \frac{\pi_l}{\pi_J} + \sum_{k=1}^p \ln \frac{f_{lk}(X_k)}{f_{Jk}(X_k)} = \alpha_l + \sum_{k=1}^p g_{lk}(X_k)
+$$
+
+Where:
+
+- $\alpha_l = \ln \frac{\pi_l}{\pi_J}$ acts as an offset.
+- $g_{lk}(X_k) = \ln \frac{f_{lk}(X_k)}{f_{Jk}(X_k)}$ represents the class-conditional log-density ratio.
+
+This model has the exact functional form of a generalized additive model (GAM). If the marginals $f_{lk}(X_k)$ are chosen to be univariate Gaussians with equal variances, the terms $g_{lk}(X_k)$ become strictly linear in $X_k$, resulting in linear decision boundaries. If the variances are unequal, $g_{lk}(X_k)$ is quadratic, yielding quadratic decision boundaries.
+
+## 5. The Variance-Bias Trade-Off & Boundary Insensitivity
+
+### 5.1 Systematic Model Error (Bias) vs. Saving in Variance
+
+- **The Strong Independence Bias:** The conditional independence assumption is clearly a strong one that is rarely precisely satisfied in practice, and it can lead to very poor representations of the true class-conditional densities.
+- **The Variance Benefit:** Although the individual class density estimates may be systematically biased, the classifier is able to withstand considerable bias because of the major savings in parameter variance earned by the "naive" independence assumption.
+
+### 5.2 Boundary Insensitivity
+
+The high classification accuracy of Naive Bayes in practical applications is explained by the fact that the resulting decision boundaries are highly insensitive to the fine details of the class-conditional densities:
+
+<img width="888" height="533" alt="image" src="https://github.com/user-attachments/assets/923d490d-fff1-45b5-83bc-4170bc3441a6" />
+
+As shown in Figure 1.27, complex multi-modal structures in the class-conditional densities often lie deep within class-specific regions and have zero effect on the posterior ratio at the decision boundary. Therefore, even if the independence assumption is violated, the boundary itself remains highly accurate.
+
+## 6. Graphical Model Structure and d-Separation
+
+The Naive Bayes model is a directed acyclic graph (Bayesian network).
+
+<img width="842" height="370" alt="image" src="https://github.com/user-attachments/assets/70b4c231-1077-4efd-b065-714bd10add01" />
+
+### 6.1 d-Separation Properties
+
+- **Conditioned on the Class Label ($z$ is observed):** In the directed graph, the class node $z$ is tail-to-tail with respect to the path between any two input variables $x_i$ and $x_j$ (for $j \neq i$). Observation of $z$ blocks this path. By the d-separation criterion, the components of the observed vector are conditionally independent given $z$:
+
+$$
+x_i \perp\!\!\!\perp x_j \mid z
+$$
+
+- **Unobserved Class Label ($z$ is latent/marginalized out):** If $z$ is not observed, the tail-to-tail path from $x_i$ to $x_j$ is no longer blocked. This implies that the joint marginal distribution $p(x)$ will not factorize with respect to its components:
+
+$$
+p(x) = \sum_{z} p(x \mid z) p(z) \neq \prod_{i=1}^D p(x_i)
+$$
+
+## 7. Model Connections: Probabilistic PCA
+
+An interesting connection occurs in Probabilistic Principal Component Analysis (PPCA). The conditional distribution of the observed $D$-dimensional variable $x$, conditioned on the $M$-dimensional Gaussian latent variable $z$, is modeled as:
+
+$$
+p(x \mid z) = \mathcal{N}(x \mid Wz + \mu, \sigma^2 I)
+$$
+
+Because the covariance matrix $\sigma^2 I$ is isotropic and diagonal, this conditional distribution factorizes with respect to the individual elements of $x$:
+
+$$
+p(x \mid z) = \prod_{i=1}^D p(x_i \mid z)
+$$
+
+Thus, Probabilistic PCA has the exact same conditional independence structure as the naive Bayes model
