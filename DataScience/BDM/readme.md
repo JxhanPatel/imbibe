@@ -5,11 +5,10 @@
 | **Week 1**  | Economics Introduction             | Introduction to Economics and basic economic concepts                                                | 🟢 Done      |
 | **Week 2**  | Demand & Supply                    | Demand, supply, curves, and elasticity                                                               | 🟢 Done      |
 | **Week 3**  | Business & B2B Basics              | Business models, services, B2B buying behavior, DMU, sales techniques                                | 🟢 Done      |
-| **Week 4**  | Demand, Supply & Consumer Behavior | Demand mechanics, supply, market equilibrium, utility theory, consumer psychology, valuation paradox | 🟡 In Progress      |
-| **Week 5**  | Accounting Fundamentals            | Accounting concepts, balance sheet, accounting equation, income statement, dividends                 | 🟡 In Progress      |
-| **Week 6**  | Financial Statements               | Transactions, accounts, inventory, depreciation, income statement, balance sheet, cash flow          | 🟡 In Progress      |
-| **Week 7**  | Financial Ratio Analysis           | Liquidity, solvency, efficiency, profitability, and market ratios                                    | 🟡 In Progress      |
-| **Week 8**  | Financial Statement Analysis       | Case study and practical application of financial analysis                                           | 🟡 In Progress      |
-| **Week 9**  | Management Accounting              | Management accounting applications, cost classification, and profits                                 | 🟡 In Progress      |
-| **Week 10** | Data & Business Conflicts          | Negotiation traps, KPI/dashboard ownership, conflict management, data protection                     | 🟡 In Progress      |
-| **Week 11** | Sales Process                      | Prospecting, approach, needs analysis, pitching, objection handling, negotiation, after-sales        | 🟡 In Progress      |
+| **Week 4**  | Demand, Supply & Consumer Behavior | Demand mechanics, supply, market equilibrium, utility theory, consumer psychology, valuation paradox | 🟢 Done      |
+| **Week 5**  | Accounting Fundamentals            | Accounting concepts, balance sheet, accounting equation, income statement, dividends                 | 🟢 Done      |
+| **Week 6**  | Financial Statements               | Transactions, accounts, inventory, depreciation, income statement, balance sheet, cash flow          | 🟢 Done      |
+| **Week 7**  | Financial Ratio Analysis           | Liquidity, solvency, efficiency, profitability, and market ratios                                    | 🟢 Done      |
+| **Week 8**  | Financial Statement Analysis       | Case study and practical application of financial analysis                                           | 🟢 Done      |
+| **Week 9**  | Management Accounting              | Management accounting applications, cost classification, and profits                                 | 🟢 Done      |
+| **Week 10** | Sales Process                      | Prospecting, approach, needs analysis, pitching, objection handling, negotiation, after-sales        | 🟢 Done      |
