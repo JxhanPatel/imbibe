@@ -225,3 +225,105 @@ imputer = SimpleImputer(strategy="median")
 
 1. **`fit()` method**: Computes the statistic (e.g., median) for each attribute and stores the result in its `statistics_` instance variable : ```python imputer.fit(housing_num) ``` Checking the learned statistics: ```python imputer.statistics_ ```
 2. **`transform()` method**: Uses the trained imputer to transform the training set by replacing missing values with the learned medians : ```python X = imputer.transform(housing_num) ``` The result is a plain NumPy array containing the transformed features, which can be converted back into a pandas DataFrame if needed : ```python import pandas as pd housing_tr = pd.DataFrame(X, columns=housing_num.columns, index=housing_num.index) ```
+
+
+
+
+
+---
+
+
+
+
+
+# Module 3: Feature Transformers & Scaling
+
+## 2.5: Categorical Transformers
+
+### Converting Text Categories to Numbers
+
+Most machine learning algorithms prefer to work with numbers  . When a dataset contains text or categorical attributes (such as `Sex` or `ocean_proximity`), we need special handling to convert these categories into numerical representations  .
+
+1. **Ordinal Encoding (`OrdinalEncoder`)**:
+- We can use Scikit-Learn’s `OrdinalEncoder` class to convert categories to numbers by calling the `fit_transform()` method on the encoder object .
+2. **One-Hot Encoding (`OneHotEncoder`)**:
+- Scikit-Learn provides the `OneHotEncoder` class to convert categorical values into one-hot vectors .
+- Characteristics of one-hot encoding:
+- Only one feature is $1$ (hot) and the rest are $0$ (cold) .
+- The new features are referred to as **dummy features** .
+- When calling `fit_transform()` on a `OneHotEncoder` object, the output is a **SciPy sparse matrix** rather than a NumPy array . This enables us to save a huge amount of space when we have a huge number of categories .
+- To convert the sparse matrix into a dense representation, we can use the `.toarray()` method .
+- The list of categories can be obtained via the `categories_` member variable .
+
+<img width="664" height="647" alt="image" src="https://github.com/user-attachments/assets/5050da82-301c-49ce-a6a1-0cf96a59ce0d" />
+
+### Handling Mixed Feature Types (`ColumnTransformer`)
+
+- In real-world situations, it is very common to have features of different types: some numerical and some categorical .
+- Transforming mixed features can be challenging, but Scikit-Learn provides **`ColumnTransformer`** from the `sklearn.compose` module for this exact purpose .
+- **Key Principles of `ColumnTransformer`**:
+- It applies each transformation to the appropriate column and then concatenates the outputs along the columns .
+- All transformers must return the same number of rows .
+- The numeric transformers return a dense matrix while the categorical ones return a sparse matrix; `ColumnTransformer` automatically determines the type of the output based on the density of the resulting matrix .
+
+## 2.6: Numeric Transformers
+
+Numeric transformers are applied to numerical features  . There are **three main types of numeric transformers** in Scikit-Learn  :
+
+1. **Feature scaling**
+2. **Polynomial transformation**
+3. **Discretization**
+
+## 2.6.2: Feature Scaling
+
+### Why Feature Scaling is Necessary
+
+- Most machine learning algorithms do not perform well when input numerical attributes are on very different scales .
+- Numerical features with different scales lead to slower convergence of iterative optimization procedures (such as gradient descent, mini-batch gradient descent, and stochastic gradient descent) .
+- It is a good practice to scale numerical features so that all of them are on the same scale .
+- **Note**: Scaling of target labels is generally *not* required .
+
+### Scikit-Learn Feature Scaling APIs
+
+Scikit-Learn provides three primary feature scaling APIs  :
+
+1. `StandardScaler`
+2. `MaxAbsScaler`
+3. `MinMaxScaler`
+
+### 1. Min-Max Scaling (Normalization)
+
+- **Definition**: Values are shifted and rescaled so that they end up ranging between $0$ and $1$ . We do this by subtracting the minimum value of a feature from the current value and dividing it by the difference between the maximum and minimum value of that feature : $$ x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}} $$
+- Scikit-Learn provides the **`MinMaxScaler`** transformer for this .
+- It has a `feature_range` hyperparameter that lets you change the target range if needed .
+
+### 2. Standardization
+
+- **Definition**: First subtracts the mean value ($\mu$) of each feature from the current value, and then divides by the standard deviation ($\sigma$) so that the resulting feature has a zero mean and unit variance : $$ x' = \frac{x - \mu}{\sigma} $$
+- Unlike min-max scaling, standardization **does not bound values to a specific range**, which may be a problem for some algorithms (e.g., neural networks often expect an input value ranging from $0$ to $1$) .
+- However, **standardization is much less affected by outliers** compared to normalization . For example, if a district had an extreme erroneous value (such as a median income of $100$), min-max scaling would crush all other values down to a tiny fraction (e.g., $0$ to $0.15$), whereas standardization would not be impacted as severely .
+- Scikit-Learn provides the **`StandardScaler`** transformer for standardization .
+
+## 2.6.3: Outliers
+
+### Identifying Outliers
+
+- We can examine the presence of outliers by plotting feature distributions using **boxplots**, where different features show varying ranges and distinct outlier points .
+- Calling `.describe()` on a DataFrame provides quartiles, minimum, maximum, and mean values to reconfirm the presence of outliers (e.g., maximum values far higher than the 75th percentile, or minimum values like $0$ in height, which can also indicate potential missing values or data capture errors) .
+
+> **Outlier Impact on Scaling**: Because standardization relies on mean and standard deviation rather than fixed min/max boundaries, it is significantly less sensitive to extreme outliers than min-max normalization  .
+>
+>
+
+### Outlier Detection Algorithms in Scikit-Learn
+
+Beyond preprocessing adjustments, specialized algorithms can detect and clean up outliers:
+
+1. **Fast-MCD (Minimum Covariance Determinant)**:
+- Implemented by the **`EllipticEnvelope`** class .
+- Assumes that normal instances (inliers) are generated from a single Gaussian distribution and that the dataset is contaminated with outliers .
+- When estimating the parameters of the Gaussian distribution, it ignores instances that are most likely outliers, providing a better estimation of the elliptic envelope .
+2. **Isolation Forest**:
+- An efficient algorithm for outlier detection, especially in high-dimensional datasets .
+- Builds a Random Forest in which each Decision Tree is grown randomly by picking a feature and a random threshold recursively until instances are isolated .
+- Anomalies are usually far from other instances, so on average across all Decision Trees, **they tend to get isolated in fewer steps** than normal instances .
