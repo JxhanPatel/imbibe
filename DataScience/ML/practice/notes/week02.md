@@ -123,3 +123,105 @@ Depending on the training data format, various specialized utilities are used:
 - **Audio**: `scipy.io.wavfile.read` specializes in reading WAV files into NumPy arrays .
 - **Optimized Numerical Data**: For managing large numerical datasets, Scikit-Learn recommends using optimized file formats such as **HDF5 (Hierarchical Data Format version 5)** to reduce data load times . Libraries like **Pandas**, **PyTables**, and **H5Py** provide interfaces to read and write data in HDF5 format .
 
+
+
+
+---
+
+
+
+# Module 2: Data Preprocessing & Missing Data
+
+## 2.4: Data Preprocessing
+
+### Real-World Data Challenges
+
+The real-world training data is usually not clean and has many issues such as  :
+
+- Missing values for certain features .
+- Features on different scales .
+- Non-numeric attributes .
+
+Often there is a need to pre-process the data to make it amenable for training the model  . Once you get the training data, the first job is to explore the data and list down preprocessing needed  . Typical problems include  :
+
+1. Missing values in features .
+2. Numerical features are not on the same scale .
+3. Categorical attributes need to be represented with sensible numerical representation .
+4. Too many features, reduce them .
+5. Extract features from non-numeric data .
+
+<img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/5a174f15-e3c7-4866-9882-b637e1aeeb65" />
+
+### Scikit-Learn Library of Transformers
+
+Scikit-Learn provides a rich set of transformers for data preprocessing  . We have to make sure that we apply the same set of transformations to both training, test, as well as on the evaluation set  . Scikit-Learn provides a **Pipeline** class for making it easier to chain multiple transformers together and ensure that we apply these transformations uniformly across training, eval, and test sets  .
+
+Scikit-Learn provides a library of transformers categorized under different modules  :
+
+- **Data cleaning (`sklearn.preprocessing`)**: Such as standardization, missing value imputation, etc .
+- **Feature extraction (`sklearn.feature_extraction`)**: Contains a bunch of feature extractors to extract features from different data types .
+- **Feature reduction (`sklearn.decomposition.pca`)**: Houses feature reduction algorithms implemented, such as Principal Component Analysis (PCA) .
+- **Feature expansion (`sklearn.kernel_approximation`)**: Methods for feature expansion done especially in kernel methods .
+
+## 2.4.2: Handling Missing Data
+
+### The Missing Data Problem
+
+Missing values occur due to errors in data capture, such as  :
+
+- Sensor malfunctioning .
+- Measurement errors .
+- Human components involved in recording data .
+
+Many machine learning algorithms do not work with missing data and need all features to be present  . Discarding records containing missing values would result in a loss of valuable training samples (throwing away precious training data), hence we need a mechanism to handle these missing values  .
+
+When handling missing features, you generally have three main options  :
+
+1. **Get rid of the corresponding districts/rows** containing missing values .
+2. **Get rid of the whole attribute/feature** .
+3. **Set the values to some value** (zero, the mean, the median, etc.) via imputation techniques . If values do not exist, it is better to keep them as `NaN` .
+
+Scikit-Learn provides methods to drop rows containing missing values (`dropna()`, `drop()`), but throwing away data can be costly  .
+
+### The `sklearn.impute` API
+
+The `sklearn.impute` API provides functionality to fill missing values in a dataset  . The key classes implemented in this module include  :
+
+- **`SimpleImputer`**: Fills missing values with statistical strategies .
+- **`KNNImputer`**: Imputes missing values using K-Nearest Neighbors.
+- **`MissingIndicator`**: Provides indicators for missing values (useful to examine data and evaluate classifier/regressor performance on missing features) .
+
+### Using `SimpleImputer`
+
+The `SimpleImputer` class fills missing values with one of the following strategies  :
+
+- `'mean'`
+- `'median'`
+- `'most_frequent'`
+- `'constant'`
+
+#### Code Implementation Example
+
+To use `SimpleImputer`, first import the class, create an instance specifying the strategy, and fit it to the numerical attributes of your dataset  :
+
+```python
+from sklearn.impute import SimpleImputer
+
+# Create an imputer instance using the median strategy
+imputer = SimpleImputer(strategy="median")
+
+```
+
+> **Note**: Since the median can only be computed on numerical attributes, you must exclude any text or categorical attributes (such as `ocean_proximity`) before calling the `fit` method  :
+>
+> ```python
+> housing_num = housing.drop("ocean_proximity", axis=1)
+>
+> ```
+>
+>
+
+#### Fitting and Transforming
+
+1. **`fit()` method**: Computes the statistic (e.g., median) for each attribute and stores the result in its `statistics_` instance variable : ```python imputer.fit(housing_num) ``` Checking the learned statistics: ```python imputer.statistics_ ```
+2. **`transform()` method**: Uses the trained imputer to transform the training set by replacing missing values with the learned medians : ```python X = imputer.transform(housing_num) ``` The result is a plain NumPy array containing the transformed features, which can be converted back into a pandas DataFrame if needed : ```python import pandas as pd housing_tr = pd.DataFrame(X, columns=housing_num.columns, index=housing_num.index) ```
