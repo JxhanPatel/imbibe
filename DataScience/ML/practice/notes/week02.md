@@ -573,3 +573,127 @@ column_trans = ColumnTransformer([
 ], remainder='drop', verbose_feature_names_out=False)
 
 ```
+
+
+
+
+
+
+---
+
+
+
+
+# Module 5: Dimensionality Reduction
+
+## 2.10: Dimensionality Reduction by Principal Component Analysis (PCA)
+
+### Overview of PCA
+
+* **Principal Component Analysis (PCA)** is an unsupervised, linear dimensionality reduction technique.
+
+
+* It is used to decompose a multivariate dataset into a set of successive **orthogonal components** that capture the maximum amount of variance.
+
+
+* **Core Mechanics**:
+* The **first principal component (PC)** lies in the direction of maximum variance in the data, capturing the bulk of the variance.
+
+
+* **Subsequent principal components** are orthogonal to the first PC and gradually capture lesser and lesser variance in the data.
+
+
+* We can select the first $k$ PCs such that we capture a desired amount of variance in the data.
+
+
+
+
+* **Benefits**: Reduces the dimensions of a dataset, thereby lowering the computational cost of subsequent steps such as training models and cross-validation.
+
+
+
+<img width="680" height="679" alt="image" src="https://github.com/user-attachments/assets/9bb31bc7-aa8f-460b-83bd-be73d964ec8c" />
+
+---
+
+### Mathematical Foundation: Singular Value Decomposition (SVD)
+
+* PCA uses a standard matrix factorization technique called **Singular Value Decomposition (SVD)** to project the feature matrix or data onto a lower-dimensional space.
+
+
+* SVD decomposes the training set matrix $X$ into the matrix multiplication of three matrices:
+
+
+
+$$X = U \Sigma V^T$$
+
+
+* Here, matrix $V$ contains the unit vectors that define all the principal components we are looking for:
+
+
+
+$$V = \begin{bmatrix} \vert{} & \vert{} & & \vert{} \\\ c_1 & c_2 & \dots & c_n \\\ \vert{} & \vert{} & & \vert{} \end{bmatrix}$$
+
+
+
+* **Data Centering**: PCA assumes that the dataset is centered around the origin. Scikit-Learn's PCA classes automatically handle data centering, but manual implementations require centering first ($X_{\text{centered}} = X - X_{\text{mean}}$).
+
+
+
+---
+
+### Projecting Down to $d$ Dimensions
+
+* Once principal components are identified, you can reduce dimensionality down to $d$ dimensions by projecting the dataset onto the hyperplane defined by the first $d$ principal components.
+
+
+* Selecting this hyperplane ensures that the projection preserves as much variance as possible.
+
+
+
+<img width="1452" height="737" alt="image" src="https://github.com/user-attachments/assets/d0ba4b4e-a73e-4894-abca-4bec1fcd95c2" />
+
+
+### Using Scikit-Learn's PCA API
+
+Scikit-Learn provides the **`sklearn.decomposition.PCA`** class to perform PCA-based dimensionality reduction.
+
+#### Basic Implementation
+
+```python
+from sklearn.decomposition import PCA 
+
+# Instantiate PCA to reduce dimensions to 2
+pca = PCA(n_components=2) 
+X2D = pca.fit_transform(X) 
+```
+
+* **`components_` attribute**: Holds the transpose of $W_d$. For example, the unit vector defining the first principal component is equal to `pca.components_.T[:, 0]`[cite: 4].
+* **Inverse Transformation**: To bring the transformed data back into the space of the original dimensions, you can use the `inverse_transform` method of the PCA object, or compute it via:
+  $$X_{\text{recovered}} = X_{d\text{-proj}} W_d^T$$
+
+#### Explained Variance Ratio
+* The **`explained_variance_ratio_`** variable provides the proportion of the dataset's variance that lies along each principal component[cite: 4].
+* **Choosing the Right Number of Dimensions**: Instead of manually specifying the number of components, you can set `n_components` to be a float between $0.0$ and $1.0$, indicating the ratio of variance you wish to preserve (e.g., preserving $95\%$ of variance)[cite: 4]:
+  ```python
+  pca = PCA() 
+  pca.fit(X_train) 
+  cumsum = np.cumsum(pca.explained_variance_ratio_) 
+  d = np.argmax(cumsum >= 0.95) + 1
+  ```
+
+
+### Advanced PCA Variants in Scikit-Learn
+
+#### 1. Randomized PCA
+* If you set the `svd_solver` hyperparameter to `"randomized"`, Scikit-Learn uses a stochastic algorithm called **Randomized PCA** that quickly finds an approximation of the first $d$ principal components[cite: 4].
+* **Computational Complexity**: $\mathcal{O}(m \times d^2) + \mathcal{O}(d^3)$ instead of $\mathcal{O}(m \times n^2) + \mathcal{O}(n^3)$ for full SVD, making it dramatically faster when $d$ is much smaller than $n$[cite: 4].
+* **Default Behavior**: By default, `svd_solver` is set to `"auto"` (Scikit-Learn automatically uses randomized PCA if $m$ or $n > 500$ and $d < 80\%$ of $m$ or $n$, otherwise it uses full SVD)[cite: 4].
+
+#### 2. Incremental PCA (IPCA)
+* Standard PCA implementations require the entire training set to fit in memory[cite: 4].
+* **Incremental PCA (IPCA)** allows you to split the training set into mini-batches and feed an IPCA algorithm one mini-batch at a time using the `partial_fit()` method[cite: 4].
+* This is especially useful for large training sets and for applying PCA online (on the fly as new instances arrive)[cite: 4].
+
+```
+
