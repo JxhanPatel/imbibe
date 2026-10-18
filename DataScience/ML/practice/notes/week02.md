@@ -1,30 +1,30 @@
 # Week 2
 
-### Module 1: Basics & Data Loading
+### [Module 1: Basics & Data Loading](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week02.md#module-1-basics--data-loading-1)
 
 - **2.1**: Introduction to Scikit-Learn
 - **2.2**: Data Loading
 - **2.3**: Demonstration of sklearn dataset API
 
-### Module 2: Data Preprocessing & Missing Data
+### [Module 2: Data Preprocessing & Missing Data](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week02.md#module-2-data-preprocessing--missing-data-1)
 
 - **2.4**: Data Preprocessing
 - **2.4.2**: Handling Missing Data
 
-### Module 3: Feature Transformers & Scaling
+### [Module 3: Feature Transformers & Scaling](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week02.md#module-3-feature-transformers--scaling-1)
 
 - **2.5**: Categorical Transformers
 - **2.6**: Numeric Transformers
 - **2.6.2**: Feature Scaling
 - **2.6.3**: Outliers
 
-### Module 4: Feature Selection & Transformations
+### [Module 4: Feature Selection & Transformations](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week02.md#module-4-feature-selection--transformations-1)
 
 - **2.7**: Filter based feature selection
 - **2.8**: Wrapper based feature selection
 - **2.9**: Heterogeneous features transformations
 
-### Module 5: Dimensionality Reduction
+### [Module 5: Dimensionality Reduction](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week02.md#module-5-dimensionality-reduction-1)
 
 - **2.10**: Dimensionality reduction by PCA
 
