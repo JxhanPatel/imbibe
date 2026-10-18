@@ -293,13 +293,13 @@ Scikit-Learn provides three primary feature scaling APIs  :
 
 ### 1. Min-Max Scaling (Normalization)
 
-- **Definition**: Values are shifted and rescaled so that they end up ranging between $0$ and $1$ . We do this by subtracting the minimum value of a feature from the current value and dividing it by the difference between the maximum and minimum value of that feature : $$ x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}} $$
+- **Definition**: Values are shifted and rescaled so that they end up ranging between $0$ and $1$ . We do this by subtracting the minimum value of a feature from the current value and dividing it by the difference between the maximum and minimum value of that feature : $x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$
 - Scikit-Learn provides the **`MinMaxScaler`** transformer for this .
 - It has a `feature_range` hyperparameter that lets you change the target range if needed .
 
 ### 2. Standardization
 
-- **Definition**: First subtracts the mean value ($\mu$) of each feature from the current value, and then divides by the standard deviation ($\sigma$) so that the resulting feature has a zero mean and unit variance : $$ x' = \frac{x - \mu}{\sigma} $$
+- **Definition**: First subtracts the mean value ($\mu$) of each feature from the current value, and then divides by the standard deviation ($\sigma$) so that the resulting feature has a zero mean and unit variance : $x' = \frac{x - \mu}{\sigma}$
 - Unlike min-max scaling, standardization **does not bound values to a specific range**, which may be a problem for some algorithms (e.g., neural networks often expect an input value ranging from $0$ to $1$) .
 - However, **standardization is much less affected by outliers** compared to normalization . For example, if a district had an extreme erroneous value (such as a median income of $100$), min-max scaling would crush all other values down to a tiny fraction (e.g., $0$ to $0.15$), whereas standardization would not be impacted as severely .
 - Scikit-Learn provides the **`StandardScaler`** transformer for standardization .
@@ -327,3 +327,249 @@ Beyond preprocessing adjustments, specialized algorithms can detect and clean up
 - An efficient algorithm for outlier detection, especially in high-dimensional datasets .
 - Builds a Random Forest in which each Decision Tree is grown randomly by picking a feature and a random threshold recursively until instances are isolated .
 - Anomalies are usually far from other instances, so on average across all Decision Trees, **they tend to get isolated in fewer steps** than normal instances .
+
+
+
+
+
+
+---
+
+
+
+
+
+
+# Module 4: Feature Selection & Transformations
+
+## 2.7: Filter-Based Feature Selection
+
+Sometimes in a real-world dataset, all features do not contribute well enough towards fitting a model. The features that do not contribute significantly can be removed, leading to a decrease in the size of the dataset and hence the computational cost of fitting a model. The `sklearn.feature_selection` module provides many APIs to accomplish this task.
+
+Feature selection methods are broadly divided into two types: **Filter-based** and **Wrapper-based** methods. Filter-based methods use a scoring function in order to score different features.
+
+### Classes of Filter-Based Feature Selection
+
+The filter-based feature selection methods include:
+
+* **`VarianceThreshold`**
+
+* **`SelectKBest`**
+
+* **`SelectPercentile`**
+
+* **`GenericUnivariateSelect`**
+
+<img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/6906cecd-af3f-4cb0-984c-58fb89e17237" />
+
+<img width="931" height="486" alt="image" src="https://github.com/user-attachments/assets/c38b45fc-c5be-4605-b67e-500059b8eb1b" />
+
+### 1. Variance Threshold (`VarianceThreshold`)
+
+* Removes all features with variance below a certain threshold, as specified by the user, from the input feature matrix.
+
+
+* By default, it removes a feature which has the same value, i.e., zero variance.
+
+
+* This is useful when all values in a feature column are very close to each other or take a single value, as such features have very low variance and are not useful for training.
+
+
+
+### 2. Univariate Feature Selection
+
+Univariate feature selection selects features based on univariate statistical tests for each feature. There are three main APIs for univariate feature selection:
+
+* **`SelectKBest`**: Removes all but the $k$ highest scoring features.
+
+
+* **`SelectPercentile`**: Removes all but a user-specified highest scoring percentage of features.
+
+
+* **`GenericUnivariateSelect`**: Performs univariate feature selection with a configurable strategy, which can be found via hyper-parameter search.
+
+
+
+Scikit-learn also provides univariate feature selection methods that work on common univariate statistical tests:
+
+* **`SelectFpr`**: Selects features based on a false positive rate test.
+
+
+* **`SelectFdr`**: Selects features based on an estimated false discovery rate.
+
+
+* **`SelectFwe`**: Selects features based on family-wise error rate.
+
+
+
+#### Univariate Scoring Functions
+
+* Each API needs a scoring function to score each feature.
+
+
+* Three classes of scoring functions are proposed: **Mutual information (MI)**, **Chi-square**, and **F-statistics**.
+
+
+* MI and F-statistics can be used in both classification and regression problems.
+
+
+* Mutual information and Chi-squared feature selection are recommended for sparse data.
+
+
+
+> **Caution**: Do not use a regression feature scoring function with a classification problem, as it will lead to useless results.
+> 
+> 
+
+#### Code Examples for Univariate Selectors
+
+```python
+# SelectKBest example
+skb = SelectKBest(chi2, k=20)
+X_new = skb.fit_transform(X, y)
+
+```
+
+* **`SelectPercentile` example**: Instantiates an object specifying `chi2` as the scoring function and a percentile (e.g., `percentile=20`), then applies `fit_transform()`.
+
+
+* **`GenericUnivariateSelect` example**:
+```python
+transformer = GenericUnivariateSelect(chi2, mode='k_best', param=20)
+X_new = transformer.fit_transform(X, y)
+
+```
+
+
+The mode can take values: `'percentile'` (default), `'k_best'`, `'fpr'`, `'fdr'`, or `'fwe'`.
+
+
+
+---
+
+## 2.8: Wrapper-Based Feature Selection
+
+Unlike filter-based methods, wrapper-based methods use an estimator class rather than a scoring function to decide the importance of features.
+
+The wrapper-based methods provided in `sklearn.feature_selection` include:
+
+* **RFE** (Recursive Feature Elimination)
+
+
+* **RFECV** (Recursive Feature Elimination with cross-validation)
+
+
+* **`SelectFromModel`**
+
+* **`SequentialFeatureSelector`**
+
+
+### 1. RFE (Recursive Feature Elimination)
+
+RFE operates in two steps:
+
+* **STEP 1**: Fits a model.
+
+
+* **STEP 2**: Ranks the features; afterwards it removes one or more features (depending upon the `step` parameter).
+These two steps are repeated until the desired number of features are selected. RFE requires only a single fit.
+
+
+
+```python
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LinearRegression
+
+estimator = LinearRegression()
+selector = RFE(estimator, n_features_to_select=3, step=1)
+
+```
+
+Once fitting is done, we obtain a boolean array in the `support_` member variable that indicates which features are selected (`True` for selected features).
+
+### 2. `SelectFromModel`
+
+* First trains an estimator on all features.
+
+
+* Then it selects a desired number of features based on feature importance.
+
+
+* The maximum number of features that we want to select is specified via the `max_features` parameter.
+
+
+* The feature importance is obtained via `coef_`, `feature_importances_`, or an `importance_getter` callable from the trained estimator.
+
+
+* The feature importance threshold can be specified either numerically or through string arguments based on built-in heuristics such as `'mean'`, `'median'`, and float multiples of these like `0.1 * mean`.
+
+
+* `SelectFromModel` requires a single fit and needs no iterations.
+
+
+
+### 3. Sequential Feature Selection (`SequentialFeatureSelector`)
+
+* Performs feature selection by selecting or deselecting features one by one in a greedy manner.
+
+
+* Uses one of two approaches:
+
+
+1. **Forward selection**: Starting with zero features, it finds the single feature that obtains the best cross-validation score for an estimator when trained on that feature. It repeats the process by adding a new feature to the set of selected features.
+
+
+2. **Backward selection**: Starting with all features, it removes least important features one by one following the idea of forward selection.
+
+
+
+
+* **Note on Efficiency**: Sequential feature selection needs more models to evaluate in comparison to recursive feature elimination and `SelectFromModel` (e.g., going from $m$ features to $m-1$ features using $k$-fold cross-validation requires fitting $m \times k$ models).
+
+
+
+
+
+## 2.9: Heterogeneous Features Transformations & Composite Transformers
+
+Real-world data often has both categorical as well as numerical features, requiring different transformations applied to separate subsets of features. Scikit-Learn provides composite transformers in the `sklearn.compose` module for this exact purpose.
+
+The two main classes focused on in composite transformers are:
+
+1. **`ColumnTransformer`**
+
+2. **`TransformedTargetRegressor`**
+
+
+### `ColumnTransformer`
+
+* Applies a set of transformers to columns of an array or pandas `DataFrame` and concatenates the transformed outputs from different transformers into a single matrix.
+
+
+* Useful for transforming heterogeneous data by applying different transformers to separate subsets of features.
+
+
+* Combines different feature selection mechanisms and transformations into a single transformer object.
+
+
+
+#### Format of Each Tuple in `ColumnTransformer`
+
+Each tuple has the format:
+
+
+$$\text{(estimatorName, estimator(...), columnIndices)}$$
+
+#### Code Snippet Example
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.feature_extraction.text import CountVectorizer
+
+column_trans = ColumnTransformer([
+    ('ageScaler', CountVectorizer(), [0]),
+    ('genderEncoder', OneHotEncoder(dtype='int'), [1])
+], remainder='drop', verbose_feature_names_out=False)
+
+```
