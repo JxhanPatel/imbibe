@@ -190,3 +190,75 @@ import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), 
 - Features like median income may display a long-tail distribution .
 - House age can show a more uniform distribution with specific spikes .
 - Features such as average rooms, average bedrooms, population, and average occupancy can exhibit large value ranges with noticeable extreme tails, indicating potential **outlier values** .
+
+
+
+
+
+---
+
+
+
+
+## Module 3: Advanced Data Transformations & Composite Pipelines
+
+### 3.3 Demonstration of Data Transformation & Composite Transformers
+
+<img width="876" height="289" alt="image" src="https://github.com/user-attachments/assets/84abea42-51f3-4bda-a238-5aa71e412a2f" />
+
+## 1. Overview of Composite Transformers (`sklearn.compose`)
+
+- The `sklearn.compose` module provides useful classes and methods to apply transformations on subsets of features and combine them.
+- Real-world data often contains heterogeneous features (both categorical and numerical features), requiring different transformations applied to separate subsets of features.
+- Two main classes in `sklearn.compose` are:
+1. **ColumnTransformer**
+2. **TransformedTargetRegressor**
+
+## 2. ColumnTransformer
+
+<img width="680" height="828" alt="image" src="https://github.com/user-attachments/assets/7a22c0ae-1895-4130-a1d3-2b3e294f38d4" />
+
+### 2.1 Definition and Purpose
+
+- **ColumnTransformer** applies a set of transformers to columns of an array or a pandas DataFrame and concatenates the transformed outputs from different transformers into a single matrix.
+- It is useful for transforming heterogeneous data by applying different transformers to separate subsets of features.
+- It combines different feature selection mechanisms and transformations into a single transformer object.
+
+### 2.2 Syntax and Tuple Format
+
+- Each tuple in a `ColumnTransformer` has the following format: $$ \text{(estimatorName, estimator(...), columnIndices)} $$
+- **Arguments & Parameters**:
+- `remainder`: Specifies what to do with columns not specified in the transformers list (e.g., `'drop'` to drop them).
+- `verbose_feature_names_out`: Controls feature naming behavior (e.g., `False`).
+
+### 2.3 Concrete Example: Transforming Heterogeneous Features
+
+- Consider a feature matrix representing the weight and gender of a class of students: $$ \mathbf{X}_{6\times2} = \begin{bmatrix} 20.0 & \text{'male'} \\ 11.2 & \text{'female'} \\ 15.6 & \text{'female'} \\ 13.0 & \text{'male'} \\ 18.6 & \text{'male'} \\ 16.4 & \text{'female'} \end{bmatrix} $$
+- Since the first column is numeric (weight) and the second column is categorical (gender), different transformers must be applied.
+- **Code Example**: ```python from sklearn.compose import ColumnTransformer from sklearn.preprocessing import MaxAbsScaler, OneHotEncoder column_trans = ColumnTransformer([ ('scaler', MaxAbsScaler(), [0]), ('encoder', OneHotEncoder(dtype='int'), [1]) ], remainder='drop', verbose_feature_names_out=False) column_trans.fit_transform(X) ```
+- **Transformed Output Matrix ($\mathbf{X}'_{6\times3}$)**: $$ \mathbf{X}'_{6\times3} = \begin{bmatrix} 1.0 & 1.0 & 0.0 \\ 0.56 & 0.0 & 1.0 \\ 0.78 & 0.0 & 1.0 \\ 0.65 & 1.0 & 0.0 \\ 0.93 & 1.0 & 0.0 \\ 0.82 & 0.0 & 1.0 \end{bmatrix} $$
+- *Note*: `MaxAbsScaler` scales the numeric weight column into the range $[-1, 1]$ (or based on maximum absolute value, scaling $20.0$ to $1.0$), and `OneHotEncoder` binarizes the categorical gender column into separate indicator columns.
+
+## 3. FeatureUnion
+
+<img width="612" height="866" alt="image" src="https://github.com/user-attachments/assets/a7cc4469-6f20-451c-8814-c6599ecf873f" />
+
+- **FeatureUnion** is another composite utility that applies a list of transformer objects in **parallel** and then concatenates their outputs side by side to form a larger transformed feature matrix.
+- FeatureUnion and Pipeline constructs can be combined together to create complex transformers.
+
+| Construct | Execution Style | Primary Purpose |
+| --- | --- | --- |
+| **Pipeline** | Sequential chain | Executes a fixed sequence of preprocessing and modeling steps one after another. |
+| **FeatureUnion** | Parallel execution | Concatenates outputs from several transformer objects side by side. |
+
+## 4. TransformedTargetRegressor
+
+<img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/52d60718-f8d2-4dba-a21a-535fbd6b7a3a" />
+
+- **TransformedTargetRegressor** transforms the target variable $y$ before fitting a regression model.
+- The predicted values are mapped back to the original space via an **inverse transform**.
+- It takes the regressor and the transformer to be applied to the target variable as arguments.
+
+## 5. FunctionTransformer
+
+- **FunctionTransformer** constructs transformed features by applying a user-defined function directly within the transformation workflow.
