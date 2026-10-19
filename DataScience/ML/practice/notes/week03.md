@@ -170,7 +170,10 @@ Various visualization techniques help inspect data distributions and feature cor
 ### 4.2 Scatter Matrix (`scatter_matrix`)
 
 - The `scatter_matrix` function from the `pandas.plotting` library plots relationships between multiple features in a grid of scatter plots .
-- **Code Example**: ```python from pandas.plotting import scatter_matrix attribute_list = ['citric acid', 'pH', 'alcohol', 'sulphates', 'quality'] scatter_matrix(exploration_set[attribute_list]) ```[cite: 2] ```
+- **Code Example**: 
+```python
+from pandas.plotting import scatter_matrix attribute_list = ['citric acid', 'pH', 'alcohol', 'sulphates', 'quality'] scatter_matrix(exploration_set[attribute_list])
+```
 - **Diagonal vs. Off-Diagonal Interpretation**:
 - **Diagonal**: Displays histograms representing the distribution of individual features (e.g., the distribution of the `citric acid` feature) .
 - **Off-Diagonal**: Displays scatter plots showing pairwise relationships between different features .
@@ -179,7 +182,10 @@ Various visualization techniques help inspect data distributions and feature cor
 
 ### 4.3 Feature Histograms & Outlier Inspection
 
-- Plotting histograms for numerical attributes helps analyze feature spreads : ```python import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), bins=30, edgecolor="black") plt.subplots_adjust(hspace=0.7, wspace=0.4) ```[cite: 4] ```
+- Plotting histograms for numerical attributes helps analyze feature spreads :
+```python
+import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), bins=30, edgecolor="black") plt.subplots_adjust(hspace=0.7, wspace=0.4)
+```
 - **Key Observations from Histograms**:
 - Features like median income may display a long-tail distribution .
 - House age can show a more uniform distribution with specific spikes .
