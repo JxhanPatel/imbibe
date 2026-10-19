@@ -1,4 +1,4 @@
-# Week 3
+# Week 3: Data Preparation and Feature Transformations
 
 **Module 1: Transformer Chaining & Integration**
 
@@ -226,17 +226,32 @@ import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), 
 
 ### 2.2 Syntax and Tuple Format
 
-- Each tuple in a `ColumnTransformer` has the following format: $$ \text{(estimatorName, estimator(...), columnIndices)} $$
+- Each tuple in a `ColumnTransformer` has the following format: 
+
+$$
+\text{(estimatorName, estimator(...), columnIndices)}
+$$
+
 - **Arguments & Parameters**:
 - `remainder`: Specifies what to do with columns not specified in the transformers list (e.g., `'drop'` to drop them).
 - `verbose_feature_names_out`: Controls feature naming behavior (e.g., `False`).
 
 ### 2.3 Concrete Example: Transforming Heterogeneous Features
 
-- Consider a feature matrix representing the weight and gender of a class of students: $$ \mathbf{X}_{6\times2} = \begin{bmatrix} 20.0 & \text{'male'} \\ 11.2 & \text{'female'} \\ 15.6 & \text{'female'} \\ 13.0 & \text{'male'} \\ 18.6 & \text{'male'} \\ 16.4 & \text{'female'} \end{bmatrix} $$
+- Consider a feature matrix representing the weight and gender of a class of students: 
+
+$$
+\mathbf{X}_{6\times2} = \begin{bmatrix} 20.0 & \text{'male'} \\ 11.2 & \text{'female'} \\ 15.6 & \text{'female'} \\ 13.0 & \text{'male'} \\ 18.6 & \text{'male'} \\ 16.4 & \text{'female'} \end{bmatrix} 
+$$
+
 - Since the first column is numeric (weight) and the second column is categorical (gender), different transformers must be applied.
 - **Code Example**: ```python from sklearn.compose import ColumnTransformer from sklearn.preprocessing import MaxAbsScaler, OneHotEncoder column_trans = ColumnTransformer([ ('scaler', MaxAbsScaler(), [0]), ('encoder', OneHotEncoder(dtype='int'), [1]) ], remainder='drop', verbose_feature_names_out=False) column_trans.fit_transform(X) ```
-- **Transformed Output Matrix ($\mathbf{X}'_{6\times3}$)**: $$ \mathbf{X}'_{6\times3} = \begin{bmatrix} 1.0 & 1.0 & 0.0 \\ 0.56 & 0.0 & 1.0 \\ 0.78 & 0.0 & 1.0 \\ 0.65 & 1.0 & 0.0 \\ 0.93 & 1.0 & 0.0 \\ 0.82 & 0.0 & 1.0 \end{bmatrix} $$
+- **Transformed Output Matrix ($\mathbf{X}'_{6\times3}$)**: 
+
+$$
+\mathbf{X}'_{6\times3} = \begin{bmatrix} 1.0 & 1.0 & 0.0 \\ 0.56 & 0.0 & 1.0 \\ 0.78 & 0.0 & 1.0 \\ 0.65 & 1.0 & 0.0 \\ 0.93 & 1.0 & 0.0 \\ 0.82 & 0.0 & 1.0 \end{bmatrix}
+$$
+
 - *Note*: `MaxAbsScaler` scales the numeric weight column into the range $[-1, 1]$ (or based on maximum absolute value, scaling $20.0$ to $1.0$), and `OneHotEncoder` binarizes the categorical gender column into separate indicator columns.
 
 ## 3. FeatureUnion
@@ -262,3 +277,104 @@ import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), 
 ## 5. FunctionTransformer
 
 - **FunctionTransformer** constructs transformed features by applying a user-defined function directly within the transformation workflow.
+
+
+
+
+
+
+---
+
+
+
+
+## Module 4: Feature Selection, PCA, Pipelines & Class Imbalance
+
+### 3.4 Demonstration of Feature Selection, PCA, Pipelines, and Handling Class Imbalance
+
+<img width="1123" height="638" alt="image" src="https://github.com/user-attachments/assets/4a3500bf-4ee0-46f5-b1b5-be8da6dc8f89" />
+
+## 1. Feature Selection APIs
+
+- In real-world datasets, all features do not contribute equally toward fitting a model .
+- Features that do not contribute significantly can be removed, leading to a decrease in dataset size and lower computational cost for model training .
+- Scikit-Learn provides `sklearn.feature_selection` with a rich set of APIs to accomplish this task , including:
+- Variance Threshold
+- SelectKBest
+- SelectPercentile
+- RFE (Recursive Feature Elimination)
+- RFECV
+- SelectFromModel
+- Sequential Features (`SequentialFeatureSelector`)
+- Generic UnivariateSelect
+
+<img width="4000" height="3926" alt="image" src="https://github.com/user-attachments/assets/ad4ba29f-21bb-4030-89b8-a2591597fa09" />
+
+### 1.1 Sequential Feature Selection (`SequentialFeatureSelector`)
+
+- Performs feature selection by selecting or deselecting features one by one in a greedy manner .
+- It uses one of two approaches:
+- **Forward selection**: Starting with zero features, it finds the single feature that obtains the best cross-validation score for an estimator, then repeats the process by adding new features iteratively .
+- **Backward selection**: Starting with all features and removing the least important features one by one following the reverse logic .
+
+## 2. Principal Component Analysis (PCA)
+
+<img width="1200" height="610" alt="image" src="https://github.com/user-attachments/assets/8c5a5ba1-f73e-4d39-a852-4c22ff9bb7a5" />
+
+- PCA is a linear dimensionality reduction technique that uses **Singular Value Decomposition (SVD)** to project the feature matrix or data onto a lower-dimensional space .
+- The first principal component (PC) lies in the direction of maximum variance in the data, capturing the bulk of the variance .
+- Subsequent PCs are orthogonal to the first PC and capture progressively lesser amounts of variance .
+- We can select the first $k$ PCs to capture the desired cumulative variance in the data .
+
+### 2.1 Mathematical Foundation: SVD and Data Centering
+
+- SVD decomposes the training set matrix $\mathbf{X}$ into the product of three matrices: 
+
+$$
+\mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T 
+$$
+
+- Here, matrix $\mathbf{V}$ contains the unit vectors that define all the principal components : 
+
+$$
+\mathbf{V} = \begin{bmatrix} \vert & \vert & & \vert \\\ c_1 & c_2 & \dots & c_n \\\ \vert & \vert & & \vert \end{bmatrix} 
+$$
+
+- **Data Centering**: PCA assumes that the dataset is centered around the origin . While Scikit-Learn's PCA classes automatically handle data centering, manual implementations require centering first ($\mathbf{X}_{\text{centered}} = \mathbf{X} - \mathbf{X}_{\text{mean}}$) .
+
+--- 📸 INSERT IMAGE: [Video slide illustrating PCA variance covered by different vectors and 2D projection | timestamp 00:12] ---
+
+### 2.2 Using Scikit-Learn's PCA API (`sklearn.decomposition.PCA`)
+
+- Basic implementation to reduce dimensions to 2 : ```python from sklearn.decomposition import PCA # Instantiate PCA to reduce dimensions to 2 pca = PCA(n_components=2) X2D = pca.fit_transform(X) ```[cite: 4] ```
+- **`components_` attribute**: Holds the transpose of $\mathbf{W}_d$. The unit vector defining the first principal component is equal to `pca.components_.T[:, 0]` .
+- **Inverse Transformation**: Brings the transformed data back into the original dimensional space : 
+
+$$
+\mathbf{X}_{\text{recovered}} = \mathbf{X}_{d\text{-proj}} \mathbf{W}_d^T
+$$
+
+- **Explained Variance Ratio**: The **`explained_variance_ratio_`** variable provides the proportion of the dataset's variance lying along each principal component .
+- **Choosing the Right Number of Dimensions**: Setting `n_components` to a float between $0.0$ and $1.0$ preserves a specific ratio of variance (e.g., $95\%$) : ```python pca = PCA() pca.fit(X_train) cumsum = np.cumsum(pca.explained_variance_ratio_) d = np.argmax(cumsum >= 0.95) + 1 ```[cite: 4] ```
+
+### 2.3 Advanced PCA Variants
+
+- **Randomized PCA**: Setting `svd_solver="randomized"` uses a stochastic algorithm to quickly approximate the first $d$ principal components with a computational complexity of $\mathcal{O}(m \times d^2) + \mathcal{O}(d^3)$ .
+- **Incremental PCA (IPCA)**: Allows splitting the training set into mini-batches and feeding an IPCA algorithm one mini-batch at a time using `partial_fit()`, ideal for large datasets or online learning .
+
+## 3. Pipelines in Machine Learning Workflows
+
+- The `sklearn.pipeline` module provides utilities to build a composite estimator as a chain of transformers and estimators .
+- Intermediate steps must be **transformers** implementing `fit` and `transform`, while the final estimator only needs to implement `fit` .
+- Pipelines assemble several steps that can be cross-validated together while setting different parameters .
+- **Important Rule**: Preprocessing steps (such as `StandardScaler`) must be applied in the exact same order on training, evaluation, and test sets to avoid distribution shift and incorrect performance evaluation .
+
+<img width="725" height="213" alt="image" src="https://github.com/user-attachments/assets/1545c4bb-4eb9-42ee-b18f-965440afee21" />
+
+## 4. Handling Imbalanced Data
+
+- **Imbalanced Datasets**: Occur when one class is significantly underrepresented compared to another, leading to less efficient machine learning algorithms that may overestimate or underestimate certain classes .
+- There are two main approaches to handle imbalanced data :
+1. **Undersampling**: Reducing the number of abundant examples in the majority class .
+2. **Oversampling**: Increasing the size of the dataset by copying minority class examples or generating synthetic examples .
+- **Class Weights**: All classification estimators in Scikit-Learn have the ability to deal with class imbalance natively through the `class_weight` parameter in their constructor .
