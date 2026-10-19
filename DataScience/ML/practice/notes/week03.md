@@ -117,3 +117,70 @@ pipe = Pipeline(steps=estimators, memory=tempDirPath)
 - Makes configuration and tuning of end-to-end machine learning pipeline quick and easy .
 - Offers convenience as the developer has to call only `fit` and `predict` methods on the pipeline object .
 - Reduces code duplication; with pipeline objects, one does not have to repeat code for pre-processing and transforming on the test set .
+
+
+
+
+
+---
+
+
+
+
+## **Module 2: Data Extraction, Imputation, Scaling & Visualization**
+
+### 3.2 Demonstration of Data Extraction, Imputation, Scaling & Visualizing Feature Distribution
+
+<img width="1024" height="816" alt="image" src="https://github.com/user-attachments/assets/c33d316a-1787-45ac-9613-d9933f471f85" />
+
+## 1. Motivation and Overview of Data Processing Steps
+
+- In machine learning algorithms, different features used to represent an example may exist at different scales, and the current data distribution might not be amenable to learning .
+- To address data capture errors and prepare data for modeling, four key data processing steps are applied :
+1. Separating features and labels .
+2. Handling missing values and outliers (e.g., fixing sensor malfunctions or measurement errors) .
+3. Feature scaling to bring all features onto the same scale .
+4. Applying mathematical transformations (such as log or square root) to achieve a data distribution more amenable to learning .
+- **Best Practice**: Always make a copy of the data and apply preprocessing on that copy, ensuring that the original dataset remains intact if anything goes wrong .
+
+## 2. Scikit-Learn Data and Preprocessing APIs
+
+- Scikit-Learn provides dedicated modules for data preparation and feature engineering :
+- **`sklearn.datasets`**: Helps in loading custom datasets as well as popular reference datasets bundled with Scikit-Learn .
+- **`sklearn.preprocessing`**: Provides utilities for feature scaling, centering, normalization, and binarization .
+- **`sklearn.impute`**: Provides tools like `SimpleImputer` to handle and fill missing values resulting from data capture errors .
+
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/4105b1b5-0889-4b8d-b89b-209bccb5da7e" />
+
+## 3. Handling Missing Values
+
+- Missing values often arise due to sensor malfunction, measurement errors, or human recording errors .
+- Many machine learning algorithms cannot process missing data, making imputation or removal necessary .
+- **`SimpleImputer`**: Fills missing values using univariate statistical strategies such as `mean`, `median`, `most_frequent`, or `constant` .
+
+## 4. Visualizing Feature Distributions and Relationships
+
+Various visualization techniques help inspect data distributions and feature correlations during exploratory data analysis  .
+
+### 4.1 Scatter Visualization
+
+- Scatter plots can be created using the **Seaborn** library to visualize the relationship between two specific features .
+- Users specify the x-axis, y-axis, and the data source . For example, plotting **fixed acidity** on the x-axis against **density** on the y-axis .
+
+### 4.2 Scatter Matrix (`scatter_matrix`)
+
+- The `scatter_matrix` function from the `pandas.plotting` library plots relationships between multiple features in a grid of scatter plots .
+- **Code Example**: ```python from pandas.plotting import scatter_matrix attribute_list = ['citric acid', 'pH', 'alcohol', 'sulphates', 'quality'] scatter_matrix(exploration_set[attribute_list]) ```[cite: 2] ```
+- **Diagonal vs. Off-Diagonal Interpretation**:
+- **Diagonal**: Displays histograms representing the distribution of individual features (e.g., the distribution of the `citric acid` feature) .
+- **Off-Diagonal**: Displays scatter plots showing pairwise relationships between different features .
+
+<img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/87b937ca-30b6-4e9b-8318-194ff6e9469d" />
+
+### 4.3 Feature Histograms & Outlier Inspection
+
+- Plotting histograms for numerical attributes helps analyze feature spreads : ```python import matplotlib.pyplot as plt california_housing.frame.hist(figsize=(12, 10), bins=30, edgecolor="black") plt.subplots_adjust(hspace=0.7, wspace=0.4) ```[cite: 4] ```
+- **Key Observations from Histograms**:
+- Features like median income may display a long-tail distribution .
+- House age can show a more uniform distribution with specific spikes .
+- Features such as average rooms, average bedrooms, population, and average occupancy can exhibit large value ranges with noticeable extreme tails, indicating potential **outlier values** .
