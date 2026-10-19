@@ -1,19 +1,20 @@
 # Week 3: Data Preparation and Feature Transformations
 
-**Module 1: Transformer Chaining & Integration**
+[**Module 1: Transformer Chaining & Integration**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week03.md#module-1-transformer-chaining--integration)
 
 - **3.1** - Chaining Transformers
 
-**Module 2: Data Extraction, Imputation, Scaling & Visualization**
-
+[**Module 2: Data Extraction, Imputation, Scaling & Visualization**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week03.md#module-2-data-extraction-imputation-scaling--visualization)
 - **3.2** - Demonstration of Data extraction, imputation, scaling, visualizing feature distribution
 
-**Module 3: Advanced Data Transformations & Composite Pipelines**
-
+[**Module 3: Advanced Data Transformations & Composite Pipelines**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week03.md#module-3-advanced-data-transformations--composite-pipelines)
 - **3.3** - Demonstration of Data transformation, Composite transformers
 
-**Module 4: Feature Selection, PCA, Pipelines & Class Imbalance**
-
+[**Module 4: Feature Selection, PCA, Pipelines & Class Imbalance**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week03.md#module-4-feature-selection-pca-pipelines--class-imbalance)
 - **3.4** - Demonstration of Feature Selection Demonstration, PCA, Pipelines, Handling class imbalance
 
 
@@ -241,7 +242,7 @@ $$
 - Consider a feature matrix representing the weight and gender of a class of students: 
 
 $$
-\mathbf{X}_{6\times2} = \begin{bmatrix} 20.0 & \text{'male'} \\ 11.2 & \text{'female'} \\ 15.6 & \text{'female'} \\ 13.0 & \text{'male'} \\ 18.6 & \text{'male'} \\ 16.4 & \text{'female'} \end{bmatrix} 
+\mathbf{X}_{6\times2} = \begin{bmatrix} 20.0 & \text{'male'} \\\ 11.2 & \text{'female'} \\\ 15.6 & \text{'female'} \\\ 13.0 & \text{'male'} \\\ 18.6 & \text{'male'} \\\ 16.4 & \text{'female'} \end{bmatrix} 
 $$
 
 - Since the first column is numeric (weight) and the second column is categorical (gender), different transformers must be applied.
@@ -249,7 +250,7 @@ $$
 - **Transformed Output Matrix ($\mathbf{X}'_{6\times3}$)**: 
 
 $$
-\mathbf{X}'_{6\times3} = \begin{bmatrix} 1.0 & 1.0 & 0.0 \\ 0.56 & 0.0 & 1.0 \\ 0.78 & 0.0 & 1.0 \\ 0.65 & 1.0 & 0.0 \\ 0.93 & 1.0 & 0.0 \\ 0.82 & 0.0 & 1.0 \end{bmatrix}
+\mathbf{X}'_{6\times3} = \begin{bmatrix} 1.0 & 1.0 & 0.0 \\\ 0.56 & 0.0 & 1.0 \\\ 0.78 & 0.0 & 1.0 \\\ 0.65 & 1.0 & 0.0 \\\ 0.93 & 1.0 & 0.0 \\\ 0.82 & 0.0 & 1.0 \end{bmatrix}
 $$
 
 - *Note*: `MaxAbsScaler` scales the numeric weight column into the range $[-1, 1]$ (or based on maximum absolute value, scaling $20.0$ to $1.0$), and `OneHotEncoder` binarizes the categorical gender column into separate indicator columns.
