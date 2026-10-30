@@ -1,3 +1,35 @@
+# Week 4: Polynomial Regression & Regularized Models
+
+**Module 1: Regression Models & Evaluation**
+
+- **4.1** - Linear regression
+- **4.2** - Model Evaluation
+- **4.3** - Polynomial Regression
+
+**Module 2: Regularization & Tuning**
+
+- **4.4** - Regularization
+- **4.5** - Hyper parameter tuning
+
+**Module 3: Linear & Distance-Based Classifiers**
+
+- **4.6** - Multi Learning Classification
+- **4.7** - Naive Bayes Classifier
+- **4.8** - K Nearest Neighbours
+- **4.9** - SVM in scikit-learn
+
+**Module 4: Decision Trees & Ensemble Methods**
+
+- **4.10** - Decision Trees
+- **4.11** - Voting, Bagging and Random Forest
+- **4.12** - Boosting: AdaBoost, GradientBoost
+
+**Module 5: Deep Learning Foundations**
+
+- **4.13** - Neural Networks: Multi-layer Perceptron
+
+
+
 # Module 1: Regression Models & Evaluation
 
 ## 4.1 Linear Regression
