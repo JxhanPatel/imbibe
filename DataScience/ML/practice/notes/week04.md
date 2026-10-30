@@ -146,3 +146,57 @@ Polynomial regression is a two-step process  :
 poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction_only=True)), ("feature_scaling", StandardScaler()), ("lin_reg", LinearRegression()) ])
 ```
 - Polynomial models have a tendency to **overfit** if higher-order polynomial features are used . Ridge regression can be used to penalize excessive model complexity in polynomial regression by adding a regularization term .
+
+
+
+
+---
+
+
+
+# Module 2: Regularization & Tuning
+
+## 4.4 Regularization
+
+<img width="715" height="403" alt="image" src="https://github.com/user-attachments/assets/8f602248-79b9-4cbc-a6ac-e7eb79d636b8" />
+<img width="602" height="399" alt="image" src="https://github.com/user-attachments/assets/08ddc4e3-a8a2-4ccc-9505-a6f21668d2a4" />
+
+### Ridge Regression (Tikhonov Regularization)
+
+- Ridge Regression is a regularized version of Linear Regression where a regularization term is added to the cost function .
+- The Ridge Regression cost function is defined as : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \frac{1}{2} \sum_{i=1}^{n} \theta_i^2 $$
+- The hyperparameter $\alpha$ controls the extent of model regularization . If $\alpha = 0$, Ridge Regression collapses to standard Linear Regression; if $\alpha$ is very large, all weights end up very close to zero, producing a flat line through the data's mean .
+- The bias term $\theta_0$ is not regularized (the summation begins at $i = 1$) .
+- **Scikit-Learn Implementation Options for Ridge**:
+- **Option #1 (Using Ridge Class)**: ```python from sklearn.linear_model import Ridge ridge = Ridge(alpha=1e-3) ```[cite: 5] *Fit, score, and predict work exactly like other linear regression estimators[cite: 5].* ```
+- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l2') ```[cite: 5] ```
+
+### Lasso Regression (Least Absolute Shrinkage and Selection Operator)
+
+- Lasso Regression adds a regularization term to the cost function using the $\ell_1$ norm of the weight vector instead of half the square of the $\ell_2$ norm : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} $$
+- **Key Characteristic**: Lasso Regression tends to eliminate the weights of the least important features by setting them to zero, automatically performing feature selection and outputting a sparse model .
+- The subgradient vector for Lasso Regression is given by : $$ g_{\mathbf{\theta}, J} = \nabla_{\mathbf{\theta}} \text{MSE}(\mathbf{\theta}) + \alpha \begin{pmatrix} \text{sign}(\theta_1) \\ \vdots \\ \text{sign}(\theta_n) \end{pmatrix} $$ where $\text{sign}(\theta_i) = -1 \text{ if } \theta_i \lt 0$, $0 \text{ if } \theta_i = 0$, and $+1 \text{ if } \theta_i \gt 0$ .
+- **Scikit-Learn Implementation Options for Lasso**:
+- **Option #1 (Using Lasso Class)**: ```python from sklearn.linear_model import Lasso lasso_reg = Lasso(alpha=0.1) lasso_reg.fit(X, y) ```[cite: 4] ```
+- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l1') ```[cite: 5] ```
+
+### Elastic Net
+
+- Elastic Net serves as a middle ground between Ridge and Lasso Regression, where the regularization term is a convex combination of both penalties .
+- Controlled by the mix ratio $r$: when $r = 0$, Elastic Net is equivalent to Ridge Regression; when $r = 1$, it is equivalent to Lasso Regression .
+- The Elastic Net cost function is defined as : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + r\alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} + \frac{1-r}{2}\alpha \sum_{i=1}^{n} \theta_i^2 $$
+- In Scikit-Learn, the mix ratio is set via `l1_ratio` (where `l1_ratio` $= r$, and the weight assigned to Ridge/$\ell_2$ is $1 - r$) .
+
+### Regularization in Logistic Regression
+
+- Logistic Regression models can be regularized using $\ell_1$, $\ell_2$, or Elastic Net penalties . Scikit-Learn adds an $\ell_2$ penalty by default .
+- The amount of regularization is controlled by parameter $C$, which is the **inverse of the regularization rate** ($\alpha$) : $$ \arg\min \left( \text{regularization penalty} + C \times \text{cross entropy loss} \right) $$
+- $C$ must be positive: a **smaller value** leads to stronger regularization, while a **larger value** leads to weaker regularization . Setting $C$ to infinity implements unregularized logistic regression .
+- Default Scikit-Learn parameters for `LogisticRegression` include an $\ell_2$ penalty, $C = 1$, and the `lbfgs` solver . Supported solvers include `liblinear`, `newton-cg`, `sag`, `saga`, and `lbfgs` .
+
+## 4.5 Hyper Parameter Tuning (HPT)
+
+<img width="1000" height="563" alt="image" src="https://github.com/user-attachments/assets/237c8daa-2148-456a-8b74-cbb1c4620bf4" />
+
+- **Hyperparameter Selection via Cross-Validation**: Regularization parameters such as $\alpha$ in Ridge and Lasso, or mix ratios in Elastic Net, must be tuned to minimize cross-validation errors . For instance, cross-validation can identify optimal regularization values (e.g., $\alpha = 0.0078$) .
+- **Hyperparameter Spaces**: Tuning involves specifying distributions or grids for parameters such as polynomial degree, learning rate strategies (`constant`, `adaptive`, `invscaling`), and regularization mix ratios (`l1_ratio`) .
