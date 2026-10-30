@@ -1,31 +1,31 @@
 # Week 4: Polynomial Regression & Regularized Models
 
-**Module 1: Regression Models & Evaluation**
-
+[**Module 1: Regression Models & Evaluation**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week04.md#module-1-regression-models--evaluation)
 - **4.1** - Linear regression
 - **4.2** - Model Evaluation
 - **4.3** - Polynomial Regression
 
-**Module 2: Regularization & Tuning**
-
+[**Module 2: Regularization & Tuning**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week04.md#module-2-regularization--tuning)
 - **4.4** - Regularization
 - **4.5** - Hyper parameter tuning
 
-**Module 3: Linear & Distance-Based Classifiers**
-
+[**Module 3: Linear & Distance-Based Classifiers**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week04.md#module-3-linear--distance-based-classifiers)
 - **4.6** - Multi Learning Classification
 - **4.7** - Naive Bayes Classifier
 - **4.8** - K Nearest Neighbours
 - **4.9** - SVM in scikit-learn
 
-**Module 4: Decision Trees & Ensemble Methods**
-
+[**Module 4: Decision Trees & Ensemble Methods**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week04.md#module-4-decision-trees--ensemble-methods)
 - **4.10** - Decision Trees
 - **4.11** - Voting, Bagging and Random Forest
 - **4.12** - Boosting: AdaBoost, GradientBoost
 
-**Module 5: Deep Learning Foundations**
-
+[**Module 5: Deep Learning Foundations**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week04.md#module-5-deep-learning-foundations)
 - **4.13** - Neural Networks: Multi-layer Perceptron
 
 
