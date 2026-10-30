@@ -87,7 +87,7 @@ from sklearn.model_selection import cross_val_predict cv_predictions = cross_val
 ```python
  linear_regressor.score(X_test, y_test)
 ```
-- The score returns $R^2$ or coefficient of determination : $$ R^2 = 1 - \frac{u}{v} $$ where residual sum of squares $u$ is : $$ u = (Xw - y)^T (Xw - y) $$ and total sum of squares $v$ (actual and mean predicted label) is : $$ v = (y - \hat{y}_{mean})^T (y - \hat{y}_{mean}) $$
+- The score returns $R^2$ or coefficient of determination : $R^2 = 1 - \frac{u}{v}$ where residual sum of squares $u$ is : $u = (Xw - y)^T (Xw - y)$ and total sum of squares $v$ (actual and mean predicted label) is : $v = (y - \hat{y}_{mean})^T (y - \hat{y}{mean})$
 
 ### Evaluation Metrics in Scikit-Learn
 
@@ -99,8 +99,9 @@ from sklearn.model_selection import cross_val_predict cv_predictions = cross_val
 - These metrics can also be used in a multi-output regression setup .
 - Example computing RMSE on the housing dataset using Scikit-Learn's `mean_squared_error()` function : 
 ```python
- from sklearn.metrics import mean_squared_error housing_predictions = lin_reg.predict(housing_prepared) lin_mse = mean_squared_error(housing_labels, housing_predictions) lin_rmse = np.sqrt(lin_mse) ```[cite: 5] This results in `lin_rmse` equal to `68628.19819848922`[cite: 5].
+ from sklearn.metrics import mean_squared_error housing_predictions = lin_reg.predict(housing_prepared) lin_mse = mean_squared_error(housing_labels, housing_predictions) lin_rmse = np.sqrt(lin_mse) 
  ```
+ This results in `lin_rmse` equal to `68628.19819848922`
 - A typical prediction error of $68,628 when median housing values range between $120,000 and $265,000 is an example of a model **underfitting** the training data . When this happens, it can mean that the features do not provide enough information .
 - Cross-validation evaluation scores can be obtained using `cross_val_score` or `cross_validate` (specifying estimator, data, target, cross-validation iterator, scoring scheme such as `scoring="neg_mean_absolute_error"`, `return_train_score=True`, and `return_estimator=True`) .
 - Cross-validation results are stored in a Python dictionary with keys: `fit_time`, `score_time`, `test_score`, `estimator` (optional), and `train_score` (optional) .
@@ -164,33 +165,60 @@ poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction
 ### Ridge Regression (Tikhonov Regularization)
 
 - Ridge Regression is a regularized version of Linear Regression where a regularization term is added to the cost function .
-- The Ridge Regression cost function is defined as : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \frac{1}{2} \sum_{i=1}^{n} \theta_i^2 $$
+- The Ridge Regression cost function is defined as : 
+
+$$
+J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \frac{1}{2} \sum_{i=1}^{n} \theta_i^2
+$$
+
 - The hyperparameter $\alpha$ controls the extent of model regularization . If $\alpha = 0$, Ridge Regression collapses to standard Linear Regression; if $\alpha$ is very large, all weights end up very close to zero, producing a flat line through the data's mean .
 - The bias term $\theta_0$ is not regularized (the summation begins at $i = 1$) .
 - **Scikit-Learn Implementation Options for Ridge**:
-- **Option #1 (Using Ridge Class)**: ```python from sklearn.linear_model import Ridge ridge = Ridge(alpha=1e-3) ```[cite: 5] *Fit, score, and predict work exactly like other linear regression estimators[cite: 5].* ```
-- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l2') ```[cite: 5] ```
+- **Option #1 (Using Ridge Class)**: ```python from sklearn.linear_model import Ridge ridge = Ridge(alpha=1e-3) ``` *Fit, score, and predict work exactly like other linear regression estimators* ```
+- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l2') ```
 
 ### Lasso Regression (Least Absolute Shrinkage and Selection Operator)
 
-- Lasso Regression adds a regularization term to the cost function using the $\ell_1$ norm of the weight vector instead of half the square of the $\ell_2$ norm : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} $$
+- Lasso Regression adds a regularization term to the cost function using the $\ell_1$ norm of the weight vector instead of half the square of the $\ell_2$ norm : 
+
+$$
+J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} 
+$$
+
+
 - **Key Characteristic**: Lasso Regression tends to eliminate the weights of the least important features by setting them to zero, automatically performing feature selection and outputting a sparse model .
-- The subgradient vector for Lasso Regression is given by : $$ g_{\mathbf{\theta}, J} = \nabla_{\mathbf{\theta}} \text{MSE}(\mathbf{\theta}) + \alpha \begin{pmatrix} \text{sign}(\theta_1) \\ \vdots \\ \text{sign}(\theta_n) \end{pmatrix} $$ where $\text{sign}(\theta_i) = -1 \text{ if } \theta_i \lt 0$, $0 \text{ if } \theta_i = 0$, and $+1 \text{ if } \theta_i \gt 0$ .
+- The subgradient vector for Lasso Regression is given by : 
+
+$$
+g_{\mathbf{\theta}, J} = \nabla_{\mathbf{\theta}} \text{MSE}(\mathbf{\theta}) + \alpha \begin{pmatrix} \text{sign}(\theta_1) \\ \vdots \\ \text{sign}(\theta_n) \end{pmatrix} 
+$$ 
+
+where $\text{sign}(\theta_i) = -1 \text{ if } \theta_i \lt 0$, $0 \text{ if } \theta_i = 0$, and $+1 \text{ if } \theta_i \gt 0$ .
 - **Scikit-Learn Implementation Options for Lasso**:
-- **Option #1 (Using Lasso Class)**: ```python from sklearn.linear_model import Lasso lasso_reg = Lasso(alpha=0.1) lasso_reg.fit(X, y) ```[cite: 4] ```
-- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l1') ```[cite: 5] ```
+- **Option #1 (Using Lasso Class)**: ```python from sklearn.linear_model import Lasso lasso_reg = Lasso(alpha=0.1) lasso_reg.fit(X, y) ```
+- **Option #2 (Using SGDRegressor)**: ```python from sklearn.linear_model import SGDRegressor sgd = SGDRegressor(alpha=1e-3, penalty='l1') ```
 
 ### Elastic Net
 
 - Elastic Net serves as a middle ground between Ridge and Lasso Regression, where the regularization term is a convex combination of both penalties .
 - Controlled by the mix ratio $r$: when $r = 0$, Elastic Net is equivalent to Ridge Regression; when $r = 1$, it is equivalent to Lasso Regression .
-- The Elastic Net cost function is defined as : $$ J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + r\alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} + \frac{1-r}{2}\alpha \sum_{i=1}^{n} \theta_i^2 $$
+- The Elastic Net cost function is defined as : 
+
+$$
+J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + r\alpha \sum_{i=1}^{n} \vert{}\theta_i\vert{} + \frac{1-r}{2}\alpha \sum_{i=1}^{n} \theta_i^2 
+$$
+
 - In Scikit-Learn, the mix ratio is set via `l1_ratio` (where `l1_ratio` $= r$, and the weight assigned to Ridge/$\ell_2$ is $1 - r$) .
 
 ### Regularization in Logistic Regression
 
 - Logistic Regression models can be regularized using $\ell_1$, $\ell_2$, or Elastic Net penalties . Scikit-Learn adds an $\ell_2$ penalty by default .
-- The amount of regularization is controlled by parameter $C$, which is the **inverse of the regularization rate** ($\alpha$) : $$ \arg\min \left( \text{regularization penalty} + C \times \text{cross entropy loss} \right) $$
+- The amount of regularization is controlled by parameter $C$, which is the **inverse of the regularization rate** ($\alpha$) : 
+
+$$
+\arg\min \left( \text{regularization penalty} + C \times \text{cross entropy loss} \right) 
+$$
+
 - $C$ must be positive: a **smaller value** leads to stronger regularization, while a **larger value** leads to weaker regularization . Setting $C$ to infinity implements unregularized logistic regression .
 - Default Scikit-Learn parameters for `LogisticRegression` include an $\ell_2$ penalty, $C = 1$, and the `lbfgs` solver . Supported solvers include `liblinear`, `newton-cg`, `sag`, `saga`, and `lbfgs` .
 
@@ -229,7 +257,7 @@ poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction
 - **One-vs-Rest (OvR) / One-vs-All**: Logistic Regression can implement multiclass classification using the One-vs-Rest strategy by setting `multi_class="ovr"` . The `SGDClassifier` and `Perceptron` also use the One-vs-Rest strategy .
 - **One-vs-One (OvO)**: Used under the hood by estimators like `SVC` when handling multiclass problems (e.g., training 45 binary classifiers for 10 classes) .
 - **Using `SGDClassifier`**:
-- Step 1: Instantiate a `SGDClassifier` estimator by setting the appropriate `loss` parameter . By default, it uses hinge loss for a linear SVM . Setting `loss='log'` defines a logistic regression classifier : ```python from sklearn.linear_model import SGDClassifier sgd_classifier = SGDClassifier(loss='log') ```[cite: 4] ```
+- Step 1: Instantiate a `SGDClassifier` estimator by setting the appropriate `loss` parameter . By default, it uses hinge loss for a linear SVM . Setting `loss='log'` defines a logistic regression classifier : ```python from sklearn.linear_model import SGDClassifier sgd_classifier = SGDClassifier(loss='log') ```
 - Step 2: Call the `.fit()` method with the training feature matrix `X_train` and label vector `y_train` .
 
 ### Multilabel Classification
@@ -243,7 +271,12 @@ poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction
 <img width="1376" height="768" alt="image" src="https://github.com/user-attachments/assets/aa6cd325-69cf-4bf7-90e2-751d86321872" />
 
 - **Core Assumption**: The Naive Bayes classifier applies Bayes' theorem with the "naive" assumption of conditional independence between every pair of features given the value of the class variable .
-- For a given class variable $y$ and dependent feature vector $x_1$ through $x_m$, the naive conditional independence assumption is expressed as : $$ P(x_i \mid y, x_1, \dots, x_{i-1}, x_{i+1}, \dots, x_m) = P(x_i \mid y) $$
+- For a given class variable $y$ and dependent feature vector $x_1$ through $x_m$, the naive conditional independence assumption is expressed as : 
+
+$$ 
+P(x_i \mid y, x_1, \dots, x_{i-1}, x_{i+1}, \dots, x_m) = P(x_i \mid y) 
+$$
+
 - Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods .
 
 ### List of Naive Bayes Classifiers in `sklearn.naive_bayes`
@@ -256,7 +289,7 @@ poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction
 
 ### Text Classification Pipeline Example
 
-- We can construct a text classification pipeline combining feature extraction and modeling : ```python from sklearn.datasets import fetch_20newsgroups from sklearn.feature_extraction.text import TfidfVectorizer from sklearn.naive_bayes import MultinomialNB from sklearn.pipeline import make_pipeline model = make_pipeline(TfidfVectorizer(), MultinomialNB()) model.fit(X_train, y_train) ```[cite: 5] ```
+- We can construct a text classification pipeline combining feature extraction and modeling : ```python from sklearn.datasets import fetch_20newsgroups from sklearn.feature_extraction.text import TfidfVectorizer from sklearn.naive_bayes import MultinomialNB from sklearn.pipeline import make_pipeline model = make_pipeline(TfidfVectorizer(), MultinomialNB()) model.fit(X_train, y_train) ```
 
 ## 4.8 K Nearest Neighbours (k-NN)
 
@@ -306,3 +339,62 @@ poly_reg_pipeline = Pipeline([ ("poly", PolynomialFeatures(degree=2, interaction
 - Unlike Logistic Regression classifiers, standard SVM classifiers do not output probabilities for each class .
 - An SVM classifier outputs the distance between the test instance and the decision boundary, which serves as a confidence score .
 - To obtain probability estimates, you can set `probability=True` when instantiating the SVC . Scikit-Learn will then calibrate probabilities using Logistic Regression on the SVM's scores via an additional five-fold cross-validation on the training data, adding `.predict_proba()` and `.predict_log_proba()` methods .
+
+
+
+
+
+---
+
+
+
+
+
+# Module 4: Decision Trees & Ensemble Methods
+
+## 4.10 Decision Trees
+
+<img width="717" height="363" alt="image" src="https://github.com/user-attachments/assets/a153fb43-9714-442a-8f3f-341f0fbe42d0" />
+
+- Decision Trees are fundamental components of Random Forests, which are among the most powerful Machine Learning algorithms available today .
+- They can be used to train, visualize, and make predictions .
+- **The CART Training Algorithm**: Scikit-Learn uses the **Classification and Regression Tree (CART)** algorithm to train (or "grow") Decision Trees .
+- The algorithm works by first splitting the training set into two subsets using a single feature $k$ and a threshold $t_k$ (e.g., “petal length $\le 2.45$ cm”) . It searches for the pair $(k, t_k)$ that produces the purest subsets (weighted by their size) .
+- **Making Predictions Example**: ```python >>> tree_clf.predict_proba([[5, 1.5]]) array([[0. , 0.90740741, 0.09259259]]) >>> tree_clf.predict([[5, 1.5]]) array([1]) ```
+- Estimated probabilities would be identical anywhere else in the same rectangle of the feature space .
+- **Pipeline and Dataset Loading Example**:
+- Loading the dataset using `load_iris` with `return_X_y=True` and `as_frame=True` returns the data in the form of a feature matrix and label vector .
+- Example decision tree classification pipeline: ```python dt_pipeline.fit(train_features, train_labels) Pipeline(steps=[('feature_scaling', MinMaxScaler()), ('dt_classifier', DecisionTreeClassifier(max_depth=3, random_state=42))]) ```
+- Once trained, the classifier is evaluated on the test set using a **confusion matrix** and a **classification report** .
+
+## 4.11 Voting, Bagging and Random Forest
+
+<img width="719" height="358" alt="image" src="https://github.com/user-attachments/assets/ba202c2d-4a1c-4556-a8cf-056189641696" />
+<img width="705" height="414" alt="image" src="https://github.com/user-attachments/assets/09782133-f3b1-4b8f-a934-6e2b67e8fb0e" />
+
+- Popular Ensemble methods include bagging, boosting, stacking, and Random Forests .
+
+### Voting Classifiers
+
+- Suppose you have trained a few classifiers (e.g., a Logistic Regression classifier, an SVM classifier, a Random Forest classifier, a K-Nearest Neighbors classifier), each achieving about 80% accuracy .
+- A very simple way to create an even better classifier is to aggregate the predictions of each classifier and predict the class that gets the most votes; this majority-vote classifier is called a **hard voting classifier** .
+- Ensemble methods work best when the predictors are as independent from one another as possible . Training them using very different algorithms increases the chance that they make very different types of errors, thereby improving the ensemble's overall accuracy .
+
+### Bagging, Pasting, and Random Forests
+
+- Ensemble techniques also encompass bagging and pasting methods, out-of-bag evaluation , and Random Forests which build upon Decision Trees as fundamental components .
+
+## 4.12 Boosting: AdaBoost, GradientBoost
+
+<img width="1920" height="1292" alt="image" src="https://github.com/user-attachments/assets/c49aea43-061f-4200-adb0-6c0e83ca3e46" />
+
+### AdaBoost
+
+- If your AdaBoost ensemble is overfitting the training set, you can try reducing the number of estimators or more strongly regularizing the base estimator .
+
+### Gradient Boosting
+
+- Gradient Boosting works by sequentially adding predictors to an ensemble, each one correcting its predecessor .
+- Instead of tweaking the instance weights at every iteration like AdaBoost, Gradient Boosting tries to fit the new predictor to the **residual errors** made by the previous predictor .
+- It is possible to use Gradient Boosting with other cost functions, controlled by the `loss` hyperparameter .
+- **XGBoost (Extreme Gradient Boosting)**: An optimized implementation of Gradient Boosting available in the popular Python library `xgboost` . Initially developed by Tianqi Chen as part of DMLC, it aims to be extremely fast, scalable, and portable, and is frequently an important component of winning entries in ML competitions with an API quite similar to Scikit-Learn's .
