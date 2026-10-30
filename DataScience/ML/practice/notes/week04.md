@@ -398,3 +398,43 @@ $$
 - Instead of tweaking the instance weights at every iteration like AdaBoost, Gradient Boosting tries to fit the new predictor to the **residual errors** made by the previous predictor .
 - It is possible to use Gradient Boosting with other cost functions, controlled by the `loss` hyperparameter .
 - **XGBoost (Extreme Gradient Boosting)**: An optimized implementation of Gradient Boosting available in the popular Python library `xgboost` . Initially developed by Tianqi Chen as part of DMLC, it aims to be extremely fast, scalable, and portable, and is frequently an important component of winning entries in ML competitions with an API quite similar to Scikit-Learn's .
+
+
+
+
+---
+
+
+
+
+# Module 5: Deep Learning Foundations
+
+## 4.13 Neural Networks: Multi-layer Perceptron (MLP)
+
+<img width="894" height="505" alt="image" src="https://github.com/user-attachments/assets/55046720-3f8c-4c35-adff-a5bad506eb72" />
+
+### Introduction to Artificial Neural Networks (ANNs)
+
+- Artificial Neural Networks (ANNs) are at the very core of Deep Learning; they are versatile, powerful, and scalable, making them ideal for tackling large and highly complex Machine Learning tasks such as classifying billions of images, powering speech recognition services, recommending videos, or playing the game of Go .
+- When an ANN contains a deep stack of hidden layers, it is called a **deep neural network (DNN)** . The field of Deep Learning studies DNNs and models containing deep stacks of computations .
+
+### Architecture of a Multilayer Perceptron (MLP)
+
+- An MLP is composed of :
+1. One (passthrough) **input layer** .
+2. One or more layers of Threshold Logic Units (TLUs), called **hidden layers** .
+3. One final layer of TLUs called the **output layer** .
+- The layers close to the input layer are usually called the **lower layers**, and the ones close to the outputs are called the **upper layers** .
+- Every layer **except the output layer** includes a bias neuron and is fully connected to the next layer .
+- The signal flows only in one direction (from the inputs to the outputs), making this architecture an example of a **feedforward neural network (FNN)** .
+
+### Hyperparameters and Configuration for MLP Tasks
+
+| Hyperparameter / Setting | Binary Classification | Multilabel Binary Classification | Multiclass Classification |
+| --- | --- | --- | --- |
+| **Input and Hidden Layers** | Same as regression | Same as regression | Same as regression |
+| **Number of Output Neurons** | $1$ | $1$ per label | $1$ per class |
+| **Output Layer Activation** | Logistic | Logistic | Softmax |
+| **Loss Function** | Cross entropy | Cross entropy | Cross entropy |
+
+- Playing with various neural network architectures using visualization tools like the **TensorFlow Playground** is useful for understanding MLPs, including the effects of all hyperparameters (number of layers and neurons, activation functions, and more) .
