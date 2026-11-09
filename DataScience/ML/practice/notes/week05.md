@@ -1,28 +1,28 @@
 # Week 5: Logistic Regression
 
-**Module 1: Exploratory Data Analysis & Baseline**
-* 5.1 - Explore California Housing Dataset
+[**Module 1: Exploratory Data Analysis & Baseline**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-1-exploratory-data-analysis--baseline)* 5.1 - Explore California Housing Dataset
 * 5.4 - Baseline Model
 
 
- **Module 2: Linear Models & Optimization**
-* 5.2 - Linear Regression on California housing Dataset
+[ **Module 2: Linear Models & Optimization**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-2-linear-models--optimization)* 5.2 - Linear Regression on California housing Dataset
 * 5.3 - Linear Regression Demonstration
 * 5.5 - SGDRegressor Demonstration
 
 
- **Module 3: Non-Linear & Distance-Based Models**
-* 5.6 - Demonstration: KNN with California Housing Dataset
+[ **Module 3: Non-Linear & Distance-Based Models**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-3-non-linear--distance-based-models)* 5.6 - Demonstration: KNN with California Housing Dataset
 * 5.7 - Decision Trees for Regression
 
 
- **Module 4: Ensemble Methods**
-* 5.8 - Bagging and Random Forest Regressor on California Housing Dataset
+[ **Module 4: Ensemble Methods**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-4-ensemble-methods)* 5.8 - Bagging and Random Forest Regressor on California Housing Dataset
 * 5.9 - AdaBoost and GradientBoost Regressor on California Housing Dataset
 
 
-**Module 5: Neural Networks**
-* 5.10 - MLP Regressor on california housing dataset
+[**Module 5: Neural Networks**
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-5-neural-networks)* 5.10 - MLP Regressor on california housing dataset
 
 
 
@@ -93,7 +93,15 @@
 
 ### Linear Regression Baseline Model
 
-- A simple linear model can be represented by Equation 1-1 : $$ \text{life\_satisfaction} = \theta_0 + \theta_1 \times \text{GDP\_per\_capita} $$
+- A simple linear model can be represented by Equation 1-1 :
+  
+
+
+$$
+ \text{life satisfaction} = \theta0 + \theta1 \times \text{GDP per capita} 
+$$
+
+
 
 <img width="757" height="330" alt="image" src="https://github.com/user-attachments/assets/90c03d8c-d62f-4075-9a34-4a8f10c6b380" />
 
@@ -131,9 +139,26 @@
 
 ### Linear Regression Model Definition & Prediction
 
-- A linear model makes a prediction by computing a weighted sum of the input features, plus a constant called the bias term (also called the intercept term) : $$ \hat{y} = w_0 + w_1 x_1 + w_2 x_2 + \dots + w_m x_m = w^T x $$
-- In simpler regression models (such as life satisfaction), the model is represented as : $$ \text{life\_satisfaction} = \theta_0 + \theta_1 \times \text{GDP\_per\_capita} $$
-- Here, $\theta_0$ and $\theta_1$ (or $w_0, w_1$) are the model's parameters .
+- A linear model makes a prediction by computing a weighted sum of the input features, plus a constant called the bias term (also called the intercept term) : 
+
+
+
+$$
+ \hat{y} = w0 + w1 x1 + w2 x2 + \dots + wm xm = w^T x 
+$$
+
+
+
+- In simpler regression models (such as life satisfaction), the model is represented as : 
+
+
+
+$$
+ \text{life\satisfaction} = \theta0 + \theta1 \times \text{GDP\per\capita} 
+$$
+
+
+- Here, $\theta0$ and $\theta1$ (or $w0, w1$) are the model's parameters .
 - Training a model means setting its parameters so that the model best fits the training set .
 
 ### Cost Function (MSE)
@@ -142,7 +167,12 @@
 - The most common performance measure of a regression model is the Root Mean Square Error (RMSE) .
 - To train the model, we need to find the value of $\theta$ that minimizes the RMSE .
 - In practice, it is simpler to minimize the Mean Squared Error (MSE) than the RMSE, leading to the same result because the value that minimizes a function also minimizes its square root .
-- The MSE cost function for a Linear Regression model hypothesis $h_\theta$ on a training set $X$ is calculated using Equation 4-3 : $$ \text{MSE}(X, h_\theta) = \frac{1}{m} \sum_{i=1}^{m} (\theta^T x^{(i)} - y^{(i)})^2 $$
+- The MSE cost function for a Linear Regression model hypothesis $h_\theta$ on a training set $X$ is calculated using Equation 4-3 : 
+
+$$
+ \text{MSE}(X, h_\theta) = \frac{1}{m} \sum_{i=1}^{m} (\theta^T x^{(i)} - y^{(i)})^2 
+$$
+
 - To simplify notations, we write $\text{MSE}(\theta)$ instead of $\text{MSE}(X, h_\theta)$ .
 
 <img width="584" height="400" alt="image" src="https://github.com/user-attachments/assets/ddf7e3d5-a354-41bb-9cf6-ce8a516c5e95" />
@@ -363,7 +393,8 @@
 - **`learning_rate`**: Weight applied to each regressor at each boosting iteration ($\eta$). Shrinkage parameter.
 - **`loss`**: Loss function to use when updating weights after each boosting iteration (`'linear'`, `'square'`, or `'exponential'`).
 
---- 📸 INSERT IMAGE: [Sequential boosting workflow showing weighted error correction across iterations] ---
+<img width="546" height="366" alt="image" src="https://github.com/user-attachments/assets/7b908f6c-4b34-4d74-9bc8-018e1fc53210" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a0cd9e2a-b8a6-45f0-a403-a4cab875af88" />
 
 ### Gradient Boosting Regressor
 
