@@ -386,3 +386,65 @@
 > [!NOTE] Gradient Boosting and Random Forests generally yield superior performance on tabular regression tasks like the California housing dataset, though they require careful hyperparameter tuning of learning rates and tree depths to avoid overfitting.
 >
 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Module 5: Neural Networks
+
+## 5.10 - MLP Regressor on California Housing Dataset
+
+### Typical Regression MLP Architecture
+
+- Table 10-1 summarizes the typical architecture of a regression MLP :
+
+| Hyperparameter | Typical value |
+| --- | --- |
+| `# input neurons` | One per input feature (e.g., $28 \times 28 = 784$ for MNIST) |
+| `# hidden layers` | Depends on the problem, but typically 1 to 5 |
+| `# neurons per hidden layer` | Depends on the problem, but typically 10 to 100 |
+| `# output neurons` | 1 per prediction dimension |
+| Hidden activation | ReLU (or SELU, see Chapter 11) |
+| Output activation | None, or ReLU/softplus (if positive outputs) or logistic/tanh (if bounded outputs) |
+
+<img width="850" height="775" alt="image" src="https://github.com/user-attachments/assets/9aa8c593-c1a7-4e48-8d87-0842909b4fca" />
+<img width="850" height="941" alt="image" src="https://github.com/user-attachments/assets/30b455c4-c11f-4ea0-a54a-c2b9f134ef42" />
+
+### Building a Regression MLP Using the Sequential API
+
+- We switch to the California housing problem and tackle it using a regression neural network .
+- For simplicity, we use Scikit-Learn's `fetch_california_housing()` function to load the data .
+- This dataset is simpler than the one used in Chapter 2, since it contains only numerical features (there is no `ocean_proximity` feature), and there are no missing values .
+- After loading the data, we split it into a training set, a validation set, and a test set, and we scale all the features : ```python from sklearn.datasets import fetch_california_housing from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler housing = fetch_california_housing() X_train_full, X_test, y_train_full, y_test = train_test_split( housing.data, housing.target) X_train, X_valid, y_train, y_valid = train_test_split( X_train_full, y_train_full) scaler = StandardScaler() X_train = scaler.fit_transform(X_train) X_valid = scaler.transform(X_valid) X_test = scaler.transform(X_test) ```
+
+
+### Training and Evaluating the Sequential Regression MLP
+
+- Using the Sequential API to build, train, evaluate, and use a regression MLP to make predictions is quite similar to what we did for classification .
+- The main differences are :
+- The output layer has a single neuron (since we only want to predict a single value) and uses no activation function .
+- The loss function is the mean squared error (`mean_squared_error`) .
+- Since the dataset is quite noisy, we just use a single hidden layer with fewer neurons than before, to avoid overfitting : ```python model = keras.models.Sequential([ keras.layers.Dense(30, activation="relu", input_shape=X_train.shape[1:]), keras.layers.Dense(1) ]) model.compile(loss="mean_squared_error", optimizer="sgd") history = model.fit(X_train, y_train, epochs=20, validation_data=(X_valid, y_valid)) mse_test = model.evaluate(X_test, y_test) X_new = X_test[:3] # pretend these are new instances y_pred = model.predict(X_new) ```
+
+
+### Using KerasRegressor for Scikit-Learn Compatibility
+
+- To build a configurable model function for hyperparameter tuning and Scikit-Learn wrapping, we define `build_model()` : ```python def build_model(n_hidden=1, n_neurons=30, learning_rate=3e-3, input_shape=[8]): model = keras.models.Sequential() model.add(keras.layers.InputLayer(input_shape=input_shape)) for layer in range(n_hidden): model.add(keras.layers.Dense(n_neurons, activation="relu")) model.add(keras.layers.Dense(1)) optimizer = keras.optimizers.SGD(lr=learning_rate) model.compile(loss="mse", optimizer=optimizer) return model ```
+- This function creates a simple Sequential model for univariate regression (only one output neuron), with the given input shape and the given number of hidden layers and neurons, and it compiles it using an SGD optimizer configured with the specified learning rate .
+- It is good practice to provide reasonable defaults to as many hyperparameters as you can, as Scikit-Learn does .
+- Next, let's create a `KerasRegressor` based on this `build_model()` function : ```python keras_reg = keras.wrappers.scikit_learn.KerasRegressor(build_model) ```
+- The `KerasRegressor` object is a thin wrapper around the Keras model built using `build_model()` .
+- Since we did not specify any hyperparameters when creating it, it will use the default hyperparameters we defined in `build_model()` .
+- Now we can use this object like a regular Scikit-Learn regressor: we can train it using its `fit()` method, then evaluate it using its `score()` method, and use it to make predictions using its `predict()` method : ```python keras_reg.fit(X_train, y_train, epochs=100, validation_data=(X_valid, y_valid), callbacks=[keras.callbacks.EarlyStopping(patience=10)]) mse_test = keras_reg.score(X_test, y_test) y_pred = keras_reg.predict(X_new) ```
