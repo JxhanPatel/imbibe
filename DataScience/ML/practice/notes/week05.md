@@ -1,28 +1,36 @@
 # Week 5: Logistic Regression
 
 [**Module 1: Exploratory Data Analysis & Baseline**
-](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-1-exploratory-data-analysis--baseline)* 5.1 - Explore California Housing Dataset
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-1-exploratory-data-analysis--baseline)
+
+ * 5.1 - Explore California Housing Dataset
 * 5.4 - Baseline Model
 
 
 [ **Module 2: Linear Models & Optimization**
-](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-2-linear-models--optimization)* 5.2 - Linear Regression on California housing Dataset
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-2-linear-models--optimization)
+* 5.2 - Linear Regression on California housing Dataset
 * 5.3 - Linear Regression Demonstration
 * 5.5 - SGDRegressor Demonstration
 
 
 [ **Module 3: Non-Linear & Distance-Based Models**
-](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-3-non-linear--distance-based-models)* 5.6 - Demonstration: KNN with California Housing Dataset
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-3-non-linear--distance-based-models)
+* 5.6 - Demonstration: KNN with California Housing Dataset
 * 5.7 - Decision Trees for Regression
 
 
 [ **Module 4: Ensemble Methods**
-](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-4-ensemble-methods)* 5.8 - Bagging and Random Forest Regressor on California Housing Dataset
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-4-ensemble-methods)
+
+* 5.8 - Bagging and Random Forest Regressor on California Housing Dataset
 * 5.9 - AdaBoost and GradientBoost Regressor on California Housing Dataset
 
 
 [**Module 5: Neural Networks**
-](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-5-neural-networks)* 5.10 - MLP Regressor on california housing dataset
+](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week05.md#module-5-neural-networks)
+
+* 5.10 - MLP Regressor on california housing dataset
 
 
 
@@ -154,7 +162,7 @@ $$
 
 
 $$
- \text{life\satisfaction} = \theta0 + \theta1 \times \text{GDP\per\capita} 
+ \text{life satisfaction} = \theta0 + \theta1 \times \text{GDP per capita} 
 $$
 
 
