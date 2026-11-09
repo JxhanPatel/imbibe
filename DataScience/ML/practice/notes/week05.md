@@ -284,3 +284,105 @@
 > Regularization techniques (such as setting `min_samples_leaf` or restricting `max_depth`) are crucial to prevent decision trees from overfitting the training data  .
 >
 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Module 4: Ensemble Methods
+
+## 5.8 - Bagging and Random Forest Regressor on California Housing Dataset
+
+### Overview of Ensemble Learning & Bagging
+
+- **Ensemble methods** combine the predictions of several base estimators built with a given learning algorithm in order to improve generalizability and robustness over a single estimator.
+- **Bagging (Bootstrap Aggregating)** involves training multiple base estimators on random subsets of the original training set with replacement.
+- The final prediction is formed by averaging the predictions of all base estimators (in regression) or taking a majority vote (in classification).
+
+### Random Forest Regressor
+
+- A Random Forest is an ensemble of decision trees, usually trained via the bagging method (with samples drawn with replacement).
+- In addition to bagging, Random Forests typically randomize feature selection at each split, considering only a random subset of features (`max_features`) to decorrelate the individual trees.
+- Scikit-Learn provides the `RandomForestRegressor` estimator in the `sklearn.ensemble` module: ```python from sklearn.ensemble import RandomForestRegressor ```
+
+<img width="872" height="473" alt="image" src="https://github.com/user-attachments/assets/eddcbb18-39ef-4a8d-be2d-3be353cd79bc" />
+
+### Pipeline Setup and Hyperparameters
+
+- A pipeline incorporating data preprocessing and the `RandomForestRegressor` can be configured as follows: ```python rf_reg_pipeline = Pipeline([ ("feature_scaling", StandardScaler()), ("rf_reg", RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)) ]) ```
+- **Key Hyperparameters**:
+- **`n_estimators`**: The number of trees in the forest (default is usually 100).
+- **`max_depth`**: The maximum depth of the trees. Restricting depth helps prevent overfitting.
+- **`max_features`**: The number of features to consider when looking for the best split (e.g., `'sqrt'`, `'log2'`, or a float/integer).
+- **`bootstrap`**: Whether bootstrap samples are used when building trees (`True` or `False`).
+- **`n_jobs`**: The number of jobs to run in parallel for both `fit` and `predict` (`n_jobs=-1` uses all available CPU cores).
+
+### Training and Evaluation
+
+- The model is trained using the training feature matrix and label vector via cross-validation or standard `.fit()` calls: ```python rf_reg_pipeline.fit(train_features, train_labels) ```
+- Evaluation is carried out using metrics such as Mean Absolute Error (MAE), Mean Squared Error (MSE), and $R^2$ score (`r2_score`).
+- Random forests often achieve higher predictive accuracy on the California housing dataset compared to single decision trees or linear models due to variance reduction.
+
+### Feature Importance Analysis
+
+- Random Forests allow us to measure the relative importance of each feature in predicting the target variable (`MedHouseVal`).
+- Feature importances can be accessed via the trained regressor step in the pipeline: ```python importances = rf_reg_pipeline[-1].feature_importances_ ```
+- Features like median income (`MedInc`) and geographical coordinates (`Latitude`, `Longitude`) typically exhibit the highest importance scores in the California housing dataset.
+
+## 5.9 - AdaBoost and Gradient Boost Regressor on California Housing Dataset
+
+### Overview of Boosting
+
+- **Boosting** refers to any ensemble method that can combine several weak learners into a strong learner sequentially.
+- Unlike bagging (which trains estimators independently in parallel), boosting trains predictors sequentially, where each new predictor tries to correct the errors made by the previous predictor.
+
+### AdaBoost Regressor
+
+- **AdaBoost (Adaptive Boosting)** works by fitting a sequence of weak learners (typically shallow decision trees, known as decision stumps) on repeatedly modified versions of the data.
+- Data instances are reweighted after each step: examples that are hard to predict (high errors) receive higher weights, forcing the subsequent predictor to focus more on them.
+- Scikit-Learn provides `AdaBoostRegressor` in the `sklearn.ensemble` module: ```python from sklearn.ensemble import AdaBoostRegressor ```
+- **Key Hyperparameters**:
+- **`estimator`**: The base estimator object (defaults to `DecisionTreeRegressor(max_depth=3)`).
+- **`n_estimators`**: The maximum number of estimators at which boosting is terminated.
+- **`learning_rate`**: Weight applied to each regressor at each boosting iteration ($\eta$). Shrinkage parameter.
+- **`loss`**: Loss function to use when updating weights after each boosting iteration (`'linear'`, `'square'`, or `'exponential'`).
+
+--- 📸 INSERT IMAGE: [Sequential boosting workflow showing weighted error correction across iterations] ---
+
+### Gradient Boosting Regressor
+
+- **Gradient Boosting** builds additive models in a forward stage-wise fashion, optimizing arbitrary differentiable loss functions.
+- At each stage, a regression tree is fit on the negative gradient (residual errors) of the loss function corresponding to the current prediction.
+- Scikit-Learn provides `GradientBoostingRegressor` in the `sklearn.ensemble` module: ```python from sklearn.ensemble import GradientBoostingRegressor ```
+- **Key Hyperparameters**:
+- **`loss`**: `'squared_error'`, `'absolute_error'`, `'huber'`, or `'quantile'`.
+- **`learning_rate`**: Shrinkage rate (e.g., `0.1`). Lower values require more estimators.
+- **`n_estimators`**: The number of boosting stages to perform.
+- **`subsample`**: The fraction of samples to be used for fitting the individual base learners; setting `subsample < 1.0` results in Stochastic Gradient Boosting, which adds regularization and speeds up training.
+- **`max_depth`**: Maximum depth of the individual regression estimators.
+
+### Pipeline Setup and Training on California Housing Dataset
+
+- A pipeline for Gradient Boosting regression can be structured as follows: ```python gbr_pipeline = Pipeline([ ("feature_scaling", StandardScaler()), ("gbr", GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=4, random_state=42)) ]) ```
+- The pipeline is fitted on the training split: ```python gbr_pipeline.fit(train_features, train_labels) ```
+- Performance can be evaluated across folds using cross-validation to compare test errors against baseline linear models, decision trees, and random forests.
+
+> [!NOTE] Gradient Boosting and Random Forests generally yield superior performance on tabular regression tasks like the California housing dataset, though they require careful hyperparameter tuning of learning rates and tree depths to avoid overfitting.
+>
+>
