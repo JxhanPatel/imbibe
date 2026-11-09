@@ -196,3 +196,91 @@
 > Tuning hyperparameters such as learning rate ($\eta_0$), penalty terms, and early stopping criteria via validation curves is essential to ensure proper convergence when using `SGDRegressor`  .
 >
 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Module 3: Non-Linear & Distance-Based Models
+
+## 5.6 - Demonstration: k-NN with California Housing Dataset
+
+### Overview of k-NN in Regression
+
+- k-NN can be used in addressing regression problems .
+- This demonstration applies k-NN in a regression setup using the California housing dataset to predict the price of a house based on its features .
+
+### Importing Libraries & Prerequisites
+
+- The data is split into training and test sets using the `train_test_split` library .
+- An `assert` statement verifies that the `sklearn` version is later than 0.20 for the colab to run .
+
+### Pipeline Setup
+
+- Model building makes use of a pipeline setup consisting of two stages: data preprocessing and estimator .
+- **Preprocessing**: Uses the `MinMaxScaler` library .
+- **Estimator**: Uses the `KNeighborsRegressor` estimator for the regression problem .
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3193c0da-9f3f-4fe1-b975-e0c45a3b3320" />
+
+## 5.7 - Decision Trees for Regression
+
+### Overview and Characteristics
+
+- Decision trees are non-parametric supervised learning methods capable of finding complex non-linear relationships in data .
+- They can perform both classification and regression tasks .
+- Decision trees predict labels or values based on rules inferred from features in the training set .
+
+### Scikit-Learn Implementation
+
+- Scikit-learn uses an optimized version of the **CART** (Classification and Regression Tree) algorithm .
+- Currently, scikit-learn decision trees do not support categorical variables .
+- For regression tasks, scikit-learn provides the `sklearn.tree.DecisionTreeRegressor` API .
+- Both classification (`DecisionTreeClassifier`) and regression (`DecisionTreeRegressor`) estimators share the same set of parameters except for the criterion used for tree splitting (e.g., `splitter`, `max_depth`, `min_samples_split`) .
+- Notice the structural similarity in model fitting between Linear Regression and Decision Trees, as both are instances of the estimator class : ```python lin_reg.fit(train_features, train_labels) tree_reg.fit(train_features, train_labels) ```
+
+<img width="800" height="1200" alt="image" src="https://github.com/user-attachments/assets/febd1677-191d-4c2d-8465-bf6408c28cf5" />
+
+### Pipeline Setup & Cross-Validation
+
+- A pipeline model can be set up using feature scaling (`StandardScaler`) as a pre-processing step followed by `DecisionTreeRegressor` : ```python dt_reg_pipeline = Pipeline([ ("feature_scaling", StandardScaler()), ("dt_reg", DecisionTreeRegressor(max_depth=3, random_state=42)) ]) ```
+- Training and evaluation are performed using cross-validation (`cross_validate`) with `ShuffleSplit` cross-validation and `"neg_mean_absolute_error"` as the scoring mechanism .
+- Cross-validation results show performance metrics such as mean absolute error on the train and test sets (e.g., train MAE of $0.590 \pm 0.005$ and test MAE of $0.593 \pm 0.007$) .
+
+### Visualizing the Tree
+
+- Decision tree outputs are intuitive and can be visualized as a tree diagram using tree APIs (`plot_tree`) .
+- The `.fit()` function must be called on the pipeline object before printing or plotting the tree .
+- **Tree Structure Details**:
+- Displays split criteria (such as median income less than a threshold like $0.62$ at the root node) .
+- Subsequent splits at lower levels rely on features like average room size, average occupancy, or median income .
+- Each node displays the squared error (or MSE), number of samples, and predicted value .
+
+<img width="1376" height="768" alt="image" src="https://github.com/user-attachments/assets/38549053-6678-4abc-9fc1-c45092a7c88f" />
+
+### How Regression Trees Work
+
+- Unlike classification trees that predict a class, a regression tree predicts a numerical value in each leaf node .
+- For example, making a prediction for a new instance involves traversing the tree from the root to a leaf node .
+- The prediction value at a leaf node is the **average target value** of the training instances associated with that leaf node, accompanied by a calculated mean squared error over those instances .
+
+### Tips for Practical Usage
+
+- Decision trees tend to overfit data with a large number of features; ensure an appropriate ratio of samples to features .
+- Perform dimensionality reduction (such as PCA or Feature Selection) on data before training trees to improve the chances of finding discriminative features .
+- Visualize the trained tree using `max_depth=3` as an initial tree depth to evaluate model fitment before increasing the depth .
+
+> [!NOTE]
+> Regularization techniques (such as setting `min_samples_leaf` or restricting `max_depth`) are crucial to prevent decision trees from overfitting the training data  .
+>
+>
