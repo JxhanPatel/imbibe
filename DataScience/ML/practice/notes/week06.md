@@ -503,3 +503,104 @@ $$
 
 * **Scikit-Learn implementation on MNIST**:
 * In `LogisticRegression`, setting `multi_class='multinomial'` switches from One-vs-Rest (`'ovr'`) to Softmax Regression, paired with a compatible solver such as `solver='lbfgs'` (and inverse L2 regularization hyperparameter `C`, or `C=np.infty` for unregularized training) wrapped in a `MinMaxScaler()` pipeline on MNIST (`X_train`, `y_train` across 10 digit classes).
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+# Module 3: Instance-based and kernel classifiers
+
+## 6.11 – Demonstration: KNN with MNIST
+
+### Dataset and setup
+
+We use the MNIST dataset, where each datapoint is contained in $x \in \mathbb{R}^{784}$ and the label $y \in \{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\}$  . Data is fetched via `fetch_openml('mnist_784', version=1, return_X_y=True)`, converted to NumPy arrays via `.to_numpy()`, and split into training (`X[:60000]`, `y[:60000]`) and test (`X[60000:]`, `y[60000:]`) sets  .
+
+For binary classification (and eventually extending to a multiclass setup), label `1` is assigned to the digit `0` and the rest of the digits get labeled `0` (or initialized as `-1` with `0` indices set to `1`)  .
+
+<img width="909" height="678" alt="image" src="https://github.com/user-attachments/assets/af76c93a-4cbb-4e72-a552-aa22d74ebf7d" />
+
+### K-Nearest Neighbors (k-NN) algorithm
+
+Nearest neighbor classifiers are a type of instance-based learning (or non-generalizing learning) that do not attempt to construct an explicit parametric model; instead, they store instances of the training data and compute classification from a simple majority vote of the nearest neighbors of each data point . Scikit-Learn provides two implementations of nearest neighbor classifiers: `KNeighborsClassifier` and `RadiusNeighborsClassifier` .
+
+The k-NN classification algorithm steps are:
+
+1. Set $k$ to the desired value (how many neighbors should be allowed to participate in prediction).
+2. Calculate the distance between the new example and every example from the data to create a distance vector.
+3. Get the indices of the nearest $k$ neighbors.
+4. Get the labels of the selected $k$ entries.
+5. If it is a classification task, return the majority class by computing the mode of the $k$ labels .
+
+### Applying `KNeighborsClassifier` and `NearestNeighbors`
+
+To apply `KNeighborsClassifier`:
+
+1. Instantiate a `KNeighborsClassifier` estimator (e.g., `kneighbor_classifier = KNeighborsClassifier()` or with `n_neighbors=3`) .
+2. Call the `.fit()` method on the `KNeighborsClassifier` object with the training feature matrix and label vector as arguments .
+3.
+
+Key implementation details and considerations from the sources:
+
+- **Small-sample / 2D PCA visualization**: Training with a small number of samples (such as 10 samples from the training set) puts datapoints in metric space without building a parameterized model, allowing visualization of test points (marked with stars along with their labels) and combining a PCA pipeline (`pipe_pca_2d`) with `KNeighborsClassifier(n_neighbors=3)` .
+- **Distance and connectivity via `NearestNeighbors`**: To inspect the distance and connectivity of $k$ neighbors for each testing point, use the `NearestNeighbors` class; `KNeighborsClassifier` calls `NearestNeighbors` internally to compute distances .
+- **Distance algorithms and feature scaling**: The distance computation algorithm can be specified via `algorithm` (`'ball_tree'`, `'kd_tree'`, `'brute'`, or `'auto'`) . Because k-NN uses Euclidean distance computations, having all features on the same scale is crucial so features with wider variance do not disproportionately dominate distance calculations; scalers such as `MinMaxScaler` or `StandardScaler` can be used in a pipeline .
+- **Multilabel capability and hyperparameter tuning**: `KNeighborsClassifier` supports multilabel classification (such as predicting `y_multilabel = np.c_[y_train_large, y_train_odd]`), and grid search over `weights` and `n_neighbors` can be used for hyperparameter tuning on MNIST .
+
+<img width="928" height="494" alt="image" src="https://github.com/user-attachments/assets/bea7d60e-520a-49e9-b0eb-7da2d18e0002" />
+
+## 6.12 – Demonstration: SVC on MNIST dataset
+
+### Support Vector Machines in scikit-learn
+
+Support Vector Machines (SVMs) are a set of supervised learning methods used for classification, regression, and outlier detection that construct a hyperplane or set of hyperplanes in a high- or infinite-dimensional space .
+
+In scikit-learn, SVM classification is implemented via three primary classes:
+
+- `SVC` (C-Support Vector Classification)
+- `NuSVC`
+- `LinearSVC`
+
+| Class | Time Complexity | Out-of-Core Support | Scaling Required | Kernel Trick |
+| --- | --- | --- | --- | --- |
+| `LinearSVC` | $O(m \times n)$ | No | Yes | No |
+| `SGDClassifier` | $O(m \times n)$ | Yes | Yes | No |
+| `SVC` | $O(m^2 \times n) \text{ to } O(m^3 \times n)$ | No | Yes | Yes |
+
+- **`SVC` and `NuSVC`**: Based on the `libsvm` library and support the kernel trick, making them suitable for complex small- or medium-sized training sets, though they become very slow when the number of training instances gets large . In `NuSVC`, instead of `C`, $\nu \in (0, 1]$ controls the number of support vectors and margin errors (an upper bound on the fraction of margin errors and a lower bound on the fraction of support vectors) .
+- **`LinearSVC`**: Based on the `liblinear` library; a faster implementation of linear SVM using only a linear kernel .
+- **`SGDClassifier`**: Setting `loss="hinge"` and `alpha=1/(m*C)` trains a linear SVM classifier via Stochastic Gradient Descent, supporting out-of-core training for huge datasets that do not fit in memory .
+
+### Loading MNIST and inspecting support vectors
+
+In the demonstration, MNIST is loaded via `mnist.load_data()` from `keras.datasets`, returning `(X_train, y_train)` with shape `(60000, 28, 28)` and `(X_test, y_test)` with shape `(10000, 28, 28)`  . Each $28 \times 28$ image is flattened into a vector of length `784` (`60000` by `784` for training and `10000` by `784` for testing) and normalized by dividing each pixel value by `255`  . For faster experimentation in the notebook, the first `10000` images are taken as the training set and the first `2000` images in the test set as the test set  .
+
+After fitting an `SVC` estimator (`clf = SVC_classifier.fit(X_train, y_train)`), attributes revealing support vector details include:
+
+- `clf.support_`: Indices of the support vectors
+- `clf.support_vectors_`: The support vectors
+- `clf.n_support_`: Number of support vectors for each class
+-
+
+### Multiclass strategy, confidence scores, and probability calibration
+
+- **Multiclass classification**: `SVC` and `NuSVC` implement the `"one-versus-one"` (`'ovo'`) approach (or `'ovr'` via `decision_function_shape`), training 45 binary classifiers for 10 classes and selecting the class that wins the most duels . `LinearSVC` implements `"one-vs-the-rest"` (`'ovr'`) or `'crammer_singer'` via `multi_class` .
+- **Confidence scores and probability estimates**: Unlike Logistic Regression classifiers, standard SVM classifiers do not output probabilities for each class; instead, they output the distance between the test instance and the decision boundary as a confidence score . Setting `probability=True` when instantiating `SVC` calibrates probabilities using Logistic Regression on the SVM's scores via an additional five-fold cross-validation on the training data, adding `.predict_proba()` and `.predict_log_proba()` methods .
+
+<img width="887" height="438" alt="image" src="https://github.com/user-attachments/assets/bf659cc6-bd5d-4f24-ace5-d4a45a451819" />
+
+### Linear SVM, nonlinear RBF SVM, and `GridSearchCV` on MNIST
+
+- **Linear SVM**: A pipeline using `MinMaxScaler` followed by `SVC(kernel='linear', C=1)` trained on MNIST achieves a validation/training accuracy of `91.07%`, and its confusion matrix can be plotted via `disp.plot()` .
+- **Nonlinear SVM (`rbf` kernel)**: A pipeline using `MinMaxScaler` followed by `SVC(kernel='rbf', gamma=0.1, C=1)` evaluated with `cross_val_score(..., cv=2)` reports a training accuracy of `82.87%` in the demonstration output .
+- **Hyperparameter tuning with `GridSearchCV`**: Using `StandardScaler` with `SVC(kernel='rbf')`, a parameter grid over `gamma` and `C`, and `StratifiedShuffleSplit` validation inside `GridSearchCV`, the best parameters and best score are accessed via `grid.best_params_` and `grid.best_score_` .
