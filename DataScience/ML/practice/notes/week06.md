@@ -191,3 +191,315 @@ To extend a binary metric to multiclass or multilabel problems:
 
 
 
+
+
+
+
+
+---
+
+
+
+
+
+
+# Module 2: Perceptron and linear/probabilistic classifiers
+
+## 6.3 – Demonstration: Binary class image classification with perceptron
+
+### Problem setup: Handwritten digit classification (0-detector)
+
+We are given an image of a digit and we are required to predict the digit present in the image, which is an instance of a multiclass classification problem with 10 digits in total  . Since a single perceptron could only be used for binary classification, we consider only two classes in the first half before extending it to the multiclass setting  .
+
+Suppose we want to recognize whether the given image is of digit zero or not (digits other than zero)  :
+
+- The problem is cast as a binary classification problem (called a **0 detector**) .
+- Since the original label vector contains 10 classes, the label `0` is changed to `+1` (`1`), and all other labels (non-zero digits) are changed to `-1` .
+- The input matrices are close to sparse (there are lots of `0` / black pixels in the matrix than non-zero pixels) .
+-
+
+<img width="704" height="546" alt="image" src="https://github.com/user-attachments/assets/00fac586-d1d0-4fee-9237-aa6c4a3a67e4" />
+
+### Recap (Theory) of Perceptron
+
+1. **Training data**: $(\text{features}, \text{label})$ or $(X, y)$, where label $y$ is a discrete number from a finite set, and features in this case are pixel values of an image .
+2. **Model**: $$ h_w : y = g(w^T x) = g(w_0 + w_1 x_1 + \dots + w_m x_m) $$ where:
+- $w$ is a weight vector in $\mathbb{R}^{m+1}$ with components $(w_0, w_1, \dots, w_m)$ .
+- $g(\cdot)$ is a non-linear activation function given by a signum function: if the linear combination is $\ge 0$, we assign the label $+1$; otherwise (if the linear combination is negative), we assign the label $-1$ .
+3. **Perceptron loss**: $$ \text{Loss} = \max\left(-w^T x^{(i)} y^{(i)}, 0\right) $$ Internally, `Perceptron()` calls hinge loss with `0` as a threshold and uses SGD to update the weights . Alternatively, `SGDClassifier(loss='perceptron')` can be used to build a perceptron model .
+4.
+
+<img width="880" height="376" alt="image" src="https://github.com/user-attachments/assets/6a2647b3-36ce-422f-a963-4d10cbca0225" />
+
+### Baseline model, training, and evaluation
+
+- **Baseline model**: Constructed using `DummyClassifier(strategy='most_frequent')`, which counts the number of samples per class (`5923` positive samples for digit `0` and `54077` negative samples) and always outputs the class with the highest number of samples (`-1`), yielding a baseline accuracy of `0.90` ($90\%$) .
+- **Instantiation & Training**:
+- Create an instance of binary classifier (`bin_clf = Perceptron()`) and call `.fit()` to train the model .
+- Setting `warm_start=True` in the `Perceptron` constructor initializes every new run with the weights obtained from the previous run, which speeds up training and is useful when training in batches on large-scale data .
+- On the training set, the model gets an accuracy of `0.99`, and on the test set, an accuracy of `0.98` .
+-
+- **Metrics & Cross-validation**:
+- Using `confusion_matrix` and `classification_report(y_train_0, y_hat_train_0)` (or `precision_score` and `recall_score`), for class `1.0` (digit `0`) the model achieves precision of `0.96`, recall of `0.92`, and F1-score of `0.94` (overall accuracy `0.99`) .
+- Using `cross_validate` with $k = 5$ folds (`cv=5`), the estimator is internally cloned 5 times and fitted independently on each fold, yielding:
+- `f1`: avg `0.94`, std `0.013`
+- `precision`: avg `0.96`, std `0.01`
+- `recall`: avg `0.92`, std `0.03`
+
+<img width="877" height="509" alt="image" src="https://github.com/user-attachments/assets/6a4d86a0-fc9d-4a99-8e22-f45f39044ddd" />
+
+## 6.4 – Demonstration: Multi class image classification with perceptron
+
+### Multiclass Classifier (OneVsAll)
+
+- A single perceptron is a binary classifier, whereas the MNIST dataset contains 10 class labels (`0, 1, 2, 3, 4, 5, 6, 7, 8, 9`) .
+- **Solution**: Combine multiple binary classifiers (One-vs-All / One-vs-Rest strategy) and devise a suitable scoring metric .
+- **Label representation**: In a multiclass setup, each example is marked with a single label out of $k$ labels (shape `(n, 1)`), or transformed into a one-hot encoding representation using `LabelBinarizer` .
+- In scikit-learn, `Perceptron` automatically handles multiclass labels without modifying a single line of code written for the binary classifier :
+- `clf.coef_.shape` is `(10, 784)` and `clf.intercept_.shape` is `(10,)`, forming a matrix of size $10 \times 784$ where each row represents the weights for a single binary classifier .
+- During inference, there is no signum function associated with the multiclass perceptron; the input is passed through all 10 binary classifiers, and the class corresponding to the highest value of `decision_function` is selected as the predicted class .
+-
+
+<img width="884" height="406" alt="image" src="https://github.com/user-attachments/assets/a02b084b-a224-4ad4-b516-e4a45818312b" />
+
+### Pipeline, GridSearchCV, and visualizing weights
+
+- **Pipeline**: Created with `MinMaxScaler()` to scale features within the range `(0, 1)` followed by `Perceptron()`: ```python estimators = [('std_scaler', MinMaxScaler()), ('bin_clf', Perceptron())] ```
+- **Evaluation**: On the training set, `classification_report(y_train, y_hat)` shows an overall accuracy of `0.90`, with `ConfusionMatrixDisplay.from_predictions(y_train, y_hat, values_format='.5g')` showing that Digit 2 is often confused with Digit 3 .
+- **Hyperparameter Tuning**: Using `GridSearchCV` with `scoring=make_scorer(hinge_loss, greater_is_better=False)` across learning rates `lr_grid = [1/2**n for n in range(1, 6)]` discovers a learning rate with much lower training loss than the default learning rate of `1` (`best_bin_clf = bin_clf_gscv.best_estimator_`). However, no matter what the learning rate is, the loss will never converge to zero as the classes are not linearly separable .
+- **Visualizing weight vectors**: Reshaping `bin_clf.coef_` into a $28 \times 28$ matrix (`w.reshape(28, 28)`) and plotting with `plt.imshow(w_matrix, cmap='gray')` shows lighter shades for higher weight values and darker shades for lower weight values (e.g., `-60` to `+20`), allowing inspection of what patterns the classifier learned and diagnosing false positives .
+
+## 6.5 – Demonstration: MNIST digits classification using SGDRegressor
+
+### `SGDRegressor` estimator overview and step-wise optimization
+
+- The lecture introduces the demonstration using `SGDClassifier` / `SGDRegressor` iterative training before solving logistic regression analytically/via solvers, noting that `SGDRegressor` implements a stochastic gradient descent algorithm for linear models and is suited for large training setups ($\gt 10\text{k}$ samples) .
+- **Key hyperparameters**:
+- `loss`: Set to supported values such as `'squared_error'` or `'huber'` .
+- `penalty`: `'l1'`, `'l2'`, `'elasticnet'`, or `None` .
+- `learning_rate`: `'constant'`, `'optimal'`, `'invscaling'`, or `'adaptive'` .
+- `eta0`: Initial learning rate (e.g., `0.01` or `0.001`) .
+- `early_stopping`: Stops training when the validation score does not improve by at least `tol` for `n_iter_no_change` consecutive epochs, or after reaching `max_iter` .
+- `shuffle`: `True` to shuffle training data after each epoch .
+- `average`: Updates the weight vector to the average of weights from previous updates to stabilize noisy single-sample SGD updates .
+
+### Step-wise training and learning curves (`warm_start=True`)
+
+To monitor SGD loss iteration by iteration, set `max_iter=1`, `tol=-np.infty`, and `warm_start=True` inside a `Pipeline` with `StandardScaler()`  :
+
+```python
+sgd_pipeline = Pipeline([
+("feature_scaling", StandardScaler()),
+("SGD", SGDRegressor(max_iter=1, tol=-np.infty, warm_start=True, random_state=42))
+])
+
+loss = []
+for epoch in range(100):
+sgd_pipeline.fit(train_features, train_labels)  # continues where it left off
+loss.append(mean_squared_error(train_labels, sgd_pipeline.predict(train_features)))
+```
+
+Because `warm_start=True`, calling `.fit()` continues updating the parameters learned in the previous iteration. Plotting `loss` against iteration number (`Iteration#`) displays the learning curve to inspect convergence across different initial learning rates (`eta0`), where an ideal learning curve shows the training loss reducing monotonically as training progresses.
+
+<img width="905" height="460" alt="image" src="https://github.com/user-attachments/assets/4b6f4eb7-c5c0-4cee-85f4-73a5f1737904" />
+
+---
+
+## 6.6 – Demonstration: MNIST digits classification using logistic regression
+
+### Binary classification setup (0-detector)
+* Logistic regression is the workhorse of machine learning and works in binary, multiclass, and multilabel classification setups.
+* **Preprocessing**: Features are scaled using `MinMaxScaler()` so each feature lies in the range $[0, 1]$.
+> **Note**: Do not apply mean centering as it removes zeros from the data; however, zeros should remain zeros in the dataset.
+* **Labels**: Unlike perceptron (where negative labels were set to `-1`), for logistic regression the label `'0'` is changed to `1` and all other labels (`1–9`) are changed to `0`:
+```python
+y_train_0 = np.zeros((len(y_train)))
+y_test_0 = np.zeros((len(y_test)))
+```
+
+
+* **Baseline**: `DummyClassifier(strategy='most_frequent')` yields `0.90` ($90\%$) accuracy because `54,077` out of `60,000` training samples belong to class `0` (non-zero digits).
+
+<img width="890" height="333" alt="image" src="https://github.com/user-attachments/assets/e01461b3-a3b9-49d0-8f90-041a4036b71a" />
+
+### Iterative training with `SGDClassifier(loss='log')`
+* **Without regularization**:
+* Configured with `SGDClassifier(loss='log', penalty='l2', max_iter=1, warm_start=True, eta0=0.01, alpha=0, learning_rate='constant', random_state=1729)`.
+* Training and test accuracy both reach `0.99`.
+* On the training set (`classification_report`), class `0.0` achieves precision `1.00`, recall `1.00`, F1-score `1.00`, while class `1.0` (digit `0`) achieves precision `0.98`, recall `0.96`, and F1-score `0.97`.
+* 5-fold cross-validation (`cross_validate(..., cv=5, scoring=['precision', 'recall', 'f1'], return_train_score=True, return_estimator=True)`) produces 5 estimators; the best model (index 2 / third model) achieves the highest F1-score (`0.96096096` on split 2).
+* **With L2 regularization (`alpha=0.001`)**:
+* Configured with `penalty='l2'`, `alpha=0.001`, `eta0=0.01`, `learning_rate='constant'`.
+* Training loss is slightly higher than the unregularized model (expected behavior), bias is `-4.43`, and `67` weights equal `0`.
+* Training and test accuracy remain `0.99`, while for class `1.0` precision is `0.98`, recall drops from `0.96` to `0.93`, and F1-score is `0.95`.
+* **Curves and Hyperparameter Search**:
+* Plotting `precision_recall_curve` (recall on x-axis, precision on y-axis) and `roc_curve` (FPR on x-axis, TPR on y-axis) produces an ROC AUC score (`roc_auc_score`) of `0.998`.
+* `RandomizedSearchCV` with `loguniform` distribution is used to search for optimal hyperparameters within a fixed budget, while `LogisticRegression` and `LogisticRegressionCV` (which default to L2 regularization controlled by inverse regularization strength `C`, or `C=np.infty` for no regularization) solve the optimization directly using solvers like `'lbfgs'`.
+
+<img width="921" height="552" alt="image" src="https://github.com/user-attachments/assets/51977b55-68a1-46ed-a6eb-343b584c644c" />
+
+---
+
+## 6.7 – Demonstration: Zero detector with ridge classifier
+
+### Formulation and implementation
+* `RidgeClassifier` is a classifier variant of the Ridge regressor that casts binary classification as a **least-squares classification** problem and finds optimal weights using matrix decomposition techniques such as **SVD**.
+* **Target encoding**: First converts binary targets to $\{-1, +1\}$ and then treats the problem as a regression task, minimizing a penalized residual sum of squares:
+```python
+y_train_0 = -1 * np.ones((len(y_train)))
+y_test_0 = -1 * np.ones((len(y_test)))
+indx_0 = np.where(y_train == '0')
+y_train_0[indx_0] = 1
+```
+
+
+* **Parameters and Pipeline**:
+* By default, `RidgeClassifier` implements L2 regularization with `alpha=1.0`, `fit_intercept=True`, and `solver='auto'` (note: the `normalize` parameter is deprecated).
+* To train without regularization, set `alpha=0`:
+```python
+estimator = RidgeClassifier(normalize=False, alpha=0)
+pipe_ridge = make_pipeline(MinMaxScaler(), estimator)
+pipe_ridge.fit(x_train, y_train_0)
+```
+
+
+### Evaluation and weight visualization across models
+* **Performance**: On the test set (`classification_report`), overall accuracy is `0.98`; for class `1.0` (digit `0`), precision is `0.95`, recall is `0.87`, and F1-score is `0.91`. Using 5-fold `cross_validate` and selecting the best estimator via `np.argmax` on train F1-score (index `3`, the fourth estimator) improves recall by 1 percentage point to `0.88` while precision remains `0.95`.
+* **Comparing learned weight vectors**: Reshaping `coef_` into $28 \times 28$ grids and setting negative weights to `0` (`w_matrix[w_matrix < 0] = 0`) across four models (`'sgd'`, `'regularized sgd'`, `'logit'`, `'ridge'`) shows:
+* Regularized SGD drives lower weights in certain regions down to `0` compared to unregularized SGD.
+* Logistic regression learns pixel weight patterns very similar to SGD.
+* Ridge classifier produces a noticeably different weight map with a black patch in the center (where many weights were $< 0$ and clipped to `0`) and positive weights placed on pixels near the boundary.
+
+---
+
+## 6.8 – Demonstration: Multiclass classifier on MNIST dataset
+
+### One-vs-All (OvR) multiclass classification with `SGDClassifier`
+* Here we solve the actual 10-class MNIST digit recognition problem (`0` through `9`).
+* **Pipeline setup**:
+```python
+estimator = SGDClassifier(loss='log',
+penalty='l2',
+max_iter=1,
+warm_start=True,
+eta0=0.01,
+alpha=0,
+learning_rate='constant',
+random_state=1729)
+pipe_sgd_ovr = make_pipeline(MinMaxScaler(), estimator)
+```
+
+
+* **Training & Inference mechanism**:
+* Behind the scenes, the library automatically creates **10 binary classifiers** (One-vs-All) and trains them.
+* Tracking `log_loss(y_train, pipe_sgd_ovr.predict_proba(x_train))` over 100 iterations shows a smoothly decreasing cross-entropy loss curve.
+* The learned weight matrix `pipe_sgd_ovr[1].coef_` has shape `(10, 784)`, where each row corresponds to the weights of a single binary classifier.
+* During inference, an input image is passed through all 10 classifiers, and the class with the highest output score is selected as the predicted class.
+
+### Multiclass `LogisticRegression` using solvers and error analysis
+* **Solver-based implementation**:
+```python
+pipe_logit_ovr = make_pipeline(MinMaxScaler(),
+LogisticRegression(random_state=1729,
+solver='lbfgs',
+C=np.infty))
+pipe_logit_ovr.fit(x_train, y_train)
+```
+
+
+* **Confusion matrix & classification report**:
+* On the test set (10,000 samples), `SGDClassifier` achieves `0.92` accuracy, with notable confusions between labels `2` and `8`, `5` and `8`, `5` and `3`, and `9` and `4` (Class `8` and Class `5` have F1-scores of `0.87`).
+* `LogisticRegression` with `'lbfgs'` achieves `0.93` test accuracy and improves F1-scores on difficult classes such as Class `5` (`0.89`) and Class `8` (`0.88`).
+* Visualizing the 10 learned weight vectors ($W_0$ through $W_9$) reshaped to $28 \times 28$ shows the distinct pixel patterns associated with each digit.
+
+<img width="898" height="597" alt="image" src="https://github.com/user-attachments/assets/0be32362-6ff0-4523-b23c-55f1e81f8893" />
+
+---
+
+## 6.9 – Demonstration: Naive Bayes classifier
+
+### Theory and Naive Bayes variants in `sklearn.naive_bayes`
+* **Conditional independence assumption**: Naive Bayes classifier applies Bayes' theorem with the "naive" assumption of conditional independence between every pair of features given the value of the class variable. For a given class variable $y$ and dependent feature vector $x_1$ through $x_m$:
+$$P(x_i \mid y, x_1, \dots, x_{i-1}, x_{i+1}, \dots, x_m) = P(x_i \mid y)
+
+$$
+Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods.
+* **List of NB Classifiers in `sklearn.naive_bayes`**:
+* `GaussianNB` (for continuous features)
+* `BernoulliNB` (for binary features)
+* `MultinomialNB` (for multinomial distributions, such as text classification)
+* `CategoricalNB` (for categorical features)
+* `ComplementNB` (performs better than `MultinomialNB` in cases of class imbalance)
+* All classifiers implement the `.fit(X, y)` method to estimate parameters and `.predict(X)` for prediction.
+
+### Demonstration: Text classification on 20 Newsgroups dataset
+1. **Data loading**: Fetch 4 categories (`'talk.religion.misc'`, `'soc.religion.christian'`, `'sci.space'`, `'comp.graphics'`) from the 20 Newsgroups dataset using `fetch_20newsgroups`:
+```python
+from sklearn.datasets import fetch_20newsgroups
+categories = ['talk.religion.misc', 'soc.religion.christian', 'sci.space', 'comp.graphics']
+train = fetch_20newsgroups(subset='train', categories=categories)
+test = fetch_20newsgroups(subset='test', categories=categories)
+```
+
+2. **Preprocessing and modeling pipeline**: Because the dataset consists of raw text documents, `TfidfVectorizer()` converts text input into a vector of numerical values before passing it to `MultinomialNB()`:
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
+
+model = make_pipeline(TfidfVectorizer(), MultinomialNB())
+model.fit(train.data, train.target)
+```
+
+3. **Evaluation**: Plotting the test set confusion matrix with `ConfusionMatrixDisplay.from_estimator(model, test.data, test.target, display_labels=test.target_names, xticks_rotation='vertical')` shows:
+* `comp.graphics` and `sci.space` are well separated.
+* Expected confusion occurs between `soc.religion.christian` and `talk.religion.misc`.
+
+---
+
+## 6.10 – Demonstration: Softmax regression with MNIST
+
+### Mathematical formulation of Softmax Regression
+Softmax Regression (also called **Multinomial Logistic Regression**) generalizes Logistic Regression to support multiple mutually exclusive classes directly without training and combining multiple binary classifiers.
+
+1. **Softmax score for class $k$**: Given an instance $\mathbf{x}$, the model computes a score $s_k(\mathbf{x})$ for each class $k$, where each class has its own dedicated parameter vector $\boldsymbol{\theta}^{(k)}$ (stored as rows in a parameter matrix $\boldsymbol{\Theta}$):
+
+$$
+s_k(\mathbf{x}) = \mathbf{x}^T \boldsymbol{\theta}^{(k)}
+$$
+
+
+2. **Softmax function (normalized exponential)**: Estimates the probability $\hat{p}_k$ that instance $\mathbf{x}$ belongs to class $k$ by computing the exponential of every score and dividing by the sum of all exponentials:
+
+
+$$
+\hat{p}_k = \sigma(\mathbf{s}(\mathbf{x}))_k = \frac{\exp(s_k(\mathbf{x}))}{\sum_{j=1}^{K} \exp(s_j(\mathbf{x}))}
+$$
+
+
+where $K$ is the number of classes and $\mathbf{s}(\mathbf{x})$ is the vector containing the scores of each class for instance $\mathbf{x}$.
+3. **Prediction**: Predicts the class with the highest estimated probability (which is the class with the highest score):
+
+$$
+\hat{y} = \underset{k}{\operatorname{argmax}} \, \sigma(\mathbf{s}(\mathbf{x}))_k = \underset{k}{\operatorname{argmax}} \, s_k(\mathbf{x}) = \underset{k}{\operatorname{argmax}} \, \left((\boldsymbol{\theta}^{(k)})^T \mathbf{x}\right)
+$$
+
+<img width="880" height="615" alt="image" src="https://github.com/user-attachments/assets/b5cd4777-2189-466c-9681-574e9730ee37" />
+
+### Cross-entropy cost function, gradient, and scikit-learn setup
+* **Cross-entropy cost function**: Penalizes the model when it estimates a low probability for the target class:
+
+
+$$
+J(\boldsymbol{\Theta}) = -\frac{1}{m} \sum_{i=1}^{m} \sum_{k=1}^{K} y_k^{(i)} \log\left(\hat{p}_k^{(i)}\right)
+$$
+
+where $y_k^{(i)}$ is the target probability ($1$ or $0$) that the $i^{\text{th}}$ instance belongs to class $k$. When $K = 2$, this reduces to the binary Logistic Regression log loss.
+* **Cross-entropy gradient vector for class $k$**:
+
+$$
+\nabla_{\boldsymbol{\theta}^{(k)}} J(\boldsymbol{\Theta}) = \frac{1}{m} \sum_{i=1}^{m} \left(\hat{p}_k^{(i)} - y_k^{(i)}\right) \mathbf{x}^{(i)}
+$$
+
+* **Scikit-Learn implementation on MNIST**:
+* In `LogisticRegression`, setting `multi_class='multinomial'` switches from One-vs-Rest (`'ovr'`) to Softmax Regression, paired with a compatible solver such as `solver='lbfgs'` (and inverse L2 regularization hyperparameter `C`, or `C=np.infty` for unregularized training) wrapped in a `MinMaxScaler()` pipeline on MNIST (`X_train`, `y_train` across 10 digit classes).
