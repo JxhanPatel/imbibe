@@ -604,3 +604,112 @@ After fitting an `SVC` estimator (`clf = SVC_classifier.fit(X_train, y_train)`),
 - **Linear SVM**: A pipeline using `MinMaxScaler` followed by `SVC(kernel='linear', C=1)` trained on MNIST achieves a validation/training accuracy of `91.07%`, and its confusion matrix can be plotted via `disp.plot()` .
 - **Nonlinear SVM (`rbf` kernel)**: A pipeline using `MinMaxScaler` followed by `SVC(kernel='rbf', gamma=0.1, C=1)` evaluated with `cross_val_score(..., cv=2)` reports a training accuracy of `82.87%` in the demonstration output .
 - **Hyperparameter tuning with `GridSearchCV`**: Using `StandardScaler` with `SVC(kernel='rbf')`, a parameter grid over `gamma` and `C`, and `StratifiedShuffleSplit` validation inside `GridSearchCV`, the best parameters and best score are accessed via `grid.best_params_` and `grid.best_score_` .
+
+
+
+
+
+---
+
+
+
+
+
+# Module 4: Tree-based and ensemble classifiers
+
+## 6.13 – Decision trees for classification – Abalone
+
+### Dataset and problem background
+
+In this lecture, we use the Abalone data set for classification  . Abalone is a type of consumable snail whose price varies as per its age, and the aim is to predict the age of abalone from physical measurements  . The age of abalone is traditionally determined by cutting the shell through the cone, staining it, and counting the number of rings through a microscope—a boring and time-consuming task  . Other measurements, which are easier to obtain, are used to predict the age as an alternative method using decision trees  .
+
+The dataset is loaded from the UCI machine learning repository in CSV format using `pandas.read_csv` with the following column names:
+
+- `Sex`
+- `Length`
+- `Diameter`
+- `Height`
+- `Whole weight`
+- `Shucked weight`
+- `Viscera weight`
+- `Shell weight`
+- `Rings`
+
+### Model training, tuning, and observations
+
+This lecture demonstrates decision trees with continuous and discrete features to predict the number of rings in Abalone  .
+
+- A classification report by class shows a bunch of classes getting `0` precision and recall, with the highest F1-score obtained for number of rings equal to `7` and an overall accuracy of `25%` (`0.25`) .
+- Creating a new pipeline with the best identified features, setting `max_depth = 5` and `min_samples_split = 4`, and fitting the pipeline on the training data gives a model score of `0.27`—an improvement over the earlier score of `25%` (`0.25`) .
+- In general, accuracy is quite low on this dataset; suggested exercises include evaluating the classifier on the test set and attempting the Abalone problem as a regression problem to check if a better model is obtained .
+-
+
+<img width="934" height="453" alt="image" src="https://github.com/user-attachments/assets/4194ae8a-3e63-4962-862e-fcc8471991f1" />
+
+## 6.14 – Decision trees for classification – Iris
+
+### Setup and pipeline training
+
+In this lecture, we demonstrate a decision tree in a classification setup with the Iris dataset  .
+
+- Libraries imported include `pandas`, `NumPy`, `matplotlib.pyplot`, `trees` from `sklearn`, `DecisionTreeClassifier` and `export_text` from `sklearn.tree`, along with `train_test_split`, `GridSearchCV`, `classification_report`, `confusion_matrix`, `ConfusionMatrixDisplay`, `pipeline`, `MinMaxScaler`, and `load_iris` from `sklearn.datasets` .
+- The Iris dataset is loaded via `load_iris(return_X_y=True, as_frame=True)` to return a feature matrix and label vector, then split into training and test sets using `train_test_split` .
+- A pipeline (`dt_pipeline`) with `feature_scaling` (`MinMaxScaler()`) and `dt_classifier` (`DecisionTreeClassifier(max_depth=3, random_state=42)`) is trained on `(train_features, train_labels)` .
+-
+
+### Test set evaluation
+
+Once the classifier is trained, it is evaluated on the test set with:
+
+- `ConfusionMatrixDisplay.from_estimator(dt_pipeline, test_features, test_labels)` displaying true labels on the y-axis and predicted labels on the x-axis
+- `classification_report(test_labels, dt_pipeline.predict(test_features))` showing precision, recall, f1-score, and support for each class
+-
+
+<img width="914" height="673" alt="image" src="https://github.com/user-attachments/assets/ae8ace4e-a632-4c41-9197-748a764bb0f7" />
+
+## 6.15 – Bagging and random forest classifier on MNIST
+
+### Bagging and pasting concepts
+
+One way to get a diverse set of classifiers is to use very different training algorithms, while another approach is to use the same training algorithm for every predictor and train them on different random subsets of the training set  . When sampling is performed with replacement, this method is called **bagging** (short for bootstrap aggregating), and when sampling is performed without replacement, it is called **pasting**  .
+
+- Both bagging and pasting allow training instances to be sampled several times across multiple predictors, but only bagging allows training instances to be sampled several times for the same predictor .
+- Once all predictors are trained, the ensemble makes a prediction for a new instance by aggregating the predictions of all predictors—typically using the statistical mode (most frequent prediction, as in a hard voting classifier) for classification, or the average for regression .
+- Each individual predictor has a higher bias than if trained on the original training set, but aggregation reduces both bias and variance; generally, the ensemble has a similar bias but lower variance than a single predictor trained on the original training set .
+-
+
+<img width="907" height="526" alt="image" src="https://github.com/user-attachments/assets/b0d8f314-2690-4c8e-bf97-0647e607725d" />
+
+### Random forest classifier and pixel importance on MNIST
+
+On the MNIST dataset (70,000 small images of handwritten digits, each $28 \times 28$ pixels / 784 features, split into 60,000 training and 10,000 test images), `RandomForestClassifier` can be trained on the dataset and evaluated for feature importances  .
+
+- Training a `RandomForestClassifier` (e.g., `rnd_clf = RandomForestClassifier(n_estimators=500, n_jobs=-1)`) on MNIST allows plotting each pixel's importance (`rnd_clf.feature_importances_`) to see which pixels matter most .
+- Random Forests are very handy to get a quick understanding of what features actually matter, in particular if you need to perform feature selection .
+- Exercises for MNIST include building a classifier achieving over `97%` accuracy on the test set (such as tuning `KNeighborsClassifier` via grid search over `weights` and `n_neighbors`) and applying data augmentation / training set expansion by adding four shifted copies (left, right, up, or down by one pixel) for each image in the training set .
+-
+
+
+
+
+
+## 6.16 – AdaBoost and GradientBoost classifier on MNIST
+
+### Boosting overview and AdaBoost algorithm
+
+Boosting (originally called hypothesis boosting) refers to any Ensemble method that can combine several weak learners into a strong learner by training predictors sequentially, each trying to correct its predecessor  .
+
+In the **AdaBoost** algorithm:
+
+1. Each instance weight $w^{(i)}$ is initially set to $\frac{1}{m}$, and a first predictor is trained to compute its weighted error rate $r_j$ on the training set : $$ r_j = \frac{\sum_{\substack{i=1 \\ \hat{y}_j^{(i)} \neq y^{(i)}}}^{m} w^{(i)}}{\sum_{i=1}^{m} w^{(i)}} $$ where $\hat{y}_j^{(i)}$ is the $j^{\text{th}}$ predictor's prediction for the $i^{\text{th}}$ instance .
+2. The predictor's weight $\alpha_j$ is computed using: $$ \alpha_j = \eta \log \frac{1 - r_j}{r_j} $$ where $\eta$ is the learning rate hyperparameter (defaults to `1`); more accurate predictors receive higher weight, random guessing yields weight near zero, and worse-than-random accuracy yields negative weight .
+3. Instance weights are updated to boost the weights of misclassified instances : $$ w^{(i)} \leftarrow \begin{cases} w^{(i)} & \text{if } \hat{y}_j^{(i)} = y^{(i)} \\ w^{(i)} \exp(\alpha_j) & \text{if } \hat{y}_j^{(i)} \neq y^{(i)} \end{cases} $$ for $i = 1, 2, \dots, m$, and then all instance weights are normalized by dividing by $\sum_{i=1}^{m} w^{(i)}$ .
+4. A new predictor is trained using the updated weights, repeating until the desired number of predictors is reached or a perfect predictor is found .
+5. To make predictions, AdaBoost weighs the predictions of all predictors using $\alpha_j$ and selects the class receiving the majority of weighted votes : $$ \hat{y}(\mathbf{x}) = \underset{k}{\operatorname{argmax}} \sum_{\substack{j=1 \\ \hat{y}_j(\mathbf{x}) = k}}^{N} \alpha_j $$ where $N$ is the number of predictors .
+
+
+### Gradient boosting considerations and MNIST ensemble workflow
+
+- **Gradient Boosting**: Another popular boosting method that trains predictors sequentially to correct predecessors; when a Gradient Boosting ensemble overfits the training set, decreasing the learning rate is a key regularization adjustment .
+- **MNIST dataset and classifier comparison**: Using the MNIST dataset (with options such as splitting into 50,000 training, 10,000 validation, and 10,000 test instances), multiple classifiers—such as a Random Forest classifier, an Extra-Trees classifier, and an SVM classifier—can be trained and combined into an ensemble (using soft or hard voting) and compared against individual classifiers on validation and test sets .
+
