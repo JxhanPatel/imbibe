@@ -690,6 +690,7 @@ On the MNIST dataset (70,000 small images of handwritten digits, each $28 \times
 -
 
 
+<img width="896" height="467" alt="image" src="https://github.com/user-attachments/assets/89eac7b4-9d34-4bb9-90ab-96e9e6244241" />
 
 
 
@@ -713,3 +714,4 @@ In the **AdaBoost** algorithm:
 - **Gradient Boosting**: Another popular boosting method that trains predictors sequentially to correct predecessors; when a Gradient Boosting ensemble overfits the training set, decreasing the learning rate is a key regularization adjustment .
 - **MNIST dataset and classifier comparison**: Using the MNIST dataset (with options such as splitting into 50,000 training, 10,000 validation, and 10,000 test instances), multiple classifiers—such as a Random Forest classifier, an Extra-Trees classifier, and an SVM classifier—can be trained and combined into an ensemble (using soft or hard voting) and compared against individual classifiers on validation and test sets .
 
+<img width="928" height="575" alt="image" src="https://github.com/user-attachments/assets/effd365e-7188-4705-837c-fcaaadd9aa32" />
