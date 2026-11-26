@@ -1,11 +1,11 @@
 # Week 7: Classification (Multiclass)
 
-### Module 1: Scalability & Multi-Class Setup
+### [Module 1: Scalability & Multi-Class Setup](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week07.md#module-1-scalability--multi-class-setup-1)
 
 - **7.1** - Large Scale Machine Learning
 - **7.7** - Multiclass
 
-### Module 2: Classification Evaluation Metrics
+### [Module 2: Classification Evaluation Metrics](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week07.md#module-2-classification-evaluation-metrics-1)
 
 - **7.2** - Confusion Matrix
 - **7.3** - Accuracy
