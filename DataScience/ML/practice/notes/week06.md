@@ -223,10 +223,22 @@ Suppose we want to recognize whether the given image is of digit zero or not (di
 ### Recap (Theory) of Perceptron
 
 1. **Training data**: $(\text{features}, \text{label})$ or $(X, y)$, where label $y$ is a discrete number from a finite set, and features in this case are pixel values of an image .
-2. **Model**: $$ h_w : y = g(w^T x) = g(w_0 + w_1 x_1 + \dots + w_m x_m) $$ where:
+2. **Model**: 
+
+$$
+h_w : y = g(w^T x) = g(w_0 + w_1 x_1 + \dots + w_m x_m) 
+$$
+
+where:
 - $w$ is a weight vector in $\mathbb{R}^{m+1}$ with components $(w_0, w_1, \dots, w_m)$ .
 - $g(\cdot)$ is a non-linear activation function given by a signum function: if the linear combination is $\ge 0$, we assign the label $+1$; otherwise (if the linear combination is negative), we assign the label $-1$ .
-3. **Perceptron loss**: $$ \text{Loss} = \max\left(-w^T x^{(i)} y^{(i)}, 0\right) $$ Internally, `Perceptron()` calls hinge loss with `0` as a threshold and uses SGD to update the weights . Alternatively, `SGDClassifier(loss='perceptron')` can be used to build a perceptron model .
+3. **Perceptron loss**: 
+
+$$
+\text{Loss} = \max\left(-w^T x^{(i)} y^{(i)}, 0\right) 
+$$
+
+Internally, `Perceptron()` calls hinge loss with `0` as a threshold and uses SGD to update the weights . Alternatively, `SGDClassifier(loss='perceptron')` can be used to build a perceptron model .
 4.
 
 <img width="880" height="376" alt="image" src="https://github.com/user-attachments/assets/6a2647b3-36ce-422f-a963-4d10cbca0225" />
@@ -420,9 +432,12 @@ pipe_logit_ovr.fit(x_train, y_train)
 
 ### Theory and Naive Bayes variants in `sklearn.naive_bayes`
 * **Conditional independence assumption**: Naive Bayes classifier applies Bayes' theorem with the "naive" assumption of conditional independence between every pair of features given the value of the class variable. For a given class variable $y$ and dependent feature vector $x_1$ through $x_m$:
-$$P(x_i \mid y, x_1, \dots, x_{i-1}, x_{i+1}, \dots, x_m) = P(x_i \mid y)
 
 $$
+P(x_i \mid y, x_1, \dots, x_{i-1}, x_{i+1}, \dots, x_m) = P(x_i \mid y)
+$$
+
+
 Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods.
 * **List of NB Classifiers in `sklearn.naive_bayes`**:
 * `GaussianNB` (for continuous features)
@@ -481,7 +496,7 @@ where $K$ is the number of classes and $\mathbf{s}(\mathbf{x})$ is the vector co
 3. **Prediction**: Predicts the class with the highest estimated probability (which is the class with the highest score):
 
 $$
-\hat{y} = \underset{k}{\operatorname{argmax}} \, \sigma(\mathbf{s}(\mathbf{x}))_k = \underset{k}{\operatorname{argmax}} \, s_k(\mathbf{x}) = \underset{k}{\operatorname{argmax}} \, \left((\boldsymbol{\theta}^{(k)})^T \mathbf{x}\right)
+\hat{y} = \underset{k}{\operator-name{argmax}} \, \sigma(\mathbf{s}(\mathbf{x}))_k = \underset{k}{\operator-name{argmax}} \, s_k(\mathbf{x}) = \underset{k}{\operator-name{argmax}} \, \left((\boldsymbol{\theta}^{(k)})^T \mathbf{x}\right)
 $$
 
 <img width="880" height="615" alt="image" src="https://github.com/user-attachments/assets/b5cd4777-2189-466c-9681-574e9730ee37" />
@@ -702,11 +717,38 @@ Boosting (originally called hypothesis boosting) refers to any Ensemble method t
 
 In the **AdaBoost** algorithm:
 
-1. Each instance weight $w^{(i)}$ is initially set to $\frac{1}{m}$, and a first predictor is trained to compute its weighted error rate $r_j$ on the training set : $$ r_j = \frac{\sum_{\substack{i=1 \\ \hat{y}_j^{(i)} \neq y^{(i)}}}^{m} w^{(i)}}{\sum_{i=1}^{m} w^{(i)}} $$ where $\hat{y}_j^{(i)}$ is the $j^{\text{th}}$ predictor's prediction for the $i^{\text{th}}$ instance .
-2. The predictor's weight $\alpha_j$ is computed using: $$ \alpha_j = \eta \log \frac{1 - r_j}{r_j} $$ where $\eta$ is the learning rate hyperparameter (defaults to `1`); more accurate predictors receive higher weight, random guessing yields weight near zero, and worse-than-random accuracy yields negative weight .
-3. Instance weights are updated to boost the weights of misclassified instances : $$ w^{(i)} \leftarrow \begin{cases} w^{(i)} & \text{if } \hat{y}_j^{(i)} = y^{(i)} \\ w^{(i)} \exp(\alpha_j) & \text{if } \hat{y}_j^{(i)} \neq y^{(i)} \end{cases} $$ for $i = 1, 2, \dots, m$, and then all instance weights are normalized by dividing by $\sum_{i=1}^{m} w^{(i)}$ .
+1. Each instance weight $w^{(i)}$ is initially set to $\frac{1}{m}$, and a first predictor is trained to compute its weighted error rate $r_j$ on the training set : 
+
+$$
+r_j = \frac{\sum_{\substack{i=1 \\ \hat{y}_j^{(i)} \neq y^{(i)}}}^{m} w^{(i)}}{\sum_{i=1}^{m} w^{(i)}}
+$$
+
+where $\hat{y}_j^{(i)}$ is the $j^{\text{th}}$ predictor's prediction for the $i^{\text{th}}$ instance .
+
+2. The predictor's weight $\alpha_j$ is computed using: 
+
+$$
+\alpha_j = \eta \log \frac{1 - r_j}{r_j} 
+$$
+
+where $\eta$ is the learning rate hyperparameter (defaults to `1`); more accurate predictors receive higher weight, random guessing yields weight near zero, and worse-than-random accuracy yields negative weight .
+
+3. Instance weights are updated to boost the weights of misclassified instances : 
+
+$$
+w^{(i)} \leftarrow \begin{cases} w^{(i)} & \text{if } \hat{y}_j^{(i)} = y^{(i)} \\ w^{(i)} \exp(\alpha_j) & \text{if } \hat{y}_j^{(i)} \neq y^{(i)} \end{cases}
+$$
+
+
+for $i = 1, 2, \dots, m$, and then all instance weights are normalized by dividing by $\sum_{i=1}^{m} w^{(i)}$ .
 4. A new predictor is trained using the updated weights, repeating until the desired number of predictors is reached or a perfect predictor is found .
-5. To make predictions, AdaBoost weighs the predictions of all predictors using $\alpha_j$ and selects the class receiving the majority of weighted votes : $$ \hat{y}(\mathbf{x}) = \underset{k}{\operatorname{argmax}} \sum_{\substack{j=1 \\ \hat{y}_j(\mathbf{x}) = k}}^{N} \alpha_j $$ where $N$ is the number of predictors .
+5. To make predictions, AdaBoost weighs the predictions of all predictors using $\alpha_j$ and selects the class receiving the majority of weighted votes : 
+
+$$
+\hat{y}(\mathbf{x}) = \underset{k}{\operator-name{argmax}} \sum_{\substack{j=1 \\ \hat{y}_j(\mathbf{x}) = k}}^{N} \alpha_j 
+$$
+
+where $N$ is the number of predictors .
 
 
 ### Gradient boosting considerations and MNIST ensemble workflow
@@ -715,3 +757,60 @@ In the **AdaBoost** algorithm:
 - **MNIST dataset and classifier comparison**: Using the MNIST dataset (with options such as splitting into 50,000 training, 10,000 validation, and 10,000 test instances), multiple classifiers—such as a Random Forest classifier, an Extra-Trees classifier, and an SVM classifier—can be trained and combined into an ensemble (using soft or hard voting) and compared against individual classifiers on validation and test sets .
 
 <img width="928" height="575" alt="image" src="https://github.com/user-attachments/assets/effd365e-7188-4705-837c-fcaaadd9aa32" />
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+# Module 5: Neural network classifiers
+
+## 6.17 – MLP classifier on MNIST dataset
+
+### Introduction to neural networks and Multilayer Perceptrons (MLP)
+
+Artificial Neural Networks (ANNs) are at the very core of Deep Learning; they are versatile, powerful, and scalable, making them ideal for tackling large and highly complex Machine Learning tasks such as classifying billions of images, powering speech recognition services, recommending videos, or playing the game of Go . When an ANN contains a deep stack of hidden layers, it is called a **deep neural network (DNN)**, and the field of Deep Learning studies DNNs and models containing deep stacks of computations .
+
+An MLP is composed of:
+
+- One (passthrough) **input layer**
+- One or more layers of Threshold Logic Units (TLUs), called **hidden layers**
+- One final layer of TLUs called the **output layer**
+
+The layers close to the input layer are usually called the **lower layers**, and the ones close to the outputs are called the **upper layers** . Every layer **except the output layer** includes a bias neuron and is fully connected to the next layer . Because the signal flows only in one direction (from the inputs to the outputs), this architecture is an example of a **feedforward neural network (FNN)** .
+
+<img width="887" height="508" alt="image" src="https://github.com/user-attachments/assets/cd543fe2-2eea-4661-86b8-b4786fefe62a" />
+
+### Hyperparameters and configuration for classification tasks
+
+For classification tasks on datasets such as MNIST (which consists of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau, labeled with the digit represented, across classes `0` through `9` for digit image classification):
+
+- If each instance can belong only to a single class out of three or more possible classes (e.g., classes `0` through `9` for digit image classification), you need one output neuron per class and should use the **softmax** activation function for the whole output layer .
+- The softmax function ensures that all estimated probabilities are between `0` and `1` and add up to `1`, which is required when classes are exclusive (multiclass classification) .
+- Since we are predicting probability distributions, **cross-entropy loss** (also called **log loss**) is generally a good choice .
+- When using one-hot target vectors per class, `"categorical_crossentropy"` is used; when using sparse target class indices (from `0` to `9` for exclusive classes), `"sparse_categorical_crossentropy"` is used . For binary classification (with one or more binary labels), `"sigmoid"` (logistic) activation is used in the output layer along with `"binary_crossentropy"` loss .
+
+| Hyperparameter / Setting | Binary Classification | Multilabel Binary Classification | Multiclass Classification |
+| --- | --- | --- | --- |
+| **Input and Hidden Layers** | Same as regression | Same as regression | Same as regression |
+| **Number of Output Neurons** | $1$ | $1$ per label | $1$ per class |
+| **Output Layer Activation** | Logistic | Logistic | Softmax |
+| **Loss Function** | Cross entropy | Cross entropy | Cross entropy |
+
+<img width="878" height="508" alt="image" src="https://github.com/user-attachments/assets/5736d24a-1df7-4aec-9efe-0288b6bd912f" />
+
+### Exploration and visualization tools
+
+Playing with various neural network architectures using visualization tools like the **TensorFlow Playground** is useful for understanding MLPs, including the effects of hyperparameters such as the number of layers and neurons and activation functions .
