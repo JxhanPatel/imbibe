@@ -1,10 +1,10 @@
 # Week 8. NLP & Visual Recognition
 
-#### Module 1: Text & Language Processing
+### [Module 1: Text & Language Processing](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week08.md#module-1-text--language-processing-1)
 
 - 8.1: **Natural Language Processing**
 
-#### Module 2: Vision & Recognition
+### [Module 2: Vision & Recognition](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week08.md#module-2-vision--recognition-1)
 
 - 8.2: **Image Classification**
 
