@@ -1,11 +1,11 @@
-# 6. Modular classification topics in scikit-learn
+# Week 6. Modular classification topics in scikit-learn
 
-### Module 1: Classification foundations and evaluation
+### [Module 1: Classification foundations and evaluation](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week06.md#module-1-classification-foundations-and-evaluation-1)
 
 - **6.1** – Classification functions in scikit-learn
 - **6.2** – Evaluating classifiers
 
-### Module 2: Perceptron and linear/probabilistic classifiers
+### [Module 2: Perceptron and linear/probabilistic classifiers](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week06.md#module-2-perceptron-and-linearprobabilistic-classifiers-1)
 
 - **6.3** – Demonstration: Binary class image classification with perceptron
 - **6.4** – Demonstration: Multi class image classification with perceptron
@@ -16,19 +16,19 @@
 - **6.9** – Demonstration: Naive Bayes classifier
 - **6.10** – Demonstration: Softmax regression with MNIST
 
-### Module 3: Instance-based and kernel classifiers
+### [Module 3: Instance-based and kernel classifiers](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week06.md#module-3-instance-based-and-kernel-classifiers-1)
 
 - **6.11** – Demonstration: KNN with MNIST
 - **6.12** – Demonstration: SVC on MNIST dataset
 
-### Module 4: Tree-based and ensemble classifiers
+### [Module 4: Tree-based and ensemble classifiers](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week06.md#module-4-tree-based-and-ensemble-classifiers-1)
 
 - **6.13** – Decision trees for classification – Abalone
 - **6.14** – Decision trees for classification – Iris
 - **6.15** – Bagging and random forest classifier on MNIST
 - **6.16** – AdaBoost and GradientBoost classifier on MNIST
 
-### Module 5: Neural network classifiers
+### [Module 5: Neural network classifiers](https://github.com/JxhanPatel/imbibe/blob/main/DataScience/ML/practice/notes/week06.md#module-5-neural-network-classifiers-1)
 
 - **6.17** – MLP classifier on MNIST dataset
 
